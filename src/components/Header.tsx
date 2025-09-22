@@ -43,7 +43,7 @@ const Header = () => {
             ))}
             <Button 
               className="bg-accent hover:bg-accent/90 text-white px-8 py-3 text-lg font-semibold"
-              onClick={() => window.location.href = '/chat'}
+              onClick={() => window.location.href = '/mediator'}
             >
               Ask Now
             </Button>
@@ -77,7 +77,7 @@ const Header = () => {
               ))}
               <Button 
                 className="bg-accent hover:bg-accent/90 text-white px-8 py-3 text-lg font-semibold self-start mt-6"
-                onClick={() => window.location.href = '/chat'}
+                onClick={() => window.location.href = '/mediator'}
               >
                 Ask Now
               </Button>

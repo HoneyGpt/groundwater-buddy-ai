@@ -37,6 +37,10 @@ All colors MUST be HSL.
     /* Water blue for interactive elements */
     --water: 200 60% 55%;
     --water-foreground: 0 0% 100%;
+    
+    /* Water colors for backgrounds */
+    --water-50: 200 40% 98%;
+    --water-100: 200 30% 95%;
 
     --destructive: 0 70% 50%;
     --destructive-foreground: 40 25% 96%;
