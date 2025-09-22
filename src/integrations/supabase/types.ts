@@ -180,6 +180,7 @@ export type Database = {
           rainfall_recharge_ham: number | null
           recharge_worthy_area_ha: number | null
           semi_confined_groundwater_resources_ham: number | null
+          serial_number: number | null
           sewage_flood_recharge_ham: number | null
           shallow_water_table: boolean | null
           spring_discharge: boolean | null
@@ -202,7 +203,7 @@ export type Database = {
           additional_potential_resources_ham?: number | null
           annual_extractable_resource_ham?: number | null
           assessment_unit_id?: string | null
-          assessment_year: string
+          assessment_year?: string
           base_flow_ham?: number | null
           canal_recharge_ham?: number | null
           confined_groundwater_resources_ham?: number | null
@@ -232,6 +233,7 @@ export type Database = {
           rainfall_recharge_ham?: number | null
           recharge_worthy_area_ha?: number | null
           semi_confined_groundwater_resources_ham?: number | null
+          serial_number?: number | null
           sewage_flood_recharge_ham?: number | null
           shallow_water_table?: boolean | null
           spring_discharge?: boolean | null
@@ -284,6 +286,7 @@ export type Database = {
           rainfall_recharge_ham?: number | null
           recharge_worthy_area_ha?: number | null
           semi_confined_groundwater_resources_ham?: number | null
+          serial_number?: number | null
           sewage_flood_recharge_ham?: number | null
           shallow_water_table?: boolean | null
           spring_discharge?: boolean | null
