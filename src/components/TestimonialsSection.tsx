@@ -1,4 +1,3 @@
-import { Card } from "@/components/ui/card";
 import { Star } from "lucide-react";
 
 const TestimonialsSection = () => {
@@ -27,42 +26,42 @@ const TestimonialsSection = () => {
   ];
 
   return (
-    <section className="py-20 bg-secondary/20">
+    <section className="py-24 bg-secondary/20">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="text-center mb-16">
-          <h2 className="text-3xl sm:text-4xl font-bold text-foreground mb-4">
+        <div className="text-center mb-20">
+          <h2 className="text-4xl sm:text-5xl font-bold text-foreground mb-6">
             What Our Users Say
           </h2>
-          <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+          <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
             Farmers, researchers, and communities trust INGRES-AI for groundwater insights
           </p>
         </div>
 
-        <div className="grid md:grid-cols-3 gap-8">
+        <div className="grid md:grid-cols-3 gap-12">
           {testimonials.map((testimonial, index) => (
-            <Card key={index} className="p-6 hover:shadow-lg transition-shadow">
-              <div className="flex items-center mb-4">
+            <div key={index} className="bg-background rounded-2xl p-8 shadow-sm">
+              <div className="flex items-center mb-6">
                 {[...Array(testimonial.rating)].map((_, i) => (
-                  <Star key={i} className="h-4 w-4 text-accent fill-current" />
+                  <Star key={i} className="h-5 w-5 text-accent fill-current" />
                 ))}
               </div>
-              <blockquote className="text-muted-foreground mb-6 leading-relaxed">
+              <blockquote className="text-muted-foreground mb-8 leading-relaxed text-lg">
                 "{testimonial.content}"
               </blockquote>
               <div className="flex items-center">
-                <div className="w-12 h-12 bg-accent/10 rounded-full flex items-center justify-center mr-4">
+                <div className="w-14 h-14 bg-accent/10 rounded-full flex items-center justify-center mr-4">
                   <span className="text-2xl">{testimonial.avatar}</span>
                 </div>
                 <div>
-                  <div className="font-semibold text-foreground">
+                  <div className="font-bold text-foreground text-lg">
                     {testimonial.name}
                   </div>
-                  <div className="text-sm text-muted-foreground">
+                  <div className="text-muted-foreground">
                     {testimonial.role}
                   </div>
                 </div>
               </div>
-            </Card>
+            </div>
           ))}
         </div>
       </div>

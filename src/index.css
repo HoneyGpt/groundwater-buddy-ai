@@ -8,42 +8,42 @@ All colors MUST be HSL.
 
 @layer base {
   :root {
-    /* Earthy, friendly color palette for groundwater AI */
-    --background: 35 20% 98%;
-    --foreground: 25 15% 15%;
+    /* Clean, modern water-themed palette */
+    --background: 0 0% 100%;
+    --foreground: 220 15% 15%;
 
-    --card: 40 25% 96%;
-    --card-foreground: 25 15% 15%;
+    --card: 210 20% 98%;
+    --card-foreground: 220 15% 15%;
 
-    --popover: 40 25% 96%;
-    --popover-foreground: 25 15% 15%;
+    --popover: 210 20% 98%;
+    --popover-foreground: 220 15% 15%;
 
-    /* Earth brown primary */
-    --primary: 25 40% 25%;
-    --primary-foreground: 40 25% 96%;
+    /* Deep ocean primary */
+    --primary: 210 45% 25%;
+    --primary-foreground: 0 0% 100%;
 
-    /* Soft sage secondary */
-    --secondary: 120 15% 85%;
-    --secondary-foreground: 25 40% 25%;
+    /* Light water secondary */
+    --secondary: 200 25% 95%;
+    --secondary-foreground: 210 45% 25%;
 
-    /* Warm muted tones */
-    --muted: 35 20% 90%;
-    --muted-foreground: 25 10% 45%;
+    /* Soft neutral tones */
+    --muted: 210 15% 95%;
+    --muted-foreground: 220 10% 45%;
 
-    /* Yellow accent as requested */
-    --accent: 45 85% 65%;
-    --accent-foreground: 25 40% 25%;
+    /* Vibrant water accent */
+    --accent: 200 75% 55%;
+    --accent-foreground: 0 0% 100%;
 
     /* Water blue for interactive elements */
     --water: 200 60% 55%;
-    --water-foreground: 40 25% 96%;
+    --water-foreground: 0 0% 100%;
 
     --destructive: 0 70% 50%;
     --destructive-foreground: 40 25% 96%;
 
-    --border: 35 15% 85%;
-    --input: 35 15% 85%;
-    --ring: 45 85% 65%;
+    --border: 210 15% 90%;
+    --input: 210 15% 90%;
+    --ring: 200 75% 55%;
 
     --radius: 0.5rem;
 
