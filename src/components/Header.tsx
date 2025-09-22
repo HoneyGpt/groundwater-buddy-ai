@@ -41,7 +41,10 @@ const Header = () => {
                 {item.name}
               </a>
             ))}
-            <Button className="bg-accent hover:bg-accent/90 text-white px-8 py-3 text-lg font-semibold">
+            <Button 
+              className="bg-accent hover:bg-accent/90 text-white px-8 py-3 text-lg font-semibold"
+              onClick={() => window.location.href = '/chat'}
+            >
               Ask Now
             </Button>
           </nav>
@@ -72,7 +75,10 @@ const Header = () => {
                   {item.name}
                 </a>
               ))}
-              <Button className="bg-accent hover:bg-accent/90 text-white px-8 py-3 text-lg font-semibold self-start mt-6">
+              <Button 
+                className="bg-accent hover:bg-accent/90 text-white px-8 py-3 text-lg font-semibold self-start mt-6"
+                onClick={() => window.location.href = '/chat'}
+              >
                 Ask Now
               </Button>
             </div>
