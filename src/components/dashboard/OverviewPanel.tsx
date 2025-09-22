@@ -181,9 +181,9 @@ export const OverviewPanel = ({ profile, onSectionChange }: OverviewPanelProps) 
           <CardContent>
             <div className="space-y-4">
               {groundwaterData.map((block) => (
-                <div key={block.blockId} className="flex items-center justify-between p-4 bg-muted/50 rounded-lg">
+                <div key={block.block} className="flex items-center justify-between p-4 bg-muted/50 rounded-lg">
                   <div className="space-y-1">
-                    <div className="font-medium">{block.blockName}</div>
+                    <div className="font-medium">{block.block}</div>
                     <div className="text-sm text-muted-foreground">
                       Last updated: {new Date(block.lastUpdated).toLocaleDateString()}
                     </div>
