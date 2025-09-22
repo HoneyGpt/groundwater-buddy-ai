@@ -50,6 +50,8 @@ export default {
         water: {
           DEFAULT: "hsl(var(--water))",
           foreground: "hsl(var(--water-foreground))",
+          50: "hsl(var(--water-50))",
+          100: "hsl(var(--water-100))",
         },
         sidebar: {
           DEFAULT: "hsl(var(--sidebar-background))",
