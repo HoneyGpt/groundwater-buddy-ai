@@ -1,6 +1,6 @@
 import { Map, MessageSquare, Globe, Zap } from "lucide-react";
 import { Card } from "@/components/ui/card";
-import interactiveMap from "@/assets/interactive-map.png";
+import interactiveMap from "@/assets/interactive-water-map.png";
 
 const FeaturesSection = () => {
   const features = [

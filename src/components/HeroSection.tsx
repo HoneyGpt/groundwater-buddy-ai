@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { MessageCircle, ArrowRight } from "lucide-react";
-import heroImage from "@/assets/hero-illustration.png";
+import heroImage from "@/assets/hero-water-illustration.png";
 
 const HeroSection = () => {
   return (
@@ -36,7 +36,7 @@ const HeroSection = () => {
             <div className="relative z-10">
               <img
                 src={heroImage}
-                alt="INGRES-AI helping with groundwater research"
+                alt="INGRES-AI with whales and marine life helping with groundwater research"
                 className="w-full h-auto rounded-2xl shadow-2xl"
               />
             </div>
