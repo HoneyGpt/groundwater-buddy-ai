@@ -2,11 +2,15 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-
-// Add routing for ProfileSetup page
-          <Route path="/profile-setup" element={<ProfileSetup />} />
+import { BrowserRouter, Routes, Route } from "react-router-dom";
+import Index from "./pages/Index";
+import About from "./pages/About";
+import Chat from "./pages/Chat";
+import Mediator from "./pages/Mediator";
+import PublicDashboard from "./pages/PublicDashboard";
+import ProfileSetup from "./pages/ProfileSetup";
+import OfficialLogin from "./pages/OfficialLogin";
+import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
 
@@ -22,6 +26,7 @@ const App = () => (
           <Route path="/chat" element={<Chat />} />
           <Route path="/mediator" element={<Mediator />} />
           <Route path="/public-dashboard" element={<PublicDashboard />} />
+          <Route path="/profile-setup" element={<ProfileSetup />} />
           <Route path="/official-login" element={<OfficialLogin />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
