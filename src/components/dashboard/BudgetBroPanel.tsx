@@ -6,6 +6,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Mic, MicOff, Send, Save, IndianRupee, Heart, Droplets, Wheat } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import { supabase } from '@/integrations/supabase/client';
 
 // Message interface for Budget Bro
 interface BudgetMessage {
@@ -61,226 +62,60 @@ Try: "I have kidney stones, my budget is ₹800" or "Need drip irrigation for 1 
   }, []);
 
   const getBudgetResponse = async (message: string): Promise<string> => {
-    const lowerMessage = message.toLowerCase();
-    
-    // Extract budget from message
-    const budgetMatch = message.match(/₹?(\d{1,3}(?:,\d{3})*(?:\.\d{2})?|\d+)/);
-    const budget = budgetMatch ? parseInt(budgetMatch[1].replace(/,/g, '')) : null;
-    
-    // Budget-focused health responses
-    if (lowerMessage.includes('health') || lowerMessage.includes('disease') || lowerMessage.includes('sick') || lowerMessage.includes('kidney') || lowerMessage.includes('diabetes') || lowerMessage.includes('fever') || lowerMessage.includes('pain')) {
-      if (budget && budget <= 500) {
-        return `💊 **Health Solutions for ₹${budget}:**
+    try {
+      console.log('Sending message to Gemini API:', message);
+      
+      const { data, error } = await supabase.functions.invoke('gemini-chat', {
+        body: {
+          message: message,
+          context: { profile },
+          chatType: 'budget'
+        }
+      });
 
-🏥 **Government Options (₹0-100):**
-• Visit PHC/CHC for free consultation & basic medicines
-• Ayushman Bharat card - free treatment up to ₹5 lakh
-• Generic medicines from Jan Aushadhi store (70% cheaper)
+      if (error) {
+        console.error('Supabase function error:', error);
+        throw new Error(error.message || 'Failed to get AI response');
+      }
 
-💡 **Immediate Relief (₹50-200):**
-• Drink turmeric milk + ginger tea for inflammation
-• ORS packets for dehydration (₹10 each)
-• Basic pain relief from government dispensary
-
-📞 **Emergency Help:** Call 108 (free ambulance)
-🏪 **Pharmacy:** Generic store near government hospital
-
-Need specific medicine alternatives or government health schemes info?`;
-      } else if (budget && budget <= 2000) {
-        return `💊 **Health Solutions for ₹${budget}:**
-
-🔬 **Tests & Treatment (₹500-1500):**
-• Basic blood tests at government lab (₹200-400)
-• Generic medicines for 2-3 months (₹300-800)
-• Consultation at district hospital (₹50-100)
-
-🌿 **Long-term Care (₹200-500):**
-• Ayurvedic medicines from AYUSH dispensary
-• Monthly vitamin supplements (₹150-300)
-• Regular health monitoring at Anganwadi
-
-💰 **Save Money Tips:**
-• Buy medicines in bulk (30% discount)
-• Use government insurance schemes
-• Join self-help group for medical fund
-
-Want government hospital contacts or insurance enrollment help?`;
+      if (data?.success && data?.response) {
+        console.log('Received AI response successfully');
+        return data.response;
+      } else if (data?.fallbackResponse) {
+        console.log('Using fallback response');
+        return data.fallbackResponse;
       } else {
-        return `💊 **Comprehensive Health Plan for ₹${budget || 5000}+:**
-
-🏥 **Complete Care Package:**
-• Full health checkup at private clinic (₹2000-4000)
-• 6-month medicine supply (₹1500-3000)
-• Emergency fund setup (₹2000-5000)
-
-🎯 **Prevention Focus:**
-• Annual health insurance (₹3000-8000)
-• Regular monitoring devices (₹1500-3000)
-• Nutrition supplements (₹1000-2000)
-
-📱 **Tech Solutions:**
-• Teleconsultation apps (₹300-500/month)
-• Health tracking devices (₹2000-5000)
-
-Ready to create a detailed health budget plan?`;
+        throw new Error('Invalid response from AI service');
       }
-    }
 
-    // Budget-focused water solutions
-    if (lowerMessage.includes('water') || lowerMessage.includes('bore') || lowerMessage.includes('well') || lowerMessage.includes('drought') || lowerMessage.includes('irrigation')) {
-      if (budget && budget <= 1000) {
-        return `💧 **Water Solutions for ₹${budget}:**
+    } catch (error) {
+      console.error('Error getting budget response:', error);
+      
+      // Fallback to simple budget advice
+      const budgetMatch = message.match(/₹?(\d{1,3}(?:,\d{3})*(?:\.\d{2})?|\d+)/);
+      const budget = budgetMatch ? parseInt(budgetMatch[1].replace(/,/g, '')) : null;
+      
+      return `💛 **Budget Bro (Offline Mode)**
 
-🏠 **Home Solutions (₹100-500):**
-• Plastic water storage tank (₹400-800)
-• Simple water filter (₹200-400)
-• Drip irrigation bottles for kitchen garden (₹100-200)
+I'm having trouble connecting to my AI brain, but I can still help!
 
-🌧️ **Rainwater Collection (₹300-800):**
-• Tarpaulin sheet collection system (₹300-500)
-• Bucket & pipe setup (₹200-400)
-• Government subsidy available (up to 90%)
+${budget ? `For your ₹${budget} budget:` : 'To help you save money:'}
 
-💡 **Smart Savings:**
-• Share community bore well (₹50-100/month)
-• Join water tanker group booking (₹30-60/family)
-• Use govt. water ATM (₹2-5 per 20L)
-
-Apply for PM Krishi Sinchai Yojana - up to ₹50,000 subsidy!`;
-      } else if (budget && budget <= 15000) {
-        return `💧 **Water Solutions for ₹${budget}:**
-
-🚜 **Farm Irrigation (₹5000-12000):**
-• Drip system for 0.5-1 acre (₹8000-12000)
-• Sprinkler system setup (₹6000-10000)
-• Solar water pump (₹12000-15000 with subsidy)
-
-🏗️ **Infrastructure (₹3000-8000):**
-• Rainwater harvesting tank (₹8000-12000)
-• Farm pond lining (₹5000-8000)
-• Bore well repair & deepening (₹8000-15000)
-
-💰 **Government Support:**
-• 75% subsidy under PMKSY scheme
-• Bank loan at 4% interest
-• Zero-interest SHG loans available
-
-Want scheme application help or contractor contacts?`;
-      }
-    }
-
-    // Budget-focused crop and farming solutions
-    if (lowerMessage.includes('crop') || lowerMessage.includes('farm') || lowerMessage.includes('harvest') || lowerMessage.includes('seed') || lowerMessage.includes('agriculture')) {
-      if (budget && budget <= 2000) {
-        return `🌾 **Farming Solutions for ₹${budget}:**
-
-🌱 **Seeds & Inputs (₹500-1500):**
-• Drought-resistant seeds from KVK (₹300-800)
-• Organic compost making (₹200-500)
-• Neem-based pesticide (₹100-300)
-
-💧 **Water-Smart Farming (₹300-1000):**
-• Mulching with crop residue (₹200-400)
-• Bottle drip irrigation (₹300-600)
-• Rainwater collection in farm (₹500-1000)
-
-📈 **Quick Returns:**
-• Vegetable farming (60-90 days cycle)
-• Mushroom cultivation (₹1000 investment, ₹3000 return)
-• Poultry (₹1500 for 25 chicks, ₹4000 return in 45 days)
-
-Get free training at Krishi Vigyan Kendra!`;
-      } else {
-        return `🌾 **Complete Farming Plan for ₹${budget || 10000}+:**
-
-🚜 **Modern Equipment (₹5000-15000):**
-• Power tiller on rent (₹800-1200/day)
-• Seed drill & fertilizer spreader (₹8000-12000)
-• Solar fence for crop protection (₹10000-20000)
-
-🌿 **Integrated Farming (₹8000-25000):**
-• Crop + fish + poultry system
-• Organic certification (₹5000, premium prices)
-• Value addition unit (₹15000-30000)
-
-💰 **Financing Options:**
-• Kisan Credit Card (4% interest)
-• NABARD schemes (up to ₹10 lakh)
-• FPO membership benefits
-
-Ready for a detailed crop planning session?`;
-      }
-    }
-
-    // Budget-focused daily needs
-    if (lowerMessage.includes('daily') || lowerMessage.includes('food') || lowerMessage.includes('grocery') || lowerMessage.includes('household') || lowerMessage.includes('family')) {
-      if (budget && budget <= 500) {
-        return `🏠 **Daily Needs for ₹${budget}:**
-
-🍚 **Food Essentials (₹200-400):**
-• Rice/wheat from PDS (₹2-3/kg)
-• Dal & oil from cooperative (30% cheaper)
-• Seasonal vegetables from mandi (₹50-100/week)
-
-🛍️ **Smart Shopping (₹100-200):**
-• Buy in bulk with neighbors (10-20% discount)
-• Use government fair price shops
-• Group buying from wholesale market
-
-💡 **Money-Saving Tips:**
-• Cook extra, save fuel costs
-• Use solar cooker (government subsidy available)
-• Kitchen garden for daily vegetables (₹100 setup)
-
-Want grocery shopping group contacts or PDS card help?`;
-      } else {
-        return `🏠 **Monthly Budget Plan for ₹${budget || 2000}:**
-
-📋 **Complete Breakdown:**
-• Food essentials (60%): ₹${Math.floor((budget || 2000) * 0.6)}
-• Utilities (20%): ₹${Math.floor((budget || 2000) * 0.2)}
-• Emergency fund (10%): ₹${Math.floor((budget || 2000) * 0.1)}
-• Savings (10%): ₹${Math.floor((budget || 2000) * 0.1)}
-
-💰 **Optimization Strategies:**
-• Bulk buying saves 15-25%
-• Community purchases for better rates
-• Government subsidized items priority
-
-📱 **Track & Save:**
-• Use expense tracking apps
-• Join local savings groups
-• Participate in government welfare schemes
-
-Ready for personalized budget planning?`;
-      }
-    }
-
-    // Generic budget help
-    return `💛 **Budget Bro Analysis:**
-
-I see you mentioned: "${message}"
-
-${budget ? `With your ₹${budget} budget, here's what I suggest:` : 'Let me help you with budget-friendly solutions:'}
-
-🎯 **Smart Approach:**
-• Prioritize urgent needs first
-• Look for government subsidies (save 50-90%)
-• Consider group buying for bulk discounts
+🎯 **Quick Tips:**
+• Check government schemes (often 50-90% subsidy)
+• Buy generic alternatives (30-70% cheaper)  
+• Join community groups for bulk buying
 • Use local cooperative stores
 
-💡 **Next Steps:**
-1. Tell me the specific problem/need
-2. Share your location for local schemes
-3. Mention timeline (urgent vs planned)
+💡 **Government Resources:**
+• Jan Aushadhi stores for medicines
+• Fair Price Shops for essentials
+• Krishi Vigyan Kendra for farming
+• Primary Health Centers for basic care
 
-**Examples to try:**
-• "Diabetes medicine for elderly, budget ₹800"
-• "Small business setup, have ₹10,000"
-• "Wedding expenses, need to save ₹50,000"
-
-What specific challenge can I help you solve affordably? 💪`;
-    };
+Please try asking again in a moment, or be more specific about what you need help with! 💪`;
+    }
+  };
 
   const handleSendMessage = async () => {
     if (!inputValue.trim() || isLoading) return;

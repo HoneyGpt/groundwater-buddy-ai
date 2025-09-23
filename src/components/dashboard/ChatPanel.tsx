@@ -5,7 +5,7 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { Card } from '@/components/ui/card';
 import { Send, Bot, User, Save, Mic } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
-import { mockApi } from '@/lib/mockApi';
+import { supabase } from '@/integrations/supabase/client';
 
 interface Message {
   id: string;
@@ -74,7 +74,31 @@ export const ChatPanel = ({ profile }: ChatPanelProps) => {
     setMessages(prev => [...prev, typingMessage]);
 
     try {
-      const botResponse = await mockApi.sendChatMessage(messageText, profile);
+      console.log('Sending message to INGRES AI:', messageText);
+      
+      const { data, error } = await supabase.functions.invoke('gemini-chat', {
+        body: {
+          message: messageText,
+          context: { profile },
+          chatType: 'ingres'
+        }
+      });
+
+      if (error) {
+        console.error('Supabase function error:', error);
+        throw new Error(error.message || 'Failed to get AI response');
+      }
+
+      let botResponse = '';
+      if (data?.success && data?.response) {
+        console.log('Received AI response successfully');
+        botResponse = data.response;
+      } else if (data?.fallbackResponse) {
+        console.log('Using fallback response');
+        botResponse = data.fallbackResponse;
+      } else {
+        throw new Error('Invalid response from AI service');
+      }
       
       // Remove typing indicator and add actual response
       setMessages(prev => {
@@ -87,12 +111,14 @@ export const ChatPanel = ({ profile }: ChatPanelProps) => {
         }];
       });
     } catch (error) {
-      // Remove typing indicator and add error message
+      console.error('Error getting AI response:', error);
+      
+      // Remove typing indicator and add fallback response
       setMessages(prev => {
         const filtered = prev.filter(msg => msg.id !== 'typing');
         return [...filtered, {
           id: Date.now().toString(),
-          text: "I'm sorry, something went wrong. Please try again! 🌊",
+          text: "🌊 I'm INGRES-AI, your groundwater assistant! I'm having some technical difficulties right now, but I can still help you with groundwater information, government schemes, and water conservation tips. Please try asking again!",
           isUser: false,
           timestamp: new Date()
         }];
