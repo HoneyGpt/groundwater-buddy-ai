@@ -5,3 +5,9 @@ verify_jwt = false
 
 [functions.gemini-chat]
 verify_jwt = false
+
+[functions.enhanced-ai-chat]
+verify_jwt = false
+
+[functions.pdf-knowledge-ingestion]
+verify_jwt = false

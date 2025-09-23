@@ -49,6 +49,57 @@ export type Database = {
           },
         ]
       }
+      conservation_tips: {
+        Row: {
+          applicable_locations: string[] | null
+          category: string
+          cost_range: string | null
+          created_at: string
+          description: string
+          difficulty_level: string | null
+          expected_impact: string | null
+          id: string
+          implementation_steps: string[] | null
+          search_vector: unknown | null
+          seasonal_relevance: string[] | null
+          source_document: string | null
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          applicable_locations?: string[] | null
+          category: string
+          cost_range?: string | null
+          created_at?: string
+          description: string
+          difficulty_level?: string | null
+          expected_impact?: string | null
+          id?: string
+          implementation_steps?: string[] | null
+          search_vector?: unknown | null
+          seasonal_relevance?: string[] | null
+          source_document?: string | null
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          applicable_locations?: string[] | null
+          category?: string
+          cost_range?: string | null
+          created_at?: string
+          description?: string
+          difficulty_level?: string | null
+          expected_impact?: string | null
+          id?: string
+          implementation_steps?: string[] | null
+          search_vector?: unknown | null
+          seasonal_relevance?: string[] | null
+          source_document?: string | null
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       districts: {
         Row: {
           code: string | null
@@ -83,6 +134,69 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      government_schemes: {
+        Row: {
+          applicable_states: string[] | null
+          application_deadline: string | null
+          application_process: string | null
+          budget_allocation: number | null
+          contact_info: string | null
+          created_at: string
+          description: string
+          eligibility_criteria: string | null
+          id: string
+          is_active: boolean | null
+          launch_date: string | null
+          ministry: string
+          official_website: string | null
+          scheme_name: string
+          scheme_type: string | null
+          search_vector: unknown | null
+          state_specific: boolean | null
+          updated_at: string
+        }
+        Insert: {
+          applicable_states?: string[] | null
+          application_deadline?: string | null
+          application_process?: string | null
+          budget_allocation?: number | null
+          contact_info?: string | null
+          created_at?: string
+          description: string
+          eligibility_criteria?: string | null
+          id?: string
+          is_active?: boolean | null
+          launch_date?: string | null
+          ministry: string
+          official_website?: string | null
+          scheme_name: string
+          scheme_type?: string | null
+          search_vector?: unknown | null
+          state_specific?: boolean | null
+          updated_at?: string
+        }
+        Update: {
+          applicable_states?: string[] | null
+          application_deadline?: string | null
+          application_process?: string | null
+          budget_allocation?: number | null
+          contact_info?: string | null
+          created_at?: string
+          description?: string
+          eligibility_criteria?: string | null
+          id?: string
+          is_active?: boolean | null
+          launch_date?: string | null
+          ministry?: string
+          official_website?: string | null
+          scheme_name?: string
+          scheme_type?: string | null
+          search_vector?: unknown | null
+          state_specific?: boolean | null
+          updated_at?: string
+        }
+        Relationships: []
       }
       groundwater_alerts: {
         Row: {
@@ -392,6 +506,57 @@ export type Database = {
           },
         ]
       }
+      knowledge_base: {
+        Row: {
+          category: string
+          content: string
+          created_at: string
+          district_id: string | null
+          id: string
+          language: string | null
+          search_vector: unknown | null
+          source_document: string
+          source_url: string | null
+          state_id: string | null
+          subcategory: string | null
+          tags: string[] | null
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          category: string
+          content: string
+          created_at?: string
+          district_id?: string | null
+          id?: string
+          language?: string | null
+          search_vector?: unknown | null
+          source_document: string
+          source_url?: string | null
+          state_id?: string | null
+          subcategory?: string | null
+          tags?: string[] | null
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          category?: string
+          content?: string
+          created_at?: string
+          district_id?: string | null
+          id?: string
+          language?: string | null
+          search_vector?: unknown | null
+          source_document?: string
+          source_url?: string | null
+          state_id?: string | null
+          subcategory?: string | null
+          tags?: string[] | null
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       states: {
         Row: {
           code: string | null
@@ -516,6 +681,60 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      water_resources_insights: {
+        Row: {
+          assessment_year: string
+          created_at: string
+          data_source: string
+          district_id: string | null
+          id: string
+          insight_type: string
+          location_name: string
+          location_type: string
+          metric_name: string
+          metric_unit: string | null
+          metric_value: number | null
+          recommendations: string | null
+          state_id: string | null
+          status_category: string | null
+          updated_at: string
+        }
+        Insert: {
+          assessment_year?: string
+          created_at?: string
+          data_source: string
+          district_id?: string | null
+          id?: string
+          insight_type: string
+          location_name: string
+          location_type: string
+          metric_name: string
+          metric_unit?: string | null
+          metric_value?: number | null
+          recommendations?: string | null
+          state_id?: string | null
+          status_category?: string | null
+          updated_at?: string
+        }
+        Update: {
+          assessment_year?: string
+          created_at?: string
+          data_source?: string
+          district_id?: string | null
+          id?: string
+          insight_type?: string
+          location_name?: string
+          location_type?: string
+          metric_name?: string
+          metric_unit?: string | null
+          metric_value?: number | null
+          recommendations?: string | null
+          state_id?: string | null
+          status_category?: string | null
+          updated_at?: string
+        }
+        Relationships: []
       }
     }
     Views: {

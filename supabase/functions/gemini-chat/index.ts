@@ -13,7 +13,24 @@ serve(async (req) => {
   }
 
   try {
-    const { message, context, chatType } = await req.json();
+    const { message, context, chatType, useEnhancedKnowledge = false } = await req.json();
+
+    // Redirect to enhanced AI chat if requested
+    if (useEnhancedKnowledge) {
+      const enhancedResponse = await fetch(`${Deno.env.get('SUPABASE_URL')}/functions/v1/enhanced-ai-chat`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${Deno.env.get('SUPABASE_ANON_KEY')}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ message, userProfile: context?.profile })
+      });
+      
+      const enhancedData = await enhancedResponse.json();
+      return new Response(JSON.stringify(enhancedData), {
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+      });
+    }
 
     if (!message) {
       throw new Error('Message is required');

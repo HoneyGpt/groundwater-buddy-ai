@@ -12,6 +12,7 @@ interface Message {
   text: string;
   isUser: boolean;
   timestamp: Date;
+  contextInfo?: string;
 }
 
 interface ChatPanelProps {
@@ -19,11 +20,12 @@ interface ChatPanelProps {
 }
 
 const quickQueries = [
-  "My block groundwater status",
-  "Nearest recharge schemes", 
-  "Crop water tips",
-  "Government subsidies",
-  "Water saving techniques"
+  "What's the groundwater status in Punjab?",
+  "Which water conservation schemes can I apply for?",
+  "Show me drip irrigation benefits",
+  "What are rainwater harvesting methods?",
+  "Help with PMKSY scheme eligibility", 
+  "Conservation tips for farmers"
 ];
 
 export const ChatPanel = ({ profile }: ChatPanelProps) => {
@@ -49,7 +51,7 @@ export const ChatPanel = ({ profile }: ChatPanelProps) => {
     scrollToBottom();
   }, [messages]);
 
-  const handleSendMessage = async (text?: string) => {
+  const handleSendMessage = async (text?: string, useEnhanced = true) => {
     const messageText = text || inputValue.trim();
     if (!messageText || isLoading) return;
 
@@ -80,7 +82,8 @@ export const ChatPanel = ({ profile }: ChatPanelProps) => {
         body: {
           message: messageText,
           context: { profile },
-          chatType: 'ingres'
+          chatType: 'ingres',
+          useEnhancedKnowledge: useEnhanced
         }
       });
 
@@ -90,9 +93,17 @@ export const ChatPanel = ({ profile }: ChatPanelProps) => {
       }
 
       let botResponse = '';
+      let contextInfo = '';
+      
       if (data?.success && data?.response) {
         console.log('Received AI response successfully');
         botResponse = data.response;
+        
+        // Add context information if available
+        if (data?.context_used) {
+          const ctx = data.context_used;
+          contextInfo = `📚 Used ${ctx.knowledge_items || 0} knowledge items, ${ctx.schemes_found || 0} schemes, ${ctx.conservation_tips || 0} tips`;
+        }
       } else if (data?.fallbackResponse) {
         console.log('Using fallback response');
         botResponse = data.fallbackResponse;
@@ -107,7 +118,8 @@ export const ChatPanel = ({ profile }: ChatPanelProps) => {
           id: Date.now().toString(),
           text: botResponse,
           isUser: false,
-          timestamp: new Date()
+          timestamp: new Date(),
+          contextInfo: contextInfo || undefined
         }];
       });
     } catch (error) {
@@ -238,7 +250,14 @@ export const ChatPanel = ({ profile }: ChatPanelProps) => {
                       <div className="w-2 h-2 bg-primary/60 rounded-full animate-bounce" style={{ animationDelay: '300ms' }}></div>
                     </div>
                   ) : (
-                    <p className="text-sm leading-relaxed whitespace-pre-wrap">{message.text}</p>
+                    <>
+                      <p className="text-sm leading-relaxed whitespace-pre-wrap">{message.text}</p>
+                      {message.contextInfo && (
+                        <p className="text-xs text-muted-foreground mt-2 italic border-t border-border/50 pt-2">
+                          {message.contextInfo}
+                        </p>
+                      )}
+                    </>
                   )}
                 </Card>
               </div>

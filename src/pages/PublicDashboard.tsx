@@ -9,6 +9,7 @@ import { ChatPanel } from '@/components/dashboard/ChatPanel';
 import { OverviewPanel } from '@/components/dashboard/OverviewPanel';
 import { HistoryPanel } from '@/components/dashboard/HistoryPanel';
 import { DocumentSaverPanel } from '@/components/dashboard/DocumentSaverPanel';
+import { KnowledgeIngestionButton } from '@/components/KnowledgeIngestionButton';
 import BudgetBroPanel from '@/components/dashboard/BudgetBroPanel';
 import { MapsPanel } from '@/components/dashboard/MapsPanel';
 import { CalendarPanel } from '@/components/dashboard/CalendarPanel';
@@ -78,7 +79,14 @@ const PublicDashboard = () => {
   const renderMainContent = () => {
     switch (activeSection) {
       case 'chat':
-        return <ChatPanel profile={profile} />;
+        return (
+          <div className="space-y-4">
+            <div className="flex justify-end">
+              <KnowledgeIngestionButton />
+            </div>
+            <ChatPanel profile={profile} />
+          </div>
+        );
       case 'history':
         return <HistoryPanel onLoadChat={handleLoadChat} onSectionChange={handleSectionChange} />;
       case 'documents':
