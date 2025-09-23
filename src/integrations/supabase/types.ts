@@ -416,6 +416,69 @@ export type Database = {
         }
         Relationships: []
       }
+      user_documents: {
+        Row: {
+          ai_summary: string | null
+          category: string | null
+          created_at: string
+          description: string | null
+          extracted_text: string | null
+          file_name: string
+          file_path: string
+          file_size: number
+          id: string
+          is_local_only: boolean | null
+          location: string | null
+          mime_type: string
+          original_name: string
+          tags: string[] | null
+          title: string | null
+          updated_at: string
+          upload_date: string
+          user_id: string
+        }
+        Insert: {
+          ai_summary?: string | null
+          category?: string | null
+          created_at?: string
+          description?: string | null
+          extracted_text?: string | null
+          file_name: string
+          file_path: string
+          file_size: number
+          id?: string
+          is_local_only?: boolean | null
+          location?: string | null
+          mime_type: string
+          original_name: string
+          tags?: string[] | null
+          title?: string | null
+          updated_at?: string
+          upload_date?: string
+          user_id: string
+        }
+        Update: {
+          ai_summary?: string | null
+          category?: string | null
+          created_at?: string
+          description?: string | null
+          extracted_text?: string | null
+          file_name?: string
+          file_path?: string
+          file_size?: number
+          id?: string
+          is_local_only?: boolean | null
+          location?: string | null
+          mime_type?: string
+          original_name?: string
+          tags?: string[] | null
+          title?: string | null
+          updated_at?: string
+          upload_date?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       water_quality_parameters: {
         Row: {
           assessment_id: string

@@ -8,6 +8,7 @@ import { DashboardSidebar } from '@/components/dashboard/DashboardSidebar';
 import { ChatPanel } from '@/components/dashboard/ChatPanel';
 import { OverviewPanel } from '@/components/dashboard/OverviewPanel';
 import { HistoryPanel } from '@/components/dashboard/HistoryPanel';
+import { DocumentSaverPanel } from '@/components/dashboard/DocumentSaverPanel';
 
 const PublicDashboard = () => {
   const navigate = useNavigate();
@@ -76,6 +77,8 @@ const PublicDashboard = () => {
         return <ChatPanel profile={profile} />;
       case 'history':
         return <HistoryPanel onLoadChat={handleLoadChat} onSectionChange={handleSectionChange} />;
+      case 'documents':
+        return <DocumentSaverPanel />;
       case 'overview':
       default:
         return <OverviewPanel profile={profile} onSectionChange={handleSectionChange} />;
