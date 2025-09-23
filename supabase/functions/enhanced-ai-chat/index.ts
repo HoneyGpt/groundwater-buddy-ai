@@ -14,22 +14,38 @@ const ENHANCED_SYSTEM_PROMPT = `You are INGRES-AI, a multilingual AI assistant f
 3. Water conservation tips (practical, location-specific advice)
 4. Policy and institutional information
 
+CRITICAL INSTRUCTIONS:
+- ALWAYS prioritize information from the SUPABASE DATABASE when available
+- Clearly distinguish between database content and general knowledge
+- Use database information as the primary source of truth
+- Only use general knowledge to supplement or explain database content
+
 RESPONSE GUIDELINES:
 - Keep responses concise for public users, detailed for experts
 - Always provide actionable next steps
-- Include source citations when using database information
+- Include clear source citations (Database vs General Knowledge)
 - Support English, Hindi, and Telugu (adapt language to user preference)
 - For scheme queries, include eligibility and application links
 - For groundwater status, provide current data with interpretation
 
-RESPONSE FORMAT:
-- Short answer (2-3 sentences)
-- Significance/Impact (1 sentence) 
-- Concrete action steps (numbered list)
-- Relevant schemes/resources (if applicable)
-- Source citation
+RESPONSE FORMAT WHEN DATABASE CONTENT IS AVAILABLE:
+📊 **From INGRES Database:** [Primary answer from database]
+💡 **Additional Context:** [Supplementary information if needed]
+🎯 **Action Steps:** [Numbered list of concrete actions]
+📋 **Relevant Resources:** [Schemes/programs from database]
+📖 **Source:** [Specific database source citation]
 
-Example: "Block X: Semi-Critical (stage 65%). This means moderate stress on groundwater resources. Steps: 1) Reduce extraction by 20%, 2) Implement rainwater harvesting, 3) Apply for [Scheme Name] - eligibility: [criteria]. Source: CGWB Assessment 2024"`;
+RESPONSE FORMAT WHEN NO DATABASE CONTENT:
+🤖 **General Response:** [Answer based on general knowledge]
+⚠️ **Note:** This response is based on general knowledge. For specific local data, please contact local water authorities.
+🎯 **General Recommendations:** [Numbered list of general actions]
+
+Example with database content: 
+📊 **From INGRES Database:** Block X shows Semi-Critical status (65% extraction stage) based on latest CGWB assessment.
+💡 **Additional Context:** This indicates moderate stress requiring immediate conservation measures.
+🎯 **Action Steps:** 1) Reduce extraction by 20%, 2) Implement rainwater harvesting, 3) Apply for Jal Jeevan Mission scheme
+📋 **Relevant Resources:** Pradhan Mantri Krishi Sinchayee Yojana - ₹50,000 crore budget, contact local agriculture dept
+📖 **Source:** CGWB Assessment 2024, Government Schemes Database`;
 
 async function searchKnowledgeBase(supabase: any, query: string, limit = 5) {
   // Search across knowledge base using full-text search
@@ -130,7 +146,8 @@ async function callGeminiAPI(prompt: string, userMessage: string, context: strin
     throw new Error('Gemini API key not configured');
   }
 
-  const fullPrompt = `${prompt}\n\nCONTEXT FROM DATABASE:\n${context}\n\nUSER QUESTION: ${userMessage}`;
+  // If context contains the full prompt (for fallback scenarios), use it directly
+  const fullPrompt = context.includes('INGRES-AI') ? context : `${prompt}\n\nCONTEXT FROM DATABASE:\n${context}\n\nUSER QUESTION: ${userMessage}`;
 
   const response = await fetch(
     `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=${apiKey}`,
@@ -186,22 +203,34 @@ serve(async (req) => {
     // Get location-specific data if location is provided
     const locationData = location ? await getLocationSpecificData(supabaseClient, location) : [];
 
-    // Build context from search results
-    const context = buildContextFromResults(searchResults, locationData);
+    // Check if we have relevant database content
+    const hasRelevantContent = searchResults.knowledge.length > 0 || 
+                              searchResults.schemes.length > 0 || 
+                              searchResults.tips.length > 0 || 
+                              locationData.length > 0;
 
-    console.log('Context built from database:', { 
+    console.log('Database search results:', { 
       knowledgeItems: searchResults.knowledge.length,
       schemes: searchResults.schemes.length, 
       tips: searchResults.tips.length,
-      locationData: locationData.length
+      locationData: locationData.length,
+      hasRelevantContent
     });
 
-    // Generate AI response using enhanced context
-    const aiResponse = await callGeminiAPI(
-      ENHANCED_SYSTEM_PROMPT, 
-      message, 
-      context
-    );
+    let aiResponse;
+
+    if (hasRelevantContent) {
+      // Priority path: Use database content with Gemini enhancement
+      const context = buildContextFromResults(searchResults, locationData);
+      const enhancedPrompt = `${ENHANCED_SYSTEM_PROMPT}\n\nIMPORTANT: You have relevant database content available. Use it as your PRIMARY source and clearly mark it as "From INGRES Database". Use your general knowledge only to supplement and explain the database content.\n\nCONTEXT FROM DATABASE:\n${context}\n\nUSER QUESTION: ${message}`;
+      
+      aiResponse = await callGeminiAPI('', message, enhancedPrompt);
+    } else {
+      // Fallback path: General knowledge response
+      const fallbackPrompt = `${ENHANCED_SYSTEM_PROMPT}\n\nIMPORTANT: No specific database content found for this query. Provide a general response based on your knowledge, but clearly indicate this is general information. Suggest contacting local authorities for specific data.\n\nUSER QUESTION: ${message}`;
+      
+      aiResponse = await callGeminiAPI('', message, fallbackPrompt);
+    }
 
     // Store chat interaction for analytics
     await supabaseClient
@@ -228,7 +257,9 @@ serve(async (req) => {
           knowledge_items: searchResults.knowledge.length,
           schemes_found: searchResults.schemes.length,
           conservation_tips: searchResults.tips.length,
-          location_data: locationData.length
+          location_data: locationData.length,
+          has_database_content: hasRelevantContent,
+          response_type: hasRelevantContent ? 'database_enhanced' : 'general_knowledge'
         }
       }),
       { 
