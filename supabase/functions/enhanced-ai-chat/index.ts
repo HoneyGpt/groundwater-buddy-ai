@@ -133,7 +133,7 @@ async function callGeminiAPI(prompt: string, userMessage: string, context: strin
   const fullPrompt = `${prompt}\n\nCONTEXT FROM DATABASE:\n${context}\n\nUSER QUESTION: ${userMessage}`;
 
   const response = await fetch(
-    `https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=${apiKey}`,
+    `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=${apiKey}`,
     {
       method: 'POST',
       headers: {

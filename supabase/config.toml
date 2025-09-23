@@ -11,3 +11,6 @@ verify_jwt = false
 
 [functions.pdf-knowledge-ingestion]
 verify_jwt = false
+
+[functions.pdf-fulltext-extract]
+verify_jwt = false

@@ -5,6 +5,7 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { Send, Bot, User } from 'lucide-react';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
+import { supabase } from '@/integrations/supabase/client';
 
 interface Message {
   id: string;
@@ -24,7 +25,7 @@ const Chat = () => {
   ]);
   const [inputValue, setInputValue] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const [apiKey] = useState('AIzaSyBPFPr_YNT5TVGZvwVvo0s6fTqbk3Gt2QU');
+  const [apiKey] = useState<string | null>(null);
   const scrollAreaRef = useRef<HTMLDivElement>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
@@ -38,52 +39,29 @@ const Chat = () => {
 
   const generateResponse = async (userMessage: string): Promise<string> => {
     try {
-      const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=${apiKey}`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
+      const { data, error } = await supabase.functions.invoke('gemini-chat', {
+        body: {
+          message: userMessage,
+          context: { profile: { name: 'Guest', allowLocation: true } },
+          chatType: 'ingres',
+          useEnhancedKnowledge: true,
         },
-        body: JSON.stringify({
-          contents: [{
-            parts: [{
-              text: `You are INGRES-AI, a friendly and helpful AI assistant specialized in groundwater data and management in India. You help farmers, citizens, researchers, and policymakers understand groundwater information from the INGRES portal.
-
-Context: INGRES (India-WRIS Groundwater Resource Estimation System) contains groundwater assessment data across India including water levels, quality, extraction stages, and recharge information.
-
-Your role:
-- Provide clear, actionable advice about groundwater in simple language
-- Help with crop planning based on water availability
-- Explain government schemes for farmers related to water conservation
-- Interpret groundwater assessment data (Critical/Semi-Critical/Safe stages)
-- Suggest water conservation methods and rainwater harvesting
-- Be encouraging and supportive, especially to farmers
-
-Guidelines:
-- Keep responses concise but helpful (2-3 sentences max for simple questions)
-- Use friendly, encouraging language
-- Provide specific actionable advice when possible
-- If you don't have exact data, provide general guidance and suggest consulting local authorities
-- Use emojis sparingly but appropriately
-
-User question: ${userMessage}`
-            }]
-          }]
-        })
       });
 
-      const data = await response.json();
-      
-      if (data.candidates && data.candidates[0] && data.candidates[0].content) {
-        return data.candidates[0].content.parts[0].text;
-      } else {
-        return "I'm sorry, I'm having trouble processing your request right now. Could you please try rephrasing your question? 💧";
+      if (error) throw error;
+
+      if (data?.success && data?.response) {
+        return data.response as string;
       }
+      if (data?.fallbackResponse) {
+        return data.fallbackResponse as string;
+      }
+      return "I'm sorry, I'm having trouble processing your request right now. Could you please try rephrasing your question? 💧";
     } catch (error) {
-      console.error('Error generating response:', error);
+      console.error('Error generating response via Supabase:', error);
       return "I'm experiencing some technical difficulties. Please try again in a moment! 🔧";
     }
   };
-
   const handleSendMessage = async () => {
     if (!inputValue.trim() || isLoading) return;
 
@@ -144,7 +122,7 @@ User question: ${userMessage}`
   };
 
   return (
-    <div className="min-h-screen flex flex-col bg-gradient-to-br from-water-50 to-accent-50">
+    <div className="min-h-screen flex flex-col bg-gradient-to-br from-water-50 to-accent-50" role="main">
       <Header />
       
       {/* Greeting Section */}

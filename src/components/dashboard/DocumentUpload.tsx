@@ -125,10 +125,20 @@ export const DocumentUpload = ({ onDocumentUploaded, onCancel }: DocumentUploadP
 
         if (uploadError) throw uploadError;
 
-        // Extract text content if it's a text file or PDF
+        // Extract text content if it's a text file or PDF via edge function
         let extractedText = '';
         if (file.type === 'text/plain') {
           extractedText = await file.text();
+        } else if (file.type === 'application/pdf' || file.name.toLowerCase().endsWith('.pdf')) {
+          const { data: extractData, error: extractError } = await supabase.functions.invoke('pdf-fulltext-extract', {
+            body: { filePath, originalName: file.name, upsertToKnowledgeBase: true }
+          });
+          if (extractError) {
+            console.error('PDF extract error:', extractError);
+          } else if (extractData?.success) {
+            // We won't store the full text in UI state, but keep it in documents for search
+            extractedText = extractData.preview ? String(extractData.preview) : '';
+          }
         }
 
         // Insert document metadata into database

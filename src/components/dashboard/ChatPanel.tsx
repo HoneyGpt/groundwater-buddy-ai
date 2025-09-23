@@ -102,7 +102,7 @@ export const ChatPanel = ({ profile }: ChatPanelProps) => {
         // Add context information if available
         if (data?.context_used) {
           const ctx = data.context_used;
-          contextInfo = `📚 Used ${ctx.knowledge_items || 0} knowledge items, ${ctx.schemes_found || 0} schemes, ${ctx.conservation_tips || 0} tips`;
+          contextInfo = `📚 Used ${ctx.knowledge_items || 0} knowledge items, ${ctx.schemes_found || 0} schemes, ${ctx.conservation_tips || 0} tips${typeof ctx.location_data !== 'undefined' ? `, ${ctx.location_data} location datapoints` : ''}`;
         }
       } else if (data?.fallbackResponse) {
         console.log('Using fallback response');
