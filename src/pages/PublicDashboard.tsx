@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
@@ -22,17 +22,11 @@ const PublicDashboard = () => {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [chatMessages, setChatMessages] = useState<any[]>([]);
-  const [scrollDirection, setScrollDirection] = useState('up');
-  const [isManualToggle, setIsManualToggle] = useState(false);
   
   // Water points gamification
   const [waterPoints, setWaterPoints] = useState(() => {
     return parseInt(localStorage.getItem('ingres_water_points') || '0');
   });
-
-  // Scroll management refs
-  const lastScrollRef = useRef<number>(window.scrollY);
-  const tickingRef = useRef(false);
 
   // Load profile from localStorage on component mount
   useEffect(() => {
@@ -45,48 +39,6 @@ const PublicDashboard = () => {
     }
   }, [navigate]);
 
-  // Handle scroll behavior for sidebar (debounced with hysteresis)
-  useEffect(() => {
-    const THRESHOLD = 16; // pixels
-    const handleScroll = () => {
-      if (isManualToggle) return; // Don't auto-collapse if user manually toggled or after nav
-
-      const current = window.scrollY;
-      const last = lastScrollRef.current;
-      const delta = current - last;
-
-      if (Math.abs(delta) < THRESHOLD) return; // ignore micro scrolls
-      if (tickingRef.current) return; // throttle to next frame
-      tickingRef.current = true;
-
-      requestAnimationFrame(() => {
-        if (current > 120 && delta > 0) {
-          setScrollDirection('down');
-          setSidebarCollapsed((prev) => (prev ? prev : true));
-        } else if (delta < 0) {
-          setScrollDirection('up');
-          setSidebarCollapsed((prev) => (prev ? false : prev));
-        }
-        lastScrollRef.current = current;
-        tickingRef.current = false;
-      });
-    };
-
-    window.addEventListener('scroll', handleScroll, { passive: true });
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, [isManualToggle]);
-
-  // Reset manual toggle after a period of inactivity
-  useEffect(() => {
-    if (isManualToggle) {
-      const timer = setTimeout(() => {
-        setIsManualToggle(false);
-      }, 1200); // Reset shortly after manual interaction/navigation
-      
-      return () => clearTimeout(timer);
-    }
-  }, [isManualToggle]);
-
   const addWaterPoints = (points: number) => {
     const newTotal = waterPoints + points;
     setWaterPoints(newTotal);
@@ -94,7 +46,6 @@ const PublicDashboard = () => {
   };
 
   const handleSectionChange = (section: string) => {
-    setIsManualToggle(true); // temporarily suppress auto-collapse while navigating
     setActiveSection(section);
     setMobileMenuOpen(false);
     
@@ -148,6 +99,9 @@ const PublicDashboard = () => {
         return <CalendarPanel />;
       case 'helpline':
         return <HelplinePanel />;
+      case 'settings':
+        navigate('/settings');
+        return null;
       case 'overview':
       default:
         return <OverviewPanel profile={profile} onSectionChange={handleSectionChange} />;
@@ -165,7 +119,6 @@ const PublicDashboard = () => {
           onSectionChange={handleSectionChange}
           isCollapsed={sidebarCollapsed}
           onToggleCollapse={() => {
-            setIsManualToggle(true);
             setSidebarCollapsed(!sidebarCollapsed);
           }}
           onNavigateHome={() => navigate('/')}
