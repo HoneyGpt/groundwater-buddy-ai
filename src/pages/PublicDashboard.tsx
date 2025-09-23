@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
@@ -30,6 +30,10 @@ const PublicDashboard = () => {
     return parseInt(localStorage.getItem('ingres_water_points') || '0');
   });
 
+  // Scroll management refs
+  const lastScrollRef = useRef<number>(window.scrollY);
+  const tickingRef = useRef(false);
+
   // Load profile from localStorage on component mount
   useEffect(() => {
     const savedProfile = localStorage.getItem('ingres_public_profile');
@@ -41,24 +45,34 @@ const PublicDashboard = () => {
     }
   }, [navigate]);
 
-  // Handle scroll behavior for sidebar (only when not manually toggled)
+  // Handle scroll behavior for sidebar (debounced with hysteresis)
   useEffect(() => {
-    let lastScroll = 0;
+    const THRESHOLD = 16; // pixels
     const handleScroll = () => {
-      if (isManualToggle) return; // Don't auto-collapse if user manually toggled
-      
-      const currentScroll = window.scrollY;
-      if (currentScroll > 100 && currentScroll > lastScroll) {
-        setScrollDirection('down');
-        setSidebarCollapsed(true);
-      } else {
-        setScrollDirection('up');
-        setSidebarCollapsed(false);
-      }
-      lastScroll = currentScroll;
+      if (isManualToggle) return; // Don't auto-collapse if user manually toggled or after nav
+
+      const current = window.scrollY;
+      const last = lastScrollRef.current;
+      const delta = current - last;
+
+      if (Math.abs(delta) < THRESHOLD) return; // ignore micro scrolls
+      if (tickingRef.current) return; // throttle to next frame
+      tickingRef.current = true;
+
+      requestAnimationFrame(() => {
+        if (current > 120 && delta > 0) {
+          setScrollDirection('down');
+          setSidebarCollapsed((prev) => (prev ? prev : true));
+        } else if (delta < 0) {
+          setScrollDirection('up');
+          setSidebarCollapsed((prev) => (prev ? false : prev));
+        }
+        lastScrollRef.current = current;
+        tickingRef.current = false;
+      });
     };
 
-    window.addEventListener('scroll', handleScroll);
+    window.addEventListener('scroll', handleScroll, { passive: true });
     return () => window.removeEventListener('scroll', handleScroll);
   }, [isManualToggle]);
 
@@ -67,7 +81,7 @@ const PublicDashboard = () => {
     if (isManualToggle) {
       const timer = setTimeout(() => {
         setIsManualToggle(false);
-      }, 5000); // Reset after 5 seconds of no manual interaction
+      }, 1200); // Reset shortly after manual interaction/navigation
       
       return () => clearTimeout(timer);
     }
@@ -80,6 +94,7 @@ const PublicDashboard = () => {
   };
 
   const handleSectionChange = (section: string) => {
+    setIsManualToggle(true); // temporarily suppress auto-collapse while navigating
     setActiveSection(section);
     setMobileMenuOpen(false);
     
