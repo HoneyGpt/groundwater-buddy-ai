@@ -23,6 +23,7 @@ const PublicDashboard = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [chatMessages, setChatMessages] = useState<any[]>([]);
   const [scrollDirection, setScrollDirection] = useState('up');
+  const [isManualToggle, setIsManualToggle] = useState(false);
   
   // Water points gamification
   const [waterPoints, setWaterPoints] = useState(() => {
@@ -40,10 +41,12 @@ const PublicDashboard = () => {
     }
   }, [navigate]);
 
-  // Handle scroll behavior for sidebar
+  // Handle scroll behavior for sidebar (only when not manually toggled)
   useEffect(() => {
     let lastScroll = 0;
     const handleScroll = () => {
+      if (isManualToggle) return; // Don't auto-collapse if user manually toggled
+      
       const currentScroll = window.scrollY;
       if (currentScroll > 100 && currentScroll > lastScroll) {
         setScrollDirection('down');
@@ -57,7 +60,18 @@ const PublicDashboard = () => {
 
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
+  }, [isManualToggle]);
+
+  // Reset manual toggle after a period of inactivity
+  useEffect(() => {
+    if (isManualToggle) {
+      const timer = setTimeout(() => {
+        setIsManualToggle(false);
+      }, 5000); // Reset after 5 seconds of no manual interaction
+      
+      return () => clearTimeout(timer);
+    }
+  }, [isManualToggle]);
 
   const addWaterPoints = (points: number) => {
     const newTotal = waterPoints + points;
@@ -135,7 +149,10 @@ const PublicDashboard = () => {
           activeSection={activeSection}
           onSectionChange={handleSectionChange}
           isCollapsed={sidebarCollapsed}
-          onToggleCollapse={() => setSidebarCollapsed(!sidebarCollapsed)}
+          onToggleCollapse={() => {
+            setIsManualToggle(true);
+            setSidebarCollapsed(!sidebarCollapsed);
+          }}
           onNavigateHome={() => navigate('/')}
         />
       </div>
