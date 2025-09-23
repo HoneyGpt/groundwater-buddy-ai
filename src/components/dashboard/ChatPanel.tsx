@@ -275,19 +275,19 @@ export const ChatPanel = ({ profile }: ChatPanelProps) => {
                               {section.startsWith('📚 Supabase') ? (
                                 <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-3">
                                   <div className="flex items-center gap-2 mb-2">
-                                    <span className="text-yellow-600 font-semibold">📚 From Knowledge Base</span>
+                                    <span className="text-yellow-600 font-semibold">📚 INGRES Knowledge Base</span>
                                   </div>
                                   <p className="text-sm leading-relaxed text-gray-800">
                                     {section.replace('📚 Supabase Knowledge:\n', '')}
                                   </p>
                                 </div>
-                              ) : section.startsWith('🤖 Gemini') ? (
-                                <div className="bg-gray-50 border border-gray-200 rounded-lg p-3">
+                              ) : section.startsWith('🤖 INGRES-AI') || section.startsWith('🤖 Gemini') ? (
+                                <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
                                   <div className="flex items-center gap-2 mb-2">
-                                    <span className="text-gray-600 font-semibold">🤖 AI Assistant</span>
+                                    <span className="text-blue-600 font-semibold">🇮🇳 INGRES-AI (Indian AI Technology)</span>
                                   </div>
                                   <p className="text-sm leading-relaxed text-gray-700">
-                                    {section.replace('🤖 Gemini AI Suggestion:\n', '')}
+                                    {section.replace('🤖 Gemini AI Suggestion:\n', '').replace('🤖 INGRES-AI Response:\n', '')}
                                   </p>
                                 </div>
                               ) : (
@@ -340,8 +340,8 @@ export const ChatPanel = ({ profile }: ChatPanelProps) => {
             variant="outline"
             size="icon"
             disabled={isLoading || isListening}
-            className={`rounded-full h-12 w-12 border-primary/20 hover:bg-primary/5 ${
-              isListening ? 'bg-accent/20 border-accent animate-pulse' : ''
+            className={`rounded-full h-12 w-12 border-primary/20 hover:bg-primary/5 transition-all duration-200 ${
+              isListening ? 'bg-accent/20 border-accent' : ''
             }`}
           >
             <Mic className={`w-5 h-5 ${isListening ? 'text-accent' : 'text-primary'}`} />

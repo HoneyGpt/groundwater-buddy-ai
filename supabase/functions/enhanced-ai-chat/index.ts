@@ -103,8 +103,8 @@ serve(async (req) => {
     
     if (geminiAnswer) {
       const geminiLabel = supabaseAnswer ? 
-        "🤖 **Additional AI Insights:**" : 
-        "🤖 **Gemini AI Response:**\n⚠️ *Note: This is general AI knowledge. For specific local data, please contact water authorities.*";
+        "🤖 **Additional INGRES-AI Insights:**" : 
+        "🤖 **INGRES-AI Response:**\n🇮🇳 *Powered by Indian AI Technology*";
       responseParts.push(`${geminiLabel}\n${geminiAnswer}`);
     }
 
