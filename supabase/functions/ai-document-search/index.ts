@@ -7,6 +7,19 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
+// Generate consistent UUID from user name (same as frontend)
+const generateUserIdFromName = (name: string): string => {
+  let hash = 0;
+  for (let i = 0; i < name.length; i++) {
+    const char = name.charCodeAt(i);
+    hash = ((hash << 5) - hash) + char;
+    hash = hash & hash;
+  }
+  
+  const hashStr = Math.abs(hash).toString(16).padStart(8, '0');
+  return `${hashStr.slice(0,8)}-${hashStr.slice(0,4)}-4${hashStr.slice(1,4)}-8${hashStr.slice(0,3)}-${hashStr.padEnd(12, '0').slice(0,12)}`;
+};
+
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
@@ -18,11 +31,14 @@ serve(async (req) => {
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
     )
 
-    const { query, userId, filters = {} } = await req.json();
+    const { query, userName, filters = {} } = await req.json();
 
-    if (!query || !userId) {
-      throw new Error('Query and userId are required');
+    if (!query || !userName) {
+      throw new Error('Query and userName are required');
     }
+
+    // Generate consistent user ID from name
+    const userId = generateUserIdFromName(userName);
 
     // Build the search query with text search and filters
     let searchQuery = supabaseClient

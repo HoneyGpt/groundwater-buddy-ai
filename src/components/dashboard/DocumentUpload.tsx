@@ -16,6 +16,8 @@ interface DocumentUploadProps {
   onCancel: () => void;
 }
 
+import { getCurrentUserId } from '@/lib/userUtils';
+
 export const DocumentUpload = ({ onDocumentUploaded, onCancel }: DocumentUploadProps) => {
   const [files, setFiles] = useState<File[]>([]);
   const [uploading, setUploading] = useState(false);
@@ -100,8 +102,8 @@ export const DocumentUpload = ({ onDocumentUploaded, onCancel }: DocumentUploadP
 
     try {
       setUploading(true);
-      const profile = localStorage.getItem('ingres_public_profile');
-      if (!profile) {
+      const userId = getCurrentUserId();
+      if (!userId) {
         toast({
           title: "Error", 
           description: "User profile not found. Please complete your profile setup.",
@@ -109,9 +111,6 @@ export const DocumentUpload = ({ onDocumentUploaded, onCancel }: DocumentUploadP
         });
         return;
       }
-      
-      const { name } = JSON.parse(profile);
-      const userId = name; // Using name as user ID for now
 
       for (const file of files) {
         // Generate unique file name

@@ -27,6 +27,8 @@ interface Document {
   ai_summary: string;
 }
 
+import { getCurrentUserId } from '@/lib/userUtils';
+
 export const DocumentSaverPanel = () => {
   const [documents, setDocuments] = useState<Document[]>([]);
   const [loading, setLoading] = useState(true);
@@ -48,18 +50,11 @@ export const DocumentSaverPanel = () => {
     'Other'
   ];
 
-  useEffect(() => {
-    fetchDocuments();
-  }, []);
-
   const fetchDocuments = async () => {
     try {
       setLoading(true);
-      const profile = localStorage.getItem('ingres_public_profile');
-      if (!profile) return;
-      
-      const { name } = JSON.parse(profile);
-      const userId = name; // Using name as user ID for now
+      const userId = getCurrentUserId();
+      if (!userId) return;
 
       const { data, error } = await supabase
         .from('user_documents')
@@ -80,6 +75,10 @@ export const DocumentSaverPanel = () => {
       setLoading(false);
     }
   };
+
+  useEffect(() => {
+    fetchDocuments();
+  }, []);
 
   const handleDocumentUploaded = (newDocument: Document) => {
     setDocuments(prev => [newDocument, ...prev]);
