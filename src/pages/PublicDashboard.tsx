@@ -12,6 +12,7 @@ import { DocumentSaverPanel } from '@/components/dashboard/DocumentSaverPanel';
 import BudgetBroPanel from '@/components/dashboard/BudgetBroPanel';
 import { MapsPanel } from '@/components/dashboard/MapsPanel';
 import { CalendarPanel } from '@/components/dashboard/CalendarPanel';
+import HelplinePanel from '@/components/dashboard/HelplinePanel';
 
 const PublicDashboard = () => {
   const navigate = useNavigate();
@@ -88,6 +89,8 @@ const PublicDashboard = () => {
         return <MapsPanel />;
       case 'calendar':
         return <CalendarPanel />;
+      case 'helpline':
+        return <HelplinePanel />;
       case 'overview':
       default:
         return <OverviewPanel profile={profile} onSectionChange={handleSectionChange} />;
