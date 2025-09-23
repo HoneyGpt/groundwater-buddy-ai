@@ -33,7 +33,7 @@ const sidebarItems = [
   { id: 'documents', label: 'Document Saver', icon: FileText },
   { id: 'budget', label: 'Budget Bro', icon: Calculator },
   { id: 'calendar', label: 'Calendar', icon: Calendar },
-  { id: 'map', label: 'Map & Alerts', icon: Map },
+  { id: 'maps', label: 'Interactive Maps', icon: Map },
   { id: 'schemes', label: 'Schemes', icon: Gift },
   { id: 'helpline', label: 'Helpline', icon: Phone },
   { id: 'settings', label: 'Settings', icon: Settings },
