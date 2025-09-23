@@ -3,7 +3,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { useNavigate } from 'react-router-dom';
-import { Menu, X, User, Settings } from 'lucide-react';
+import { Menu, X, Bell, Settings } from 'lucide-react';
 import { DashboardSidebar } from '@/components/dashboard/DashboardSidebar';
 import { ChatPanel } from '@/components/dashboard/ChatPanel';
 import { OverviewPanel } from '@/components/dashboard/OverviewPanel';
@@ -22,6 +22,7 @@ const PublicDashboard = () => {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [chatMessages, setChatMessages] = useState<any[]>([]);
+  const [scrollDirection, setScrollDirection] = useState('up');
   
   // Water points gamification
   const [waterPoints, setWaterPoints] = useState(() => {
@@ -38,6 +39,25 @@ const PublicDashboard = () => {
       navigate('/profile-setup');
     }
   }, [navigate]);
+
+  // Handle scroll behavior for sidebar
+  useEffect(() => {
+    let lastScroll = 0;
+    const handleScroll = () => {
+      const currentScroll = window.scrollY;
+      if (currentScroll > 100 && currentScroll > lastScroll) {
+        setScrollDirection('down');
+        setSidebarCollapsed(true);
+      } else {
+        setScrollDirection('up');
+        setSidebarCollapsed(false);
+      }
+      lastScroll = currentScroll;
+    };
+
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
 
   const addWaterPoints = (points: number) => {
     const newTotal = waterPoints + points;
@@ -106,82 +126,100 @@ const PublicDashboard = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-water-50 to-accent/10 flex flex-col">
-      {/* Header */}
-      <header className="bg-background/95 backdrop-blur-sm border-b sticky top-0 z-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-16">
-            <div className="flex items-center space-x-4">
-              <Button
-                onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-                variant="ghost"
-                size="sm"
-                className="md:hidden"
-              >
-                {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
-              </Button>
-              <div className="flex items-center space-x-2">
-                <div className="w-8 h-8 bg-accent/20 rounded-full flex items-center justify-center">
-                  <span className="text-accent font-bold text-sm">I</span>
+    <div className="min-h-screen bg-gradient-to-br from-primary/5 via-background to-accent/5 flex">
+      {/* Sidebar */}
+      <div className={`hidden md:block transition-all duration-500 ease-in-out ${
+        sidebarCollapsed ? 'w-16' : 'w-64'
+      } sticky top-0 h-screen`}>
+        <DashboardSidebar
+          activeSection={activeSection}
+          onSectionChange={handleSectionChange}
+          isCollapsed={sidebarCollapsed}
+          onToggleCollapse={() => setSidebarCollapsed(!sidebarCollapsed)}
+          onNavigateHome={() => navigate('/')}
+        />
+      </div>
+
+      {/* Mobile Sidebar Overlay */}
+      {mobileMenuOpen && (
+        <div className="md:hidden fixed inset-0 z-50 bg-black/50 backdrop-blur-sm">
+          <div className="w-64 h-full">
+            <DashboardSidebar
+              activeSection={activeSection}
+              onSectionChange={handleSectionChange}
+              isCollapsed={false}
+              onToggleCollapse={() => {}}
+              onNavigateHome={() => navigate('/')}
+            />
+          </div>
+        </div>
+      )}
+
+      {/* Main Content Area */}
+      <div className="flex-1 flex flex-col min-h-screen">
+        {/* Header */}
+        <header className="bg-background/95 backdrop-blur-sm border-b sticky top-0 z-40 shadow-sm">
+          <div className="px-6 py-4">
+            <div className="flex justify-between items-center">
+              <div className="flex items-center space-x-4">
+                <Button
+                  onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+                  variant="ghost"
+                  size="sm"
+                  className="md:hidden hover:bg-primary/10"
+                >
+                  {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+                </Button>
+                <div className="flex items-center space-x-3">
+                  <div className="w-10 h-10 bg-gradient-to-br from-primary to-accent rounded-xl flex items-center justify-center shadow-md">
+                    <span className="text-white font-bold">I</span>
+                  </div>
+                  <div>
+                    <h1 className="text-xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
+                      INGRES-AI
+                    </h1>
+                    <p className="text-xs text-muted-foreground">Groundwater Intelligence</p>
+                  </div>
                 </div>
-                <h1 className="text-xl font-bold text-primary">INGRES-AI Public</h1>
-              </div>
-            </div>
-            
-            <div className="flex items-center space-x-4">
-              {/* Water Points */}
-              <div className="flex items-center space-x-2 bg-accent/10 px-3 py-1 rounded-full">
-                <span className="text-accent text-sm font-medium">💧 {waterPoints}</span>
               </div>
               
-              {/* Profile */}
-              <div className="flex items-center space-x-2">
-                <Avatar className="h-8 w-8">
-                  <AvatarFallback className="bg-primary/10 text-primary text-xs">
-                    {getUserInitials()}
-                  </AvatarFallback>
-                </Avatar>
-                <span className="hidden sm:block text-sm font-medium">
-                  {profile.name || 'Guest'}
-                </span>
+              <div className="flex items-center space-x-3">
+                {/* Water Points */}
+                <div className="flex items-center space-x-2 bg-gradient-to-r from-blue-500/10 to-cyan-500/10 px-4 py-2 rounded-full border border-blue-200/20">
+                  <span className="text-blue-600 font-semibold">💧 {waterPoints}</span>
+                </div>
+                
+                {/* Notifications */}
+                <Button variant="ghost" size="sm" className="relative">
+                  <Bell className="w-4 h-4" />
+                  <span className="absolute -top-1 -right-1 w-2 h-2 bg-red-500 rounded-full"></span>
+                </Button>
+                
+                {/* Profile */}
+                <div className="flex items-center space-x-3">
+                  <Avatar className="h-9 w-9 ring-2 ring-primary/20">
+                    <AvatarFallback className="bg-gradient-to-br from-primary/20 to-accent/20 text-primary font-semibold">
+                      {getUserInitials()}
+                    </AvatarFallback>
+                  </Avatar>
+                  <div className="hidden sm:block">
+                    <p className="text-sm font-medium">{profile.name || 'Guest'}</p>
+                    <p className="text-xs text-muted-foreground">{profile.location || 'India'}</p>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
-        </div>
-      </header>
-
-      <div className="flex-1 flex">
-        {/* Desktop Sidebar */}
-        <div className={`hidden md:block transition-all duration-300 ${mobileMenuOpen ? 'block' : ''}`}>
-          <DashboardSidebar
-            activeSection={activeSection}
-            onSectionChange={handleSectionChange}
-            isCollapsed={sidebarCollapsed}
-            onToggleCollapse={() => setSidebarCollapsed(!sidebarCollapsed)}
-            onNavigateHome={() => navigate('/')}
-          />
-        </div>
-
-        {/* Mobile Sidebar Overlay */}
-        {mobileMenuOpen && (
-          <div className="md:hidden fixed inset-0 z-40 bg-background/80 backdrop-blur-sm">
-            <div className="w-64">
-              <DashboardSidebar
-                activeSection={activeSection}
-                onSectionChange={handleSectionChange}
-                isCollapsed={false}
-                onToggleCollapse={() => {}}
-                onNavigateHome={() => navigate('/')}
-              />
-            </div>
-          </div>
-        )}
+        </header>
 
         {/* Main Content */}
-        <div className="flex-1 overflow-hidden">
-          {renderMainContent()}
-        </div>
+        <main className="flex-1 p-6 overflow-auto">
+          <div className="max-w-7xl mx-auto">
+            {renderMainContent()}
+          </div>
+        </main>
       </div>
+
     </div>
   );
 };

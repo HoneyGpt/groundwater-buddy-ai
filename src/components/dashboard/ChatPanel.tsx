@@ -188,24 +188,33 @@ export const ChatPanel = ({ profile }: ChatPanelProps) => {
   };
 
   return (
-    <div className="flex flex-col h-full">
+    <div className="h-full flex flex-col bg-gradient-to-br from-background to-primary/5 rounded-xl border shadow-lg">
       {/* Chat Header */}
-      <div className="flex items-center justify-between p-4 border-b border-border">
-        <h2 className="text-lg font-semibold text-primary">Chat with INGRES-AI</h2>
+      <div className="flex items-center justify-between p-6 border-b bg-gradient-to-r from-primary/5 to-accent/5 rounded-t-xl">
+        <div className="flex items-center space-x-3">
+          <div className="w-10 h-10 bg-gradient-to-br from-primary to-accent rounded-full flex items-center justify-center">
+            <Bot className="w-5 h-5 text-white" />
+          </div>
+          <div>
+            <h2 className="text-lg font-semibold text-primary">INGRES-AI Chat</h2>
+            <p className="text-xs text-muted-foreground">Your groundwater assistant</p>
+          </div>
+        </div>
         <Button
           onClick={handleSaveChat}
           variant="outline"
           size="sm"
           disabled={messages.length <= 1}
+          className="hover:bg-accent/10"
         >
           <Save className="w-4 h-4 mr-2" />
-          Save Chat
+          Save
         </Button>
       </div>
 
       {/* Quick Query Buttons */}
-      <div className="p-4 border-b border-border">
-        <p className="text-sm text-muted-foreground mb-3">Quick questions:</p>
+      <div className="p-4 border-b bg-background/50">
+        <p className="text-sm text-muted-foreground mb-3 font-medium">💡 Quick questions:</p>
         <div className="flex flex-wrap gap-2">
           {quickQueries.map((query) => (
             <Button
@@ -214,7 +223,7 @@ export const ChatPanel = ({ profile }: ChatPanelProps) => {
               size="sm"
               onClick={() => handleSendMessage(query)}
               disabled={isLoading}
-              className="text-xs hover:bg-accent/10 hover:border-accent"
+              className="text-xs hover:bg-accent/10 hover:border-accent hover:text-accent transition-all duration-200"
             >
               {query}
             </Button>
@@ -223,43 +232,88 @@ export const ChatPanel = ({ profile }: ChatPanelProps) => {
       </div>
 
       {/* Messages */}
-      <ScrollArea className="flex-1 p-4">
-        <div className="space-y-4">
+      <ScrollArea className="flex-1 p-6 bg-gradient-to-b from-transparent to-primary/5">
+        <div className="space-y-2">
           {messages.map((message) => (
             <div
               key={message.id}
-              className={`flex ${message.isUser ? 'justify-end' : 'justify-start'} animate-fade-in`}
+              className={`flex ${message.isUser ? 'justify-start' : 'justify-end'} animate-fade-in mb-4`}
             >
-              <div className={`flex items-start gap-3 max-w-[80%] ${message.isUser ? 'flex-row-reverse' : 'flex-row'}`}>
-                <div className={`w-8 h-8 rounded-full flex items-center justify-center ${
+              <div className={`flex items-start gap-3 max-w-[75%] ${message.isUser ? 'flex-row' : 'flex-row-reverse'}`}>
+                <div className={`w-10 h-10 rounded-full flex items-center justify-center shadow-md ${
                   message.isUser 
-                    ? 'bg-accent/20 text-accent' 
-                    : 'bg-primary/20 text-primary'
+                    ? 'bg-gradient-to-br from-blue-500 to-cyan-500 text-white' 
+                    : 'bg-gradient-to-br from-primary to-accent text-white'
                 }`}>
-                  {message.isUser ? <User className="w-4 h-4" /> : <Bot className="w-4 h-4" />}
+                  {message.isUser ? <User className="w-5 h-5" /> : <Bot className="w-5 h-5" />}
                 </div>
-                <Card className={`px-4 py-3 ${
+                <div className={`relative ${
                   message.isUser
-                    ? 'bg-accent/10 border-accent/20'
-                    : 'bg-background border-border'
-                }`}>
+                    ? 'bg-gradient-to-br from-blue-50 to-cyan-50 border border-blue-200'
+                    : 'bg-gradient-to-br from-primary/5 to-accent/5 border border-primary/20'
+                } rounded-2xl px-4 py-3 shadow-sm`}>
+                  {/* Message bubble arrow */}
+                  <div className={`absolute top-4 w-0 h-0 ${
+                    message.isUser
+                      ? '-left-2 border-l-0 border-r-8 border-t-8 border-b-8 border-transparent border-r-blue-200'
+                      : '-right-2 border-r-0 border-l-8 border-t-8 border-b-8 border-transparent border-l-primary/20'
+                  }`}></div>
+                  
                   {message.id === 'typing' ? (
-                    <div className="flex space-x-1">
+                    <div className="flex space-x-1 py-2">
                       <div className="w-2 h-2 bg-primary/60 rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></div>
                       <div className="w-2 h-2 bg-primary/60 rounded-full animate-bounce" style={{ animationDelay: '150ms' }}></div>
                       <div className="w-2 h-2 bg-primary/60 rounded-full animate-bounce" style={{ animationDelay: '300ms' }}></div>
                     </div>
                   ) : (
                     <>
-                      <p className="text-sm leading-relaxed whitespace-pre-wrap">{message.text}</p>
-                      {message.contextInfo && (
-                        <p className="text-xs text-muted-foreground mt-2 italic border-t border-border/50 pt-2">
-                          {message.contextInfo}
-                        </p>
+                      {/* Parse response for Supabase vs Gemini content */}
+                      {message.text.includes('📚 Supabase') || message.text.includes('🤖 Gemini') ? (
+                        <div className="space-y-3">
+                          {message.text.split('\n\n').map((section, idx) => (
+                            <div key={idx}>
+                              {section.startsWith('📚 Supabase') ? (
+                                <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-3">
+                                  <div className="flex items-center gap-2 mb-2">
+                                    <span className="text-yellow-600 font-semibold">📚 From Knowledge Base</span>
+                                  </div>
+                                  <p className="text-sm leading-relaxed text-gray-800">
+                                    {section.replace('📚 Supabase Knowledge:\n', '')}
+                                  </p>
+                                </div>
+                              ) : section.startsWith('🤖 Gemini') ? (
+                                <div className="bg-gray-50 border border-gray-200 rounded-lg p-3">
+                                  <div className="flex items-center gap-2 mb-2">
+                                    <span className="text-gray-600 font-semibold">🤖 AI Assistant</span>
+                                  </div>
+                                  <p className="text-sm leading-relaxed text-gray-700">
+                                    {section.replace('🤖 Gemini AI Suggestion:\n', '')}
+                                  </p>
+                                </div>
+                              ) : (
+                                <p className="text-sm leading-relaxed">{section}</p>
+                              )}
+                            </div>
+                          ))}
+                        </div>
+                      ) : (
+                        <p className="text-sm leading-relaxed whitespace-pre-wrap">{message.text}</p>
                       )}
+                      
+                      {message.contextInfo && (
+                        <div className="mt-3 pt-2 border-t border-border/30">
+                          <p className="text-xs text-muted-foreground italic">
+                            {message.contextInfo}
+                          </p>
+                        </div>
+                      )}
+                      
+                      <p className="text-xs text-muted-foreground mt-2 opacity-70">
+                        {message.timestamp.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}
+                      </p>
                     </>
                   )}
-                </Card>
+                </div>
               </div>
             </div>
           ))}
@@ -268,8 +322,8 @@ export const ChatPanel = ({ profile }: ChatPanelProps) => {
       </ScrollArea>
 
       {/* Input Section */}
-      <div className="p-4 border-t border-border bg-background/50">
-        <div className="flex gap-2 items-end">
+      <div className="p-4 border-t bg-background rounded-b-xl">
+        <div className="flex gap-3 items-end">
           <div className="flex-1">
             <Input
               value={inputValue}
@@ -277,7 +331,7 @@ export const ChatPanel = ({ profile }: ChatPanelProps) => {
               onKeyPress={handleKeyPress}
               placeholder="Ask me anything about groundwater... 💧"
               disabled={isLoading}
-              className="border-border/50 focus:border-accent"
+              className="border-primary/20 focus:border-accent focus:ring-2 focus:ring-accent/20 rounded-full px-4 py-2 h-12"
             />
           </div>
           
@@ -286,18 +340,20 @@ export const ChatPanel = ({ profile }: ChatPanelProps) => {
             variant="outline"
             size="icon"
             disabled={isLoading || isListening}
-            className={`border-border/50 ${isListening ? 'bg-accent/20 border-accent' : ''}`}
+            className={`rounded-full h-12 w-12 border-primary/20 hover:bg-primary/5 ${
+              isListening ? 'bg-accent/20 border-accent animate-pulse' : ''
+            }`}
           >
-            <Mic className={`w-4 h-4 ${isListening ? 'text-accent' : ''}`} />
+            <Mic className={`w-5 h-5 ${isListening ? 'text-accent' : 'text-primary'}`} />
           </Button>
           
           <Button
             onClick={() => handleSendMessage()}
             disabled={!inputValue.trim() || isLoading}
             size="icon"
-            className="bg-accent hover:bg-accent/90 text-accent-foreground"
+            className="bg-gradient-to-r from-primary to-accent hover:from-primary/90 hover:to-accent/90 text-white rounded-full h-12 w-12 shadow-lg hover:shadow-xl transition-all duration-200"
           >
-            <Send className="w-4 h-4" />
+            <Send className="w-5 h-5" />
           </Button>
         </div>
       </div>
