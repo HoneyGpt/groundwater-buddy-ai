@@ -6,11 +6,40 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
-async function callGeminiAPI(question: string) {
+async function callGeminiAPI(question: string, conversationHistory: string = "") {
   const apiKey = Deno.env.get('GEMINI_API_KEY');
   if (!apiKey) {
     throw new Error('Gemini API key not configured');
   }
+
+  const systemPrompt = `You are INGRES-AI, a specialized assistant for groundwater management in India. 
+
+RESPONSE FORMAT REQUIREMENTS:
+• Use emojis and clear section headers
+• Structure responses with bullet points and numbered lists
+• Keep paragraphs concise and well-formatted
+• Use markdown-style formatting for better readability
+• Include practical actionable advice
+• Reference specific Indian government schemes when relevant
+
+EXAMPLE FORMAT:
+💧 **Groundwater Status Analysis**
+
+**Current Situation:**
+• Key finding 1
+• Key finding 2
+
+**📊 Why This Matters:**
+• Impact point 1 with specific data
+• Impact point 2 with context
+
+**⚡ Recommended Actions:**
+1. Immediate step with specific guidance
+2. Long-term strategy with implementation details
+
+${conversationHistory ? `\nCONVERSATION CONTEXT:\n${conversationHistory}\n` : ""}
+
+Question: ${question}`;
 
   const response = await fetch(
     `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=${apiKey}`,
@@ -21,13 +50,13 @@ async function callGeminiAPI(question: string) {
       },
       body: JSON.stringify({
         contents: [{
-          parts: [{ text: `You are INGRES-AI, a helpful assistant for groundwater management in India. Answer this question: ${question}` }]
+          parts: [{ text: systemPrompt }]
         }],
         generationConfig: {
           temperature: 0.7,
           topK: 40,
           topP: 0.95,
-          maxOutputTokens: 1024,
+          maxOutputTokens: 1500,
         }
       }),
     }
@@ -53,9 +82,15 @@ serve(async (req) => {
       Deno.env.get('SUPABASE_ANON_KEY') ?? '',
     );
 
-    const { message: question, userProfile } = await req.json();
+    const { message: question, userProfile, conversationHistory } = await req.json();
     
     console.log('Processing chat request:', { question, userId: userProfile?.id });
+
+    // Get recent conversation context for memory
+    const contextHistory = conversationHistory ? 
+      conversationHistory.slice(-6).map((msg: any) => 
+        `${msg.isUser ? 'User' : 'INGRES-AI'}: ${msg.text}`
+      ).join('\n') : "";
 
     // 1️⃣ Search Supabase knowledge_base first
     const { data: kbResults, error } = await supabaseClient
@@ -75,42 +110,34 @@ serve(async (req) => {
 
     let supabaseAnswer = "";
     if (kbResults && kbResults.length > 0) {
-      supabaseAnswer = kbResults
-        .map((row) => `${row.title}: ${row.content}`)
-        .join('\n\n');
+      // Format knowledge base results better
+      supabaseAnswer = `📚 **INGRES Knowledge Base**\n\n${kbResults
+        .map((row, idx) => `**${idx + 1}. ${row.title}**\n${row.content}`)
+        .join('\n\n')}`;
     }
 
-    // 2️⃣ Fallback to Gemini if needed or supplement
+    // 2️⃣ Get structured AI response with conversation memory
     let geminiAnswer = "";
-    const needsGeminiFallback = !supabaseAnswer || kbResults.length < 3;
-    
-    if (needsGeminiFallback) {
-      console.log('Calling Gemini API for fallback/supplement');
-      try {
-        geminiAnswer = await callGeminiAPI(question);
-      } catch (geminiError) {
-        console.error('Gemini API error:', geminiError);
-        geminiAnswer = "I'm having trouble accessing additional information right now.";
-      }
+    console.log('Calling Gemini API with context');
+    try {
+      geminiAnswer = await callGeminiAPI(question, contextHistory);
+    } catch (geminiError) {
+      console.error('Gemini API error:', geminiError);
+      geminiAnswer = "🌊 I'm experiencing technical difficulties but remain ready to help with groundwater queries. Please try again!";
     }
 
-    // 3️⃣ Merge intelligently with clear source separation
-    const responseParts = [];
+    // 3️⃣ Combine responses with better formatting
+    let finalAnswer = "";
     
-    if (supabaseAnswer) {
-      responseParts.push(`📚 **From INGRES Knowledge Base:**\n${supabaseAnswer}`);
+    if (supabaseAnswer && geminiAnswer) {
+      finalAnswer = `${supabaseAnswer}\n\n---\n\n🤖 **INGRES-AI Analysis**\n${geminiAnswer}`;
+    } else if (supabaseAnswer) {
+      finalAnswer = `${supabaseAnswer}\n\n🤖 **Additional Context**\nFor more specific guidance, please provide your location details or specific requirements.`;
+    } else if (geminiAnswer) {
+      finalAnswer = geminiAnswer;
+    } else {
+      finalAnswer = "🌊 **INGRES-AI Response**\n\nI couldn't find specific information about your query. Please try:\n• Being more specific about your location\n• Asking about government schemes\n• Requesting water conservation tips\n• Checking groundwater levels in your area";
     }
-    
-    if (geminiAnswer) {
-      const geminiLabel = supabaseAnswer ? 
-        "🤖 **Additional INGRES-AI Insights:**" : 
-        "🤖 **INGRES-AI Response:**\n🇮🇳 *Powered by Indian AI Technology*";
-      responseParts.push(`${geminiLabel}\n${geminiAnswer}`);
-    }
-
-    const finalAnswer = responseParts.length > 0 ? 
-      responseParts.join('\n\n---\n\n') : 
-      "I couldn't find relevant information. Please try rephrasing your question or contact local water authorities.";
 
     // Store chat interaction for analytics
     await supabaseClient
@@ -135,7 +162,7 @@ serve(async (req) => {
         response: finalAnswer,
         sources: {
           supabase_results: kbResults?.length || 0,
-          used_gemini: needsGeminiFallback,
+          used_gemini: !!geminiAnswer,
           primary_source: supabaseAnswer ? 'supabase' : 'gemini'
         }
       }),

@@ -79,12 +79,14 @@ export const ChatPanel = ({ profile }: ChatPanelProps) => {
     try {
       console.log('Sending message to INGRES AI:', messageText);
       
-      const { data, error } = await supabase.functions.invoke('gemini-chat', {
+      // Include conversation history for context
+      const conversationHistory = messages.filter(m => m.id !== 'typing').slice(-10);
+      
+      const { data, error } = await supabase.functions.invoke('enhanced-ai-chat', {
         body: {
           message: messageText,
-          context: { profile },
-          chatType: 'ingres',
-          useEnhancedKnowledge: useEnhanced
+          userProfile: profile,
+          conversationHistory: conversationHistory
         }
       });
 
@@ -100,14 +102,11 @@ export const ChatPanel = ({ profile }: ChatPanelProps) => {
         console.log('Received AI response successfully');
         botResponse = data.response;
         
-        // Add context information if available
-        if (data?.context_used) {
-          const ctx = data.context_used;
-          contextInfo = `📚 Used ${ctx.knowledge_items || 0} knowledge items, ${ctx.schemes_found || 0} schemes, ${ctx.conservation_tips || 0} tips${typeof ctx.location_data !== 'undefined' ? `, ${ctx.location_data} location datapoints` : ''}`;
+        // Add source information if available
+        if (data?.sources) {
+          const src = data.sources;
+          contextInfo = `📊 Sources: ${src.supabase_results || 0} knowledge items${src.used_gemini ? ', AI analysis' : ''}`;
         }
-      } else if (data?.fallbackResponse) {
-        console.log('Using fallback response');
-        botResponse = data.fallbackResponse;
       } else {
         throw new Error('Invalid response from AI service');
       }
@@ -131,7 +130,7 @@ export const ChatPanel = ({ profile }: ChatPanelProps) => {
         const filtered = prev.filter(msg => msg.id !== 'typing');
         return [...filtered, {
           id: Date.now().toString(),
-          text: "🌊 I'm INGRES-AI, your groundwater assistant! I'm having some technical difficulties right now, but I can still help you with groundwater information, government schemes, and water conservation tips. Please try asking again!",
+          text: "🌊 **INGRES-AI Status**\n\nI'm experiencing technical difficulties but remain ready to assist you with:\n\n• **Groundwater Information** - Status and trends\n• **Government Schemes** - Eligibility and applications  \n• **Conservation Tips** - Practical water-saving methods\n• **Local Guidance** - Area-specific recommendations\n\nPlease try your question again! 💧",
           isUser: false,
           timestamp: new Date()
         }];
@@ -267,38 +266,67 @@ export const ChatPanel = ({ profile }: ChatPanelProps) => {
                     </div>
                   ) : (
                     <>
-                      {/* Parse response for Supabase vs Gemini content */}
-                      {message.text.includes('📚 Supabase') || message.text.includes('🤖 Gemini') ? (
-                        <div className="space-y-3">
-                          {message.text.split('\n\n').map((section, idx) => (
-                            <div key={idx}>
-                              {section.startsWith('📚 Supabase') ? (
-                                <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-3">
-                                  <div className="flex items-center gap-2 mb-2">
-                                    <span className="text-yellow-600 font-semibold">📚 INGRES Knowledge Base</span>
-                                  </div>
-                                  <p className="text-sm leading-relaxed text-gray-800">
-                                    {section.replace('📚 Supabase Knowledge:\n', '')}
-                                  </p>
+                      {/* Enhanced structured response rendering */}
+                      <div className="space-y-4">
+                        {message.text.split(/\n\n---\n\n|\n\n/).map((section, idx) => {
+                          const trimmedSection = section.trim();
+                          if (!trimmedSection) return null;
+                          
+                          // Knowledge Base sections
+                          if (trimmedSection.startsWith('📚 **INGRES Knowledge Base**')) {
+                            return (
+                              <div key={idx} className="bg-gradient-to-r from-yellow-50 to-amber-50 border border-yellow-200 rounded-lg p-4">
+                                <div className="flex items-center gap-2 mb-3">
+                                  <span className="text-amber-600 font-semibold">📚 INGRES Knowledge Base</span>
                                 </div>
-                              ) : section.startsWith('🤖 INGRES-AI') || section.startsWith('🤖 Gemini') ? (
-                                <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
-                                  <div className="flex items-center gap-2 mb-2">
-                                    <span className="text-blue-600 font-semibold">🇮🇳 INGRES-AI (Indian AI Technology)</span>
-                                  </div>
-                                  <p className="text-sm leading-relaxed text-gray-700">
-                                    {section.replace('🤖 Gemini AI Suggestion:\n', '').replace('🤖 INGRES-AI Response:\n', '')}
-                                  </p>
+                                <div className="text-sm leading-relaxed text-gray-800 space-y-2">
+                                  {trimmedSection.replace('📚 **INGRES Knowledge Base**\n\n', '').split('\n\n').map((item, itemIdx) => (
+                                    <div key={itemIdx} className="border-l-2 border-yellow-300 pl-3">
+                                      <div className="prose prose-sm max-w-none" dangerouslySetInnerHTML={{
+                                        __html: item.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+                                      }} />
+                                    </div>
+                                  ))}
                                 </div>
-                              ) : (
-                                <p className="text-sm leading-relaxed">{section}</p>
-                              )}
+                              </div>
+                            );
+                          }
+                          
+                          // AI Analysis sections
+                          if (trimmedSection.startsWith('🤖 **INGRES-AI Analysis**') || trimmedSection.startsWith('🤖 **Additional Context**')) {
+                            return (
+                              <div key={idx} className="bg-gradient-to-r from-blue-50 to-cyan-50 border border-blue-200 rounded-lg p-4">
+                                <div className="flex items-center gap-2 mb-3">
+                                  <span className="text-blue-600 font-semibold">🇮🇳 INGRES-AI Analysis</span>
+                                </div>
+                                <div className="text-sm leading-relaxed text-gray-700">
+                                  <div className="prose prose-sm max-w-none" dangerouslySetInnerHTML={{
+                                    __html: trimmedSection
+                                      .replace(/🤖 \*\*INGRES-AI Analysis\*\*\n?/, '')
+                                      .replace(/🤖 \*\*Additional Context\*\*\n?/, '')
+                                      .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+                                      .replace(/• /g, '• ')
+                                      .replace(/\n/g, '<br/>')
+                                  }} />
+                                </div>
+                              </div>
+                            );
+                          }
+                          
+                          // General formatted content
+                          return (
+                            <div key={idx} className="text-sm leading-relaxed space-y-2">
+                              <div className="prose prose-sm max-w-none" dangerouslySetInnerHTML={{
+                                __html: trimmedSection
+                                  .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+                                  .replace(/💧|🌊|📊|⚡|🇮🇳|📚|🤖/g, '<span class="text-lg">$&</span>')
+                                  .replace(/• /g, '• ')
+                                  .replace(/\n/g, '<br/>')
+                              }} />
                             </div>
-                          ))}
-                        </div>
-                      ) : (
-                        <p className="text-sm leading-relaxed whitespace-pre-wrap">{message.text}</p>
-                      )}
+                          );
+                        })}
+                      </div>
                       
                       {message.contextInfo && (
                         <div className="mt-3 pt-2 border-t border-border/30">
