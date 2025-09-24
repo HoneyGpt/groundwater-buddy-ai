@@ -16,7 +16,7 @@ serve(async (req) => {
     const { query, searchType = 'web', options = {} } = await req.json();
 
     const GOOGLE_API_KEY = Deno.env.get('GOOGLE_SEARCH_API_KEY');
-    const SEARCH_ENGINE_ID = '436035263b1de8a7cf';
+    const SEARCH_ENGINE_ID = Deno.env.get('GOOGLE_SEARCH_CX') ?? 'c35c85b4f765b4693';
 
     if (!GOOGLE_API_KEY) {
       throw new Error('GOOGLE_SEARCH_API_KEY is not configured');

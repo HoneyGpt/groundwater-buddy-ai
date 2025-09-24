@@ -14,3 +14,6 @@ verify_jwt = false
 
 [functions.pdf-fulltext-extract]
 verify_jwt = false
+
+[functions.google-search]
+verify_jwt = false

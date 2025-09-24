@@ -19,6 +19,7 @@ import BudgetBroPanel from '@/components/dashboard/BudgetBroPanel';
 import { MapsPanel } from '@/components/dashboard/MapsPanel';
 import { CalendarPanel } from '@/components/dashboard/CalendarPanel';
 import HelplinePanel from '@/components/dashboard/HelplinePanel';
+import GoogleCSE from '@/components/GoogleCSE';
 
 const Playground = () => {
   const navigate = useNavigate();
@@ -513,6 +514,12 @@ const Playground = () => {
                 </Button>
               </div>
             </div>
+
+            {activeTab === 'web' && (
+              <div className="w-full max-w-4xl mt-8">
+                <GoogleCSE cx="c35c85b4f765b4693" />
+              </div>
+            )}
 
             {/* Search Results */}
             {searchResults.length > 0 && (
