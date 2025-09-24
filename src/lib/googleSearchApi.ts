@@ -3,7 +3,7 @@
  */
 
 const GOOGLE_API_KEY = 'AIzaSyAKE8LeBqiIAgcYKnS_EW4Mej9Po0vKCnU';
-const SEARCH_ENGINE_ID = '9360352631de8a7cf';
+const SEARCH_ENGINE_ID = '436035263b1de8a7cf';
 
 export interface GoogleSearchResult {
   title: string;
