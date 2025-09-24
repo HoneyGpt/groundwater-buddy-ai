@@ -5,7 +5,7 @@ import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { useNavigate } from 'react-router-dom';
-import { Search, Settings, LogOut, Crown, FileText, Zap, BookOpen, Database, Globe, Filter, Calendar, Star, Mic, Camera, MessageCircle, History, Save, DollarSign, Map, Gift, Phone, Home, Menu, X, Send } from 'lucide-react';
+import { Search, LogOut, Crown, FileText, Zap, BookOpen, Database, Globe, Filter, Calendar, Star, Mic, Camera, MessageCircle, History, Save, DollarSign, Map, Gift, Phone, Home, Menu, X, Send } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { searchGoogle, searchGovernmentDocs, getSearchSuggestions } from '@/lib/googleSearchApi';
@@ -18,7 +18,7 @@ import BudgetBroPanel from '@/components/dashboard/BudgetBroPanel';
 import { MapsPanel } from '@/components/dashboard/MapsPanel';
 import { CalendarPanel } from '@/components/dashboard/CalendarPanel';
 import HelplinePanel from '@/components/dashboard/HelplinePanel';
-import GoogleCSE from '@/components/GoogleCSE';
+// GoogleCSE removed to keep single search bar
 import { GOVERNMENT_SECRETARIES } from '@/data/governmentSecretaries';
 
 const Playground = () => {
@@ -202,7 +202,6 @@ const Playground = () => {
     { icon: Map, label: 'Interactive Maps', key: 'maps' },
     { icon: Gift, label: 'Schemes', key: 'schemes' },
     { icon: Phone, label: 'Helpline', key: 'helpline' },
-    { icon: Settings, label: 'Settings', key: 'settings' },
   ];
 
   if (loading) {
@@ -287,15 +286,9 @@ const Playground = () => {
             <Button variant="ghost" size="sm" onClick={() => navigate('/')} className="text-foreground/70 hover:text-foreground">
               Home
             </Button>
-            <Button variant="ghost" size="sm" onClick={() => navigate('/settings')} className="text-foreground/70 hover:text-foreground">
-              Settings
-            </Button>
           </div>
           
           <div className="flex items-center space-x-3">
-            <Button variant="ghost" size="sm" className="text-foreground/70 hover:text-foreground">
-              <Settings className="w-4 h-4" />
-            </Button>
             
             <Badge className="bg-gradient-to-r from-yellow-500 to-orange-500 text-white border-0 px-3 py-1">
               <Crown className="w-3 h-3 mr-1" />
@@ -451,11 +444,6 @@ const Playground = () => {
               </div>
             </div>
 
-            {activeTab === 'web' && (
-              <div className="w-full max-w-4xl mt-8">
-                <GoogleCSE cx="c35c85b4f765b4693" />
-              </div>
-            )}
 
             {activeTab === 'government' && (
               <div className="w-full max-w-6xl mt-8">
@@ -534,21 +522,6 @@ const Playground = () => {
                   return <CalendarPanel />;
                 case 'helpline':
                   return <HelplinePanel />;
-                case 'settings':
-                  return (
-                    <div className="text-center py-12">
-                      <Settings className="w-16 h-16 mx-auto text-foreground/40 mb-4" />
-                      <h3 className="text-xl font-medium text-foreground/80 mb-2">
-                        Settings Panel
-                      </h3>
-                      <p className="text-foreground/60 mb-6">
-                        Configure your INGRES-AI preferences and account settings.
-                      </p>
-                      <Button onClick={() => navigate('/settings')} className="bg-primary hover:bg-primary/90">
-                        Go to Settings
-                      </Button>
-                    </div>
-                  );
                 case 'overview':
                 default:
                   return <OverviewPanel profile={mockProfile} onSectionChange={setActivePanel} />;
