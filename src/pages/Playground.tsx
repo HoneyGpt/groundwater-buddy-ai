@@ -153,42 +153,49 @@ const Playground = () => {
 
   const renderSearchResult = (result: any, index: number) => {
     return (
-      <div key={index} className="bg-white/40 dark:bg-black/20 backdrop-blur-sm border border-white/20 dark:border-white/10 rounded-2xl p-6 hover:bg-white/50 dark:hover:bg-black/30 transition-all duration-300 shadow-sm hover:shadow-lg">
-        <div className="space-y-3">
-          <div className="flex items-start justify-between">
-            <div className="flex-1">
-              <div className="flex items-center space-x-2 mb-1">
-                <span className="text-sm text-foreground/60">{result.displayLink}</span>
-                <span className="w-1 h-1 bg-foreground/30 rounded-full"></span>
-                <span className="text-xs text-foreground/40">INGRES-AI</span>
-              </div>
-              <h3 className="text-lg font-medium text-primary hover:text-primary/80 cursor-pointer transition-colors duration-200 line-clamp-2">
-                <a href={result.link} target="_blank" rel="noopener noreferrer">
-                  {result.title}
-                </a>
-              </h3>
-              <p className="text-sm text-foreground/70 mt-2 line-clamp-3 leading-relaxed">
-                {result.snippet}
+      <div key={index} className="group">
+        <div className="flex items-start justify-between">
+          <div className="flex-1 min-w-0">
+            <div className="flex items-center gap-2 mb-1">
+              <p className="text-sm text-muted-foreground truncate">
+                {result.displayLink}
               </p>
+              <span className="text-xs bg-primary/10 text-primary px-2 py-0.5 rounded">
+                INGRES-AI
+              </span>
             </div>
-          </div>
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-2">
+            
+            <h3 className="text-xl text-primary hover:text-primary/80 cursor-pointer mb-2 line-clamp-2 group-hover:underline">
+              <a href={result.link} target="_blank" rel="noopener noreferrer">
+                {result.title}
+              </a>
+            </h3>
+            
+            <p className="text-sm text-foreground/70 line-clamp-2 mb-3 leading-relaxed">
+              {result.snippet}
+            </p>
+            
+            <div className="flex items-center gap-4">
               <a 
                 href={result.link} 
                 target="_blank" 
-                rel="noopener noreferrer" 
-                className="inline-flex items-center space-x-1 text-xs text-blue-600 dark:text-blue-400 hover:underline bg-blue-50 dark:bg-blue-900/20 px-2 py-1 rounded-full transition-colors duration-200"
+                rel="noopener noreferrer"
+                className="text-primary hover:text-primary/80 text-sm font-medium flex items-center gap-1"
               >
                 <Globe className="w-3 h-3" />
-                <span>Visit Site</span>
+                Visit Site
               </a>
             </div>
-            <span className="text-xs text-foreground/40">
-              {new Date().toLocaleDateString()}
-            </span>
+          </div>
+          
+          <div className="text-xs text-muted-foreground ml-4 flex-shrink-0">
+            {new Date().toLocaleDateString()}
           </div>
         </div>
+        
+        {index < searchResults.length - 1 && (
+          <div className="border-b border-muted/30 mt-6"></div>
+        )}
       </div>
     );
   };
@@ -412,38 +419,64 @@ const Playground = () => {
                 )}
               </div>
 
-              {/* Example Searches */}
-              <div className="flex justify-center mt-8">
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-3 max-w-4xl">
-                  <button
-                    onClick={() => {
-                      setSearchQuery("groundwater levels Karnataka");
-                      handleSearch("groundwater levels Karnataka");
-                    }}
-                    className="p-3 text-sm bg-white/10 hover:bg-white/20 backdrop-blur-sm border border-white/20 text-foreground rounded-xl transition-all duration-300"
-                  >
-                    "groundwater levels Karnataka"
-                  </button>
-                  <button
-                    onClick={() => {
-                      setSearchQuery("water table depth monitoring");
-                      handleSearch("water table depth monitoring");
-                    }}
-                    className="p-3 text-sm bg-white/10 hover:bg-white/20 backdrop-blur-sm border border-white/20 text-foreground rounded-xl transition-all duration-300"
-                  >
-                    "water table depth monitoring"
-                  </button>
-                  <button
-                    onClick={() => {
-                      setSearchQuery("irrigation schemes farmers");
-                      handleSearch("irrigation schemes farmers");
-                    }}
-                    className="p-3 text-sm bg-white/10 hover:bg-white/20 backdrop-blur-sm border border-white/20 text-foreground rounded-xl transition-all duration-300"
-                  >
-                    "irrigation schemes farmers"
-                  </button>
+              {/* Search Suggestions Pills */}
+              {searchQuery && (
+                <div className="flex justify-center mt-6">
+                  <div className="flex flex-wrap gap-3 max-w-4xl">
+                    {[
+                      `"groundwater levels ${searchQuery.split(' ').slice(-1)[0] || 'Karnataka'}"`,
+                      `"water table depth monitoring"`,
+                      `"irrigation schemes farmers"`
+                    ].map((suggestion, index) => (
+                      <button
+                        key={index}
+                        onClick={() => {
+                          setSearchQuery(suggestion.replace(/"/g, ''));
+                          handleSearch(suggestion.replace(/"/g, ''));
+                        }}
+                        className="px-4 py-2 bg-muted hover:bg-muted/80 text-foreground rounded-full text-sm transition-colors border border-muted-foreground/20"
+                      >
+                        {suggestion}
+                      </button>
+                    ))}
+                  </div>
                 </div>
-              </div>
+              )}
+
+              {/* Example Searches - Only show when no query */}
+              {!searchQuery && (
+                <div className="flex justify-center mt-8">
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-3 max-w-4xl">
+                    <button
+                      onClick={() => {
+                        setSearchQuery("groundwater levels Karnataka");
+                        handleSearch("groundwater levels Karnataka");
+                      }}
+                      className="p-3 text-sm bg-white/10 hover:bg-white/20 backdrop-blur-sm border border-white/20 text-foreground rounded-xl transition-all duration-300"
+                    >
+                      "groundwater levels Karnataka"
+                    </button>
+                    <button
+                      onClick={() => {
+                        setSearchQuery("water table depth monitoring");
+                        handleSearch("water table depth monitoring");
+                      }}
+                      className="p-3 text-sm bg-white/10 hover:bg-white/20 backdrop-blur-sm border border-white/20 text-foreground rounded-xl transition-all duration-300"
+                    >
+                      "water table depth monitoring"
+                    </button>
+                    <button
+                      onClick={() => {
+                        setSearchQuery("irrigation schemes farmers");
+                        handleSearch("irrigation schemes farmers");
+                      }}
+                      className="p-3 text-sm bg-white/10 hover:bg-white/20 backdrop-blur-sm border border-white/20 text-foreground rounded-xl transition-all duration-300"
+                    >
+                      "irrigation schemes farmers"
+                    </button>
+                  </div>
+                </div>
+              )}
             </div>
 
 
@@ -483,15 +516,13 @@ const Playground = () => {
             {searchResults.length > 0 && (
               <div className="w-full max-w-4xl mt-12">
                 <div className="flex items-center justify-between mb-6">
-                  <p className="text-foreground/60 text-sm">
+                  <p className="text-muted-foreground text-sm">
                     About {searchResults.length} results for "{searchQuery}"
                   </p>
-                  <div className="flex items-center space-x-2">
-                    <Button variant="ghost" size="sm" className="text-foreground/60">
-                      <Filter className="w-4 h-4 mr-2" />
-                      Filter
-                    </Button>
-                  </div>
+                  <Button variant="ghost" size="sm" className="text-muted-foreground hover:text-foreground">
+                    <Filter className="w-4 h-4 mr-2" />
+                    Filter
+                  </Button>
                 </div>
                 
                 <div className="space-y-6">
