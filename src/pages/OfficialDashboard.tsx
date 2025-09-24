@@ -166,7 +166,7 @@ const OfficialDashboard = () => {
           isCollapsed={sidebarCollapsed}
           onToggleCollapse={() => setSidebarCollapsed(!sidebarCollapsed)}
           onNavigateHome={() => navigate('/')}
-          onNavigateToDashboard={() => navigate('/playground')}
+          onNavigateToDashboard={() => setActiveSection('overview')}
         />
       </div>
 
@@ -180,7 +180,7 @@ const OfficialDashboard = () => {
               isCollapsed={false}
               onToggleCollapse={() => {}}
               onNavigateHome={() => navigate('/')}
-              onNavigateToDashboard={() => navigate('/playground')}
+              onNavigateToDashboard={() => setActiveSection('overview')}
             />
           </div>
         </div>
