@@ -5,7 +5,7 @@ import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { useNavigate } from 'react-router-dom';
-import { Search, LogOut, Crown, FileText, Zap, BookOpen, Database, Globe, Filter, Calendar, Star, Mic, Camera, MessageCircle, History, Save, DollarSign, Map, Gift, Phone, Home, Menu, X, Send, Settings } from 'lucide-react';
+import { Search, LogOut, Crown, FileText, Zap, BookOpen, Database, Globe, Filter, Calendar, Star, Mic, Camera, MessageCircle, History, Save, DollarSign, Map, Gift, Phone, Home, Menu, X, Send, Settings, ArrowLeft, ChevronLeft, ChevronRight } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { searchGoogle, searchGovernmentDocs, getSearchSuggestions } from '@/lib/googleSearchApi';
@@ -35,6 +35,7 @@ const Playground = () => {
   const [searchSuggestions, setSearchSuggestions] = useState<string[]>([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [chatMessages, setChatMessages] = useState<any[]>([]);
   const [activePanel, setActivePanel] = useState<string>('search');
 
@@ -241,23 +242,53 @@ const Playground = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 dark:from-slate-900 dark:via-slate-800 dark:to-indigo-900">
       {/* Sidebar */}
-      <div className={`fixed inset-y-0 left-0 z-50 w-64 bg-white/20 dark:bg-black/20 backdrop-blur-md border-r border-white/20 dark:border-white/10 transform transition-transform duration-300 ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'} lg:translate-x-0`}>
+      <div className={`fixed inset-y-0 left-0 z-50 ${sidebarCollapsed ? 'w-16' : 'w-64'} bg-white/20 dark:bg-black/20 backdrop-blur-md border-r border-white/20 dark:border-white/10 transform transition-transform duration-300 ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'} lg:translate-x-0`}>
         <div className="flex flex-col h-full">
           <div className="flex items-center justify-between p-4 border-b border-white/20 dark:border-white/10">
-            <div className="flex items-center space-x-2">
-              <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-purple-600 rounded-lg flex items-center justify-center">
-                <span className="text-white font-bold text-sm">IA</span>
-              </div>
-              <span className="font-semibold text-foreground">INGRES-AI</span>
+            <div className="flex items-center gap-2">
+              {!sidebarCollapsed && (
+                activePanel === 'search' ? (
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => navigate('/')}
+                    className="text-primary hover:text-primary/80 hover:bg-white/20"
+                  >
+                    <Home className="w-4 h-4 mr-2" />
+                    Home
+                  </Button>
+                ) : (
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => setActivePanel('search')}
+                    className="text-primary hover:text-primary/80 hover:bg-white/20"
+                  >
+                    <ArrowLeft className="w-4 h-4 mr-2" />
+                    Dashboard
+                  </Button>
+                )
+              )}
             </div>
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => setSidebarOpen(false)}
-              className="lg:hidden"
-            >
-              <X className="w-4 h-4" />
-            </Button>
+            <div className="flex items-center gap-1">
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setSidebarCollapsed(!sidebarCollapsed)}
+                className="rounded-full"
+                title={sidebarCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}
+              >
+                {sidebarCollapsed ? <ChevronRight className="w-4 h-4" /> : <ChevronLeft className="w-4 h-4" />}
+              </Button>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setSidebarOpen(false)}
+                className="lg:hidden"
+              >
+                <X className="w-4 h-4" />
+              </Button>
+            </div>
           </div>
           
           <nav className="flex-1 p-4 space-y-2">
@@ -269,11 +300,12 @@ const Playground = () => {
                   activePanel === item.key 
                     ? 'bg-primary/20 text-primary border border-primary/30' 
                     : 'text-foreground/70 hover:text-foreground hover:bg-white/10'
-                }`}
+                } ${sidebarCollapsed ? 'px-3' : ''}`}
                 onClick={() => setActivePanel(item.key)}
+                title={sidebarCollapsed ? item.label : undefined}
               >
-                <item.icon className="w-4 h-4 mr-3" />
-                {item.label}
+                <item.icon className={`w-4 h-4 ${sidebarCollapsed ? '' : 'mr-3'}`} />
+                {!sidebarCollapsed && item.label}
               </Button>
             ))}
           </nav>
@@ -281,7 +313,7 @@ const Playground = () => {
       </div>
 
       {/* Main Content */}
-      <div className={`transition-all duration-300 ${sidebarOpen ? 'lg:ml-64' : 'lg:ml-64'}`}>
+      <div className={`transition-all duration-300 ${sidebarCollapsed ? 'lg:ml-16' : 'lg:ml-64'}`}>
         {/* Top Navigation */}
         <nav className="flex justify-between items-center p-4 md:p-6">
           <div className="flex items-center space-x-6">
