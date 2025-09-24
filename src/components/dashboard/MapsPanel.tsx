@@ -6,6 +6,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Badge } from '@/components/ui/badge';
 import { MapPin, Search, Download, Filter, ZoomIn, ZoomOut, Home, Layers, Info } from 'lucide-react';
 import ingresLogo from '@/assets/ingres-ai-logo.png';
+import indiaMap from '@/assets/india-groundwater-map.jpg';
 
 export const MapsPanel = () => {
   const [selectedYear, setSelectedYear] = useState('2024-2025');
@@ -190,111 +191,19 @@ export const MapsPanel = () => {
         {/* Map Display */}
         <div className="flex-1 bg-slate-100 relative overflow-hidden">
           <div className="absolute inset-0">
-            <div className="w-full h-full relative bg-gradient-to-b from-blue-50 to-blue-100">
-              {/* India Map SVG */}
-              <div className="flex items-center justify-center h-full">
-                <svg 
-                  width="600" 
-                  height="400" 
-                  viewBox="0 0 800 600" 
-                  className="drop-shadow-lg"
-                >
-                  {/* India outline */}
-                  <path
-                    d="M300,100 L350,80 L400,90 L450,85 L500,95 L550,100 L580,120 L600,140 L620,160 L630,180 L635,200 L640,220 L645,240 L650,260 L655,280 L660,300 L665,320 L670,340 L675,360 L680,380 L685,400 L690,420 L685,440 L680,460 L670,480 L660,500 L645,515 L630,525 L610,530 L590,535 L570,540 L550,545 L530,550 L510,555 L490,560 L470,565 L450,570 L430,575 L410,580 L390,575 L370,570 L350,565 L330,560 L310,555 L290,550 L270,545 L250,540 L230,535 L210,530 L190,525 L175,515 L165,500 L160,480 L155,460 L150,440 L145,420 L150,400 L155,380 L160,360 L165,340 L170,320 L175,300 L180,280 L185,260 L190,240 L195,220 L205,200 L220,180 L235,160 L250,140 L270,120 L290,105 Z"
-                    fill="#e6f3ff"
-                    stroke="#2563eb"
-                    strokeWidth="2"
-                    className="hover:fill-blue-100 transition-colors cursor-pointer"
-                  />
-                  
-                  {/* States boundaries - simplified */}
-                  <g stroke="#94a3b8" strokeWidth="1" fill="none" opacity="0.5">
-                    <path d="M200,200 L300,180 L350,200 L400,190 L450,200" />
-                    <path d="M300,200 L350,250 L400,240 L450,250" />
-                    <path d="M350,250 L400,300 L450,290 L500,300" />
-                    <path d="M400,300 L450,350 L500,340 L550,350" />
-                    <path d="M450,350 L500,400 L550,390 L600,400" />
-                  </g>
-                  
-                  {/* Interactive markers for different regions */}
-                  <g>
-                    {/* North India */}
-                    <circle 
-                      cx="350" 
-                      cy="200" 
-                      r="8" 
-                      fill={selectedCategory === 'safe' ? '#22c55e' : '#ef4444'}
-                      className="hover:r-10 cursor-pointer transition-all"
-                    />
-                    <text x="370" y="205" fontSize="12" fill="#1f2937" className="font-medium">North</text>
-                    
-                    {/* Central India */}
-                    <circle 
-                      cx="400" 
-                      cy="300" 
-                      r="8" 
-                      fill={selectedCategory === 'semiCritical' ? '#f59e0b' : '#22c55e'}
-                      className="hover:r-10 cursor-pointer transition-all"
-                    />
-                    <text x="420" y="305" fontSize="12" fill="#1f2937" className="font-medium">Central</text>
-                    
-                    {/* South India */}
-                    <circle 
-                      cx="450" 
-                      cy="400" 
-                      r="8" 
-                      fill={selectedCategory === 'critical' ? '#ef4444' : '#22c55e'}
-                      className="hover:r-10 cursor-pointer transition-all"
-                    />
-                    <text x="470" y="405" fontSize="12" fill="#1f2937" className="font-medium">South</text>
-                    
-                    {/* East India */}
-                    <circle 
-                      cx="500" 
-                      cy="250" 
-                      r="8" 
-                      fill={selectedCategory === 'safe' ? '#22c55e' : '#f59e0b'}
-                      className="hover:r-10 cursor-pointer transition-all"
-                    />
-                    <text x="520" y="255" fontSize="12" fill="#1f2937" className="font-medium">East</text>
-                    
-                    {/* West India */}
-                    <circle 
-                      cx="300" 
-                      cy="300" 
-                      r="8" 
-                      fill={selectedCategory === 'overExploited' ? '#ef4444' : '#22c55e'}
-                      className="hover:r-10 cursor-pointer transition-all"
-                    />
-                    <text x="250" y="305" fontSize="12" fill="#1f2937" className="font-medium">West</text>
-                  </g>
-                  
-                  {/* Legend */}
-                  <g transform="translate(50, 450)">
-                    <rect x="0" y="0" width="200" height="120" fill="white" fillOpacity="0.9" stroke="#e5e7eb" rx="8" />
-                    <text x="10" y="20" fontSize="14" fill="#1f2937" className="font-semibold">Category Legend</text>
-                    
-                    <circle cx="20" cy="40" r="6" fill="#22c55e" />
-                    <text x="35" y="45" fontSize="12" fill="#1f2937">Safe</text>
-                    
-                    <circle cx="20" cy="60" r="6" fill="#f59e0b" />
-                    <text x="35" y="65" fontSize="12" fill="#1f2937">Semi-Critical</text>
-                    
-                    <circle cx="20" cy="80" r="6" fill="#ef4444" />
-                    <text x="35" y="85" fontSize="12" fill="#1f2937">Critical/Over-exploited</text>
-                    
-                    <circle cx="20" cy="100" r="6" fill="#8b5cf6" />
-                    <text x="35" y="105" fontSize="12" fill="#1f2937">Saline</text>
-                  </g>
-                </svg>
-              </div>
+            <div className="w-full h-full relative bg-white flex items-center justify-center">
+              {/* India Map from PDF */}
+              <img 
+                src={indiaMap} 
+                alt="India Groundwater Map - Annual Ground Water Extraction Assessment 2024-2025"
+                className="max-w-full max-h-full object-contain"
+              />
               
               {/* Data overlay */}
-              <div className="absolute top-4 right-4 bg-white/90 backdrop-blur-sm rounded-lg p-4 shadow-lg">
+              <div className="absolute top-4 right-4 bg-white/95 backdrop-blur-sm rounded-lg p-4 shadow-lg border">
                 <div className="text-center">
-                  <div className="text-sm font-medium text-gray-700">Showing {selectedComponent} data</div>
-                  <div className="text-xs text-gray-500">{selectedYear}</div>
+                  <div className="text-sm font-medium text-gray-700">Annual Ground Water Extraction</div>
+                  <div className="text-xs text-gray-500">Assessment year: {selectedYear}</div>
                   <div className="grid grid-cols-2 gap-2 mt-2 text-xs">
                     <div>
                       <div className="font-medium">Annual Extractable:</div>
@@ -309,10 +218,10 @@ export const MapsPanel = () => {
               </div>
               
               {/* Scale bar */}
-              <div className="absolute bottom-4 left-4 bg-white/90 backdrop-blur-sm rounded px-3 py-2 text-xs shadow-md">
+              <div className="absolute bottom-4 left-4 bg-white/95 backdrop-blur-sm rounded px-3 py-2 text-xs shadow-md border">
                 <div className="flex items-center gap-2">
                   <div className="w-16 h-1 bg-gray-400"></div>
-                  <span>0 — 300 — 600km</span>
+                  <span>50 100km</span>
                 </div>
               </div>
             </div>
