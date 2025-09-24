@@ -185,15 +185,46 @@ const Settings = () => {
                 </Button>
               </div>
               <div className="flex-1 space-y-4">
-                <div>
-                  <Label htmlFor="name" className="text-sm font-medium">Full Name</Label>
-                  <Input
-                    id="name"
-                    value={name}
-                    onChange={(e) => setName(e.target.value)}
-                    placeholder="Enter your full name"
-                    className="mt-1"
-                  />
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <Label htmlFor="name" className="text-sm font-medium">Full Name</Label>
+                    <Input
+                      id="name"
+                      value={name}
+                      onChange={(e) => setName(e.target.value)}
+                      placeholder="Enter your full name"
+                      className="mt-1"
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="email" className="text-sm font-medium">Email Address</Label>
+                    <Input
+                      id="email"
+                      type="email"
+                      placeholder="your.email@example.com"
+                      className="mt-1"
+                    />
+                  </div>
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <Label htmlFor="phone" className="text-sm font-medium">Phone Number</Label>
+                    <Input
+                      id="phone"
+                      type="tel"
+                      placeholder="+91 XXXXX XXXXX"
+                      className="mt-1"
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="password" className="text-sm font-medium">Change Password</Label>
+                    <Input
+                      id="password"
+                      type="password"
+                      placeholder="Enter new password"
+                      className="mt-1"
+                    />
+                  </div>
                 </div>
                 <div>
                   <Label htmlFor="profileType" className="text-sm font-medium">Profile Type</Label>

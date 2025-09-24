@@ -5,7 +5,7 @@ import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { useNavigate } from 'react-router-dom';
-import { Search, Settings, LogOut, Crown, FileText, Zap, BookOpen, Database, Globe, Filter, Calendar, Star, Mic, Camera, MessageCircle, History, Save, DollarSign, Map, Gift, Phone, Home, Menu, X } from 'lucide-react';
+import { Search, Settings, LogOut, Crown, FileText, Zap, BookOpen, Database, Globe, Filter, Calendar, Star, Mic, Camera, MessageCircle, History, Save, DollarSign, Map, Gift, Phone, Home, Menu, X, Send, GraduationCap } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { searchGoogle, searchAcademicPapers, searchWaterResources, searchGovernmentDocs, searchPDFs, getSearchSuggestions } from '@/lib/googleSearchApi';
@@ -329,11 +329,11 @@ const Playground = () => {
             >
               <Menu className="w-4 h-4" />
             </Button>
-            <Button variant="ghost" size="sm" className="text-foreground/70 hover:text-foreground">
-              About
+            <Button variant="ghost" size="sm" onClick={() => navigate('/')} className="text-foreground/70 hover:text-foreground">
+              Home
             </Button>
-            <Button variant="ghost" size="sm" className="text-foreground/70 hover:text-foreground">
-              Research
+            <Button variant="ghost" size="sm" onClick={() => navigate('/settings')} className="text-foreground/70 hover:text-foreground">
+              Settings
             </Button>
           </div>
           
@@ -395,7 +395,7 @@ const Playground = () => {
                     size="sm"
                     onClick={() => setActiveTab('web')}
                     className={activeTab === 'web' 
-                      ? "rounded-full bg-white dark:bg-white/10 shadow-md" 
+                      ? "rounded-full bg-primary text-primary-foreground shadow-md" 
                       : "rounded-full text-foreground/70 hover:text-foreground hover:bg-white/10"
                     }
                   >
@@ -407,11 +407,11 @@ const Playground = () => {
                     size="sm"
                     onClick={() => setActiveTab('academic')}
                     className={activeTab === 'academic' 
-                      ? "rounded-full bg-white dark:bg-white/10 shadow-md" 
+                      ? "rounded-full bg-primary text-primary-foreground shadow-md" 
                       : "rounded-full text-foreground/70 hover:text-foreground hover:bg-white/10"
                     }
                   >
-                    <BookOpen className="w-4 h-4 mr-2" />
+                    <GraduationCap className="w-4 h-4 mr-2" />
                     Academic
                   </Button>
                   <Button
@@ -419,7 +419,7 @@ const Playground = () => {
                     size="sm"
                     onClick={() => setActiveTab('government')}
                     className={activeTab === 'government' 
-                      ? "rounded-full bg-white dark:bg-white/10 shadow-md" 
+                      ? "rounded-full bg-primary text-primary-foreground shadow-md" 
                       : "rounded-full text-foreground/70 hover:text-foreground hover:bg-white/10"
                     }
                   >
@@ -431,7 +431,7 @@ const Playground = () => {
                     size="sm"
                     onClick={() => setActiveTab('crossref')}
                     className={activeTab === 'crossref' 
-                      ? "rounded-full bg-white dark:bg-white/10 shadow-md" 
+                      ? "rounded-full bg-primary text-primary-foreground shadow-md" 
                     : "rounded-full text-foreground/70 hover:text-foreground hover:bg-white/10"
                     }
                   >
@@ -454,11 +454,12 @@ const Playground = () => {
                       className="pl-12 pr-20 py-4 text-lg bg-transparent border-none focus-visible:ring-0 focus-visible:ring-offset-0 placeholder:text-foreground/40 rounded-full"
                     />
                     <div className="absolute right-2 flex items-center space-x-1">
-                      <Button size="sm" variant="ghost" className="rounded-full w-9 h-9 p-0 hover:bg-white/20">
-                        <Mic className="w-4 h-4 text-foreground/60" />
-                      </Button>
-                      <Button size="sm" variant="ghost" className="rounded-full w-9 h-9 p-0 hover:bg-white/20">
-                        <Camera className="w-4 h-4 text-foreground/60" />
+                      <Button 
+                        size="sm" 
+                        onClick={() => handleSearch()}
+                        className="rounded-full w-9 h-9 p-0 bg-primary hover:bg-primary/90 text-white"
+                      >
+                        <Send className="w-4 h-4" />
                       </Button>
                     </div>
                   </div>
@@ -485,33 +486,37 @@ const Playground = () => {
                 )}
               </div>
 
-              {/* Search Buttons */}
-              <div className="flex justify-center space-x-4 mt-8">
-                <Button
-                  onClick={() => handleSearch()}
-                  disabled={isSearching}
-                  className="bg-white/10 hover:bg-white/20 dark:bg-white/5 dark:hover:bg-white/10 backdrop-blur-sm border border-white/20 text-foreground rounded-full px-6 py-2 transition-all duration-300 hover:shadow-lg"
-                >
-                  {isSearching ? (
-                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-current mr-2" />
-                  ) : (
-                    <Search className="w-4 h-4 mr-2" />
-                  )}
-                  INGRES Search
-                </Button>
-                <Button
-                  onClick={() => {
-                    const queries = ['groundwater india', 'water management', 'aquifer recharge', 'water policy'];
-                    const randomQuery = queries[Math.floor(Math.random() * queries.length)];
-                    setSearchQuery(randomQuery);
-                    handleSearch(randomQuery);
-                  }}
-                  variant="outline"
-                  className="bg-white/5 hover:bg-white/10 dark:bg-white/5 dark:hover:bg-white/10 backdrop-blur-sm border border-white/20 text-foreground rounded-full px-6 py-2 transition-all duration-300"
-                >
-                  <Zap className="w-4 h-4 mr-2" />
-                  I'm Feeling Lucky
-                </Button>
+              {/* Example Searches */}
+              <div className="flex justify-center mt-8">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-3 max-w-4xl">
+                  <button
+                    onClick={() => {
+                      setSearchQuery("groundwater levels Karnataka");
+                      handleSearch("groundwater levels Karnataka");
+                    }}
+                    className="p-3 text-sm bg-white/10 hover:bg-white/20 backdrop-blur-sm border border-white/20 text-foreground rounded-xl transition-all duration-300"
+                  >
+                    "groundwater levels Karnataka"
+                  </button>
+                  <button
+                    onClick={() => {
+                      setSearchQuery("water table depth monitoring");
+                      handleSearch("water table depth monitoring");
+                    }}
+                    className="p-3 text-sm bg-white/10 hover:bg-white/20 backdrop-blur-sm border border-white/20 text-foreground rounded-xl transition-all duration-300"
+                  >
+                    "water table depth monitoring"
+                  </button>
+                  <button
+                    onClick={() => {
+                      setSearchQuery("irrigation schemes farmers");
+                      handleSearch("irrigation schemes farmers");
+                    }}
+                    className="p-3 text-sm bg-white/10 hover:bg-white/20 backdrop-blur-sm border border-white/20 text-foreground rounded-xl transition-all duration-300"
+                  >
+                    "irrigation schemes farmers"
+                  </button>
+                </div>
               </div>
             </div>
 
