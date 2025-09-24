@@ -27,7 +27,7 @@ const OfficialLogin = () => {
     const checkUser = async () => {
       const { data: { session } } = await supabase.auth.getSession();
       if (session) {
-        navigate('/official-dashboard');
+        navigate('/playground');
       }
     };
     checkUser();
