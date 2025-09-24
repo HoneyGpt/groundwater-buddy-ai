@@ -148,6 +148,7 @@ const Playground = () => {
       setShowSuggestions(true);
     } else {
       setShowSuggestions(false);
+      setSearchResults([]); // Clear search results when query is cleared
     }
   };
 
@@ -338,7 +339,7 @@ const Playground = () => {
                 </h1>
               </div>
               <p className="text-foreground/60 text-lg font-light">
-                Intelligent Groundwater Research & Environmental Systems
+                Indian Ground Water
               </p>
             </div>
 
