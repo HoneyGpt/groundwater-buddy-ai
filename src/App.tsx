@@ -10,6 +10,7 @@ import Mediator from "./pages/Mediator";
 import PublicDashboard from "./pages/PublicDashboard";
 import ProfileSetup from "./pages/ProfileSetup";
 import OfficialLogin from "./pages/OfficialLogin";
+import OfficialDashboard from "./pages/OfficialDashboard";
 import Settings from "./pages/Settings";
 import NotFound from "./pages/NotFound";
 
@@ -30,6 +31,7 @@ const App = () => (
           <Route path="/profile-setup" element={<ProfileSetup />} />
           <Route path="/settings" element={<Settings />} />
           <Route path="/official-login" element={<OfficialLogin />} />
+          <Route path="/official-dashboard" element={<OfficialDashboard />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>

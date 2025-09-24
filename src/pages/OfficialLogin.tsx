@@ -1,13 +1,105 @@
+import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { ShieldCheck, ArrowLeft } from 'lucide-react';
+import { ShieldCheck, ArrowLeft, Eye, EyeOff } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { supabase } from '@/integrations/supabase/client';
+import { useToast } from '@/hooks/use-toast';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 
 const OfficialLogin = () => {
   const navigate = useNavigate();
+  const { toast } = useToast();
+  const [isLogin, setIsLogin] = useState(true);
+  const [loading, setLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const [formData, setFormData] = useState({
+    email: '',
+    password: '',
+    departmentId: '',
+    name: ''
+  });
+
+  // Check if user is already logged in
+  useEffect(() => {
+    const checkUser = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (session) {
+        navigate('/official-dashboard');
+      }
+    };
+    checkUser();
+
+    // Listen for auth changes
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+      if (event === 'SIGNED_IN' && session) {
+        navigate('/official-dashboard');
+      }
+    });
+
+    return () => subscription.unsubscribe();
+  }, [navigate]);
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setFormData({
+      ...formData,
+      [e.target.name]: e.target.value
+    });
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoading(true);
+
+    try {
+      if (isLogin) {
+        // Login
+        const { error } = await supabase.auth.signInWithPassword({
+          email: formData.email,
+          password: formData.password,
+        });
+
+        if (error) throw error;
+
+        toast({
+          title: "Login successful!",
+          description: "Welcome to the official dashboard.",
+        });
+      } else {
+        // Sign up
+        const { error } = await supabase.auth.signUp({
+          email: formData.email,
+          password: formData.password,
+          options: {
+            emailRedirectTo: `${window.location.origin}/official-login`,
+            data: {
+              department_id: formData.departmentId,
+              name: formData.name,
+              user_type: 'official'
+            }
+          }
+        });
+
+        if (error) throw error;
+
+        toast({
+          title: "Registration successful!",
+          description: "Please check your email to verify your account before logging in.",
+        });
+        setIsLogin(true); // Switch to login mode
+      }
+    } catch (error: any) {
+      toast({
+        title: "Error",
+        description: error.message,
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <div className="min-h-screen flex flex-col bg-gradient-to-br from-water-50 to-accent-50">
@@ -29,49 +121,119 @@ const OfficialLogin = () => {
             </CardHeader>
             
             <CardContent className="space-y-6">
-              <div className="space-y-4">
+              <form onSubmit={handleSubmit} className="space-y-4">
+                {!isLogin && (
+                  <div>
+                    <label className="text-sm font-medium text-foreground">Full Name</label>
+                    <Input 
+                      type="text"
+                      name="name"
+                      value={formData.name}
+                      onChange={handleInputChange}
+                      placeholder="Enter your full name"
+                      className="mt-1"
+                      required={!isLogin}
+                    />
+                  </div>
+                )}
+                
                 <div>
                   <label className="text-sm font-medium text-foreground">Official Email</label>
                   <Input 
-                    type="email" 
+                    type="email"
+                    name="email"
+                    value={formData.email}
+                    onChange={handleInputChange}
                     placeholder="your.name@gov.in"
                     className="mt-1"
+                    required
                   />
                 </div>
                 
                 <div>
                   <label className="text-sm font-medium text-foreground">Password</label>
-                  <Input 
-                    type="password" 
-                    placeholder="••••••••"
-                    className="mt-1"
-                  />
+                  <div className="relative">
+                    <Input 
+                      type={showPassword ? "text" : "password"}
+                      name="password"
+                      value={formData.password}
+                      onChange={handleInputChange}
+                      placeholder="••••••••"
+                      className="mt-1 pr-10"
+                      required
+                      minLength={6}
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowPassword(!showPassword)}
+                      className="absolute right-3 top-1/2 transform -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                    >
+                      {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                    </button>
+                  </div>
                 </div>
                 
-                <div>
-                  <label className="text-sm font-medium text-foreground">Department ID</label>
-                  <Input 
-                    type="text" 
-                    placeholder="DEPT-12345"
-                    className="mt-1"
-                  />
-                </div>
-              </div>
+                {!isLogin && (
+                  <div>
+                    <label className="text-sm font-medium text-foreground">Department ID</label>
+                    <Input 
+                      type="text"
+                      name="departmentId"
+                      value={formData.departmentId}
+                      onChange={handleInputChange}
+                      placeholder="DEPT-12345"
+                      className="mt-1"
+                      required={!isLogin}
+                    />
+                  </div>
+                )}
 
-              <Button className="w-full bg-primary hover:bg-primary/90 text-primary-foreground">
-                Sign In to Official Dashboard
-              </Button>
+                <Button 
+                  type="submit"
+                  disabled={loading}
+                  className="w-full bg-primary hover:bg-primary/90 text-primary-foreground"
+                >
+                  {loading ? (
+                    <div className="flex items-center space-x-2">
+                      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                      <span>{isLogin ? 'Signing In...' : 'Creating Account...'}</span>
+                    </div>
+                  ) : (
+                    isLogin ? 'Sign In to Official Dashboard' : 'Create Official Account'
+                  )}
+                </Button>
+              </form>
 
               <div className="text-center space-y-2">
-                <p className="text-sm text-muted-foreground">
-                  Don't have official access?
-                </p>
-                <Button
-                  variant="link"
-                  className="text-accent hover:text-accent/80 p-0 h-auto"
-                >
-                  Request Access
-                </Button>
+                {isLogin ? (
+                  <>
+                    <p className="text-sm text-muted-foreground">
+                      Don't have official access?
+                    </p>
+                    <Button
+                      type="button"
+                      onClick={() => setIsLogin(false)}
+                      variant="link"
+                      className="text-accent hover:text-accent/80 p-0 h-auto"
+                    >
+                      Create Official Account
+                    </Button>
+                  </>
+                ) : (
+                  <>
+                    <p className="text-sm text-muted-foreground">
+                      Already have an account?
+                    </p>
+                    <Button
+                      type="button"
+                      onClick={() => setIsLogin(true)}
+                      variant="link"
+                      className="text-accent hover:text-accent/80 p-0 h-auto"
+                    >
+                      Sign In Instead
+                    </Button>
+                  </>
+                )}
               </div>
 
               <div className="pt-4 border-t border-border">
