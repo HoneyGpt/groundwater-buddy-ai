@@ -5,7 +5,7 @@ import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { useNavigate } from 'react-router-dom';
-import { Search, Settings, LogOut, Crown, FileText, Zap, BookOpen, Database, Globe, Filter, Calendar, Star, Mic, Camera } from 'lucide-react';
+import { Search, Settings, LogOut, Crown, FileText, Zap, BookOpen, Database, Globe, Filter, Calendar, Star, Mic, Camera, MessageCircle, History, Save, DollarSign, Map, Gift, Phone, Home, Menu, X } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { searchGoogle, searchAcademicPapers, searchWaterResources, searchGovernmentDocs, searchPDFs, getSearchSuggestions } from '@/lib/googleSearchApi';
@@ -24,6 +24,8 @@ const Playground = () => {
   const [activeTab, setActiveTab] = useState<'web' | 'academic' | 'government' | 'crossref'>('web');
   const [searchSuggestions, setSearchSuggestions] = useState<string[]>([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [activePanel, setActivePanel] = useState<string>('search');
 
   // Check authentication
   useEffect(() => {
@@ -221,6 +223,19 @@ const Playground = () => {
     );
   };
 
+  const sidebarItems = [
+    { icon: Home, label: 'Dashboard', key: 'search' },
+    { icon: MessageCircle, label: 'Chat', key: 'chat' },
+    { icon: History, label: 'History', key: 'history' },
+    { icon: Save, label: 'Document Saver', key: 'documents' },
+    { icon: DollarSign, label: 'Budget Bro', key: 'budget' },
+    { icon: Calendar, label: 'Calendar', key: 'calendar' },
+    { icon: Map, label: 'Interactive Maps', key: 'maps' },
+    { icon: Gift, label: 'Schemes', key: 'schemes' },
+    { icon: Phone, label: 'Helpline', key: 'helpline' },
+    { icon: Settings, label: 'Settings', key: 'settings' },
+  ];
+
   if (loading) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 dark:from-slate-900 dark:via-slate-800 dark:to-indigo-900 flex items-center justify-center">
@@ -247,254 +262,295 @@ const Playground = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 dark:from-slate-900 dark:via-slate-800 dark:to-indigo-900">
-      {/* Top Navigation */}
-      <nav className="flex justify-between items-center p-4 md:p-6">
-        <div className="flex items-center space-x-6">
-          <Button variant="ghost" size="sm" className="text-foreground/70 hover:text-foreground">
-            About
-          </Button>
-          <Button variant="ghost" size="sm" className="text-foreground/70 hover:text-foreground">
-            Research
-          </Button>
-        </div>
-        
-        <div className="flex items-center space-x-3">
-          <Button variant="ghost" size="sm" className="text-foreground/70 hover:text-foreground">
-            <Settings className="w-4 h-4" />
-          </Button>
-          
-          <Badge className="bg-gradient-to-r from-yellow-500 to-orange-500 text-white border-0 px-3 py-1">
-            <Crown className="w-3 h-3 mr-1" />
-            Official
-          </Badge>
-          
-          <Avatar className="h-8 w-8 ring-2 ring-primary/20">
-            <AvatarFallback className="bg-gradient-to-br from-primary/20 to-accent/20 text-primary font-semibold text-sm">
-              {getUserInitials()}
-            </AvatarFallback>
-          </Avatar>
-          
-          <Button
-            onClick={handleLogout}
-            variant="ghost"
-            size="sm"
-            className="text-destructive/70 hover:text-destructive"
-          >
-            <LogOut className="w-4 h-4" />
-          </Button>
-        </div>
-      </nav>
-
-      {/* Main Content Container */}
-      <div className="flex flex-col items-center justify-center min-h-[70vh] px-4">
-        {/* INGRES-AI Logo */}
-        <div className="text-center mb-8">
-          <div className="flex items-center justify-center mb-4">
-            <h1 className="text-6xl md:text-8xl font-light tracking-tight">
-              <span className="bg-gradient-to-r from-blue-600 via-purple-600 to-blue-800 bg-clip-text text-transparent">
-                INGRES
-              </span>
-              <span className="text-foreground/80">-</span>
-              <span className="bg-gradient-to-r from-emerald-600 via-teal-600 to-cyan-600 bg-clip-text text-transparent">
-                AI
-              </span>
-            </h1>
-          </div>
-          <p className="text-foreground/60 text-lg font-light">
-            Intelligent Groundwater Research & Environmental Systems
-          </p>
-        </div>
-
-        {/* Search Container */}
-        <div className="w-full max-w-2xl mb-8">
-          {/* Search Tabs */}
-          <div className="flex justify-center mb-6">
-            <div className="flex bg-white/20 dark:bg-black/20 backdrop-blur-sm rounded-full p-1 border border-white/30 dark:border-white/10">
-              <Button
-                variant={activeTab === 'web' ? 'default' : 'ghost'}
-                size="sm"
-                onClick={() => setActiveTab('web')}
-                className={activeTab === 'web' 
-                  ? "rounded-full bg-white dark:bg-white/10 shadow-md" 
-                  : "rounded-full text-foreground/70 hover:text-foreground hover:bg-white/10"
-                }
-              >
-                <Globe className="w-4 h-4 mr-2" />
-                Web
-              </Button>
-              <Button
-                variant={activeTab === 'academic' ? 'default' : 'ghost'}
-                size="sm"
-                onClick={() => setActiveTab('academic')}
-                className={activeTab === 'academic' 
-                  ? "rounded-full bg-white dark:bg-white/10 shadow-md" 
-                  : "rounded-full text-foreground/70 hover:text-foreground hover:bg-white/10"
-                }
-              >
-                <BookOpen className="w-4 h-4 mr-2" />
-                Academic
-              </Button>
-              <Button
-                variant={activeTab === 'government' ? 'default' : 'ghost'}
-                size="sm"
-                onClick={() => setActiveTab('government')}
-                className={activeTab === 'government' 
-                  ? "rounded-full bg-white dark:bg-white/10 shadow-md" 
-                  : "rounded-full text-foreground/70 hover:text-foreground hover:bg-white/10"
-                }
-              >
-                <FileText className="w-4 h-4 mr-2" />
-                Government
-              </Button>
-              <Button
-                variant={activeTab === 'crossref' ? 'default' : 'ghost'}
-                size="sm"
-                onClick={() => setActiveTab('crossref')}
-                className={activeTab === 'crossref' 
-                  ? "rounded-full bg-white dark:bg-white/10 shadow-md" 
-                : "rounded-full text-foreground/70 hover:text-foreground hover:bg-white/10"
-                }
-              >
-                <Database className="w-4 h-4 mr-2" />
-                CrossRef
-              </Button>
+      {/* Sidebar */}
+      <div className={`fixed inset-y-0 left-0 z-50 w-64 bg-white/20 dark:bg-black/20 backdrop-blur-md border-r border-white/20 dark:border-white/10 transform transition-transform duration-300 ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'} lg:translate-x-0`}>
+        <div className="flex flex-col h-full">
+          <div className="flex items-center justify-between p-4 border-b border-white/20 dark:border-white/10">
+            <div className="flex items-center space-x-2">
+              <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-purple-600 rounded-lg flex items-center justify-center">
+                <span className="text-white font-bold text-sm">IA</span>
+              </div>
+              <span className="font-semibold text-foreground">INGRES-AI</span>
             </div>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => setSidebarOpen(false)}
+              className="lg:hidden"
+            >
+              <X className="w-4 h-4" />
+            </Button>
           </div>
+          
+          <nav className="flex-1 p-4 space-y-2">
+            {sidebarItems.map((item) => (
+              <Button
+                key={item.key}
+                variant={activePanel === item.key ? 'default' : 'ghost'}
+                className={`w-full justify-start ${
+                  activePanel === item.key 
+                    ? 'bg-primary/20 text-primary border border-primary/30' 
+                    : 'text-foreground/70 hover:text-foreground hover:bg-white/10'
+                }`}
+                onClick={() => setActivePanel(item.key)}
+              >
+                <item.icon className="w-4 h-4 mr-3" />
+                {item.label}
+              </Button>
+            ))}
+          </nav>
+        </div>
+      </div>
 
-          {/* Search Bar */}
-          <div className="relative">
-            <div className="relative bg-white/70 dark:bg-black/20 backdrop-blur-md rounded-full border border-white/30 dark:border-white/10 shadow-2xl hover:shadow-3xl transition-all duration-300 hover:bg-white/80 dark:hover:bg-black/30">
-              <div className="flex items-center">
-                <Search className="absolute left-4 w-5 h-5 text-foreground/50" />
-                <Input
-                  placeholder={`Search ${activeTab} for groundwater research, policies, and data...`}
-                  value={searchQuery}
-                  onChange={(e) => handleQueryChange(e.target.value)}
-                  onKeyPress={(e) => e.key === 'Enter' && handleSearch()}
-                  className="pl-12 pr-20 py-4 text-lg bg-transparent border-none focus-visible:ring-0 focus-visible:ring-offset-0 placeholder:text-foreground/40 rounded-full"
-                />
-                <div className="absolute right-2 flex items-center space-x-1">
-                  <Button size="sm" variant="ghost" className="rounded-full w-9 h-9 p-0 hover:bg-white/20">
-                    <Mic className="w-4 h-4 text-foreground/60" />
+      {/* Main Content */}
+      <div className={`transition-all duration-300 ${sidebarOpen ? 'lg:ml-64' : 'lg:ml-64'}`}>
+        {/* Top Navigation */}
+        <nav className="flex justify-between items-center p-4 md:p-6">
+          <div className="flex items-center space-x-6">
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => setSidebarOpen(!sidebarOpen)}
+              className="lg:hidden"
+            >
+              <Menu className="w-4 h-4" />
+            </Button>
+            <Button variant="ghost" size="sm" className="text-foreground/70 hover:text-foreground">
+              About
+            </Button>
+            <Button variant="ghost" size="sm" className="text-foreground/70 hover:text-foreground">
+              Research
+            </Button>
+          </div>
+          
+          <div className="flex items-center space-x-3">
+            <Button variant="ghost" size="sm" className="text-foreground/70 hover:text-foreground">
+              <Settings className="w-4 h-4" />
+            </Button>
+            
+            <Badge className="bg-gradient-to-r from-yellow-500 to-orange-500 text-white border-0 px-3 py-1">
+              <Crown className="w-3 h-3 mr-1" />
+              Official
+            </Badge>
+            
+            <Avatar className="h-8 w-8 ring-2 ring-primary/20">
+              <AvatarFallback className="bg-gradient-to-br from-primary/20 to-accent/20 text-primary font-semibold text-sm">
+                {getUserInitials()}
+              </AvatarFallback>
+            </Avatar>
+            
+            <Button
+              onClick={handleLogout}
+              variant="ghost"
+              size="sm"
+              className="text-destructive/70 hover:text-destructive"
+            >
+              <LogOut className="w-4 h-4" />
+            </Button>
+          </div>
+        </nav>
+
+        {/* Main Content Container */}
+        {activePanel === 'search' ? (
+          <div className="flex flex-col items-center justify-center min-h-[70vh] px-4">
+            {/* INGRES-AI Logo */}
+            <div className="text-center mb-8">
+              <div className="flex items-center justify-center mb-4">
+                <h1 className="text-6xl md:text-8xl font-light tracking-tight">
+                  <span className="bg-gradient-to-r from-blue-600 via-purple-600 to-blue-800 bg-clip-text text-transparent">
+                    INGRES
+                  </span>
+                  <span className="text-foreground/80">-</span>
+                  <span className="bg-gradient-to-r from-emerald-600 via-teal-600 to-cyan-600 bg-clip-text text-transparent">
+                    AI
+                  </span>
+                </h1>
+              </div>
+              <p className="text-foreground/60 text-lg font-light">
+                Intelligent Groundwater Research & Environmental Systems
+              </p>
+            </div>
+
+            {/* Search Container */}
+            <div className="w-full max-w-2xl mb-8">
+              {/* Search Tabs */}
+              <div className="flex justify-center mb-6">
+                <div className="flex bg-white/20 dark:bg-black/20 backdrop-blur-sm rounded-full p-1 border border-white/30 dark:border-white/10">
+                  <Button
+                    variant={activeTab === 'web' ? 'default' : 'ghost'}
+                    size="sm"
+                    onClick={() => setActiveTab('web')}
+                    className={activeTab === 'web' 
+                      ? "rounded-full bg-white dark:bg-white/10 shadow-md" 
+                      : "rounded-full text-foreground/70 hover:text-foreground hover:bg-white/10"
+                    }
+                  >
+                    <Globe className="w-4 h-4 mr-2" />
+                    Web
                   </Button>
-                  <Button size="sm" variant="ghost" className="rounded-full w-9 h-9 p-0 hover:bg-white/20">
-                    <Camera className="w-4 h-4 text-foreground/60" />
+                  <Button
+                    variant={activeTab === 'academic' ? 'default' : 'ghost'}
+                    size="sm"
+                    onClick={() => setActiveTab('academic')}
+                    className={activeTab === 'academic' 
+                      ? "rounded-full bg-white dark:bg-white/10 shadow-md" 
+                      : "rounded-full text-foreground/70 hover:text-foreground hover:bg-white/10"
+                    }
+                  >
+                    <BookOpen className="w-4 h-4 mr-2" />
+                    Academic
+                  </Button>
+                  <Button
+                    variant={activeTab === 'government' ? 'default' : 'ghost'}
+                    size="sm"
+                    onClick={() => setActiveTab('government')}
+                    className={activeTab === 'government' 
+                      ? "rounded-full bg-white dark:bg-white/10 shadow-md" 
+                      : "rounded-full text-foreground/70 hover:text-foreground hover:bg-white/10"
+                    }
+                  >
+                    <FileText className="w-4 h-4 mr-2" />
+                    Government
+                  </Button>
+                  <Button
+                    variant={activeTab === 'crossref' ? 'default' : 'ghost'}
+                    size="sm"
+                    onClick={() => setActiveTab('crossref')}
+                    className={activeTab === 'crossref' 
+                      ? "rounded-full bg-white dark:bg-white/10 shadow-md" 
+                    : "rounded-full text-foreground/70 hover:text-foreground hover:bg-white/10"
+                    }
+                  >
+                    <Database className="w-4 h-4 mr-2" />
+                    CrossRef
                   </Button>
                 </div>
               </div>
+
+              {/* Search Bar */}
+              <div className="relative">
+                <div className="relative bg-white/70 dark:bg-black/20 backdrop-blur-md rounded-full border border-white/30 dark:border-white/10 shadow-2xl hover:shadow-3xl transition-all duration-300 hover:bg-white/80 dark:hover:bg-black/30">
+                  <div className="flex items-center">
+                    <Search className="absolute left-4 w-5 h-5 text-foreground/50" />
+                    <Input
+                      placeholder={`Search ${activeTab} for groundwater research, policies, and data...`}
+                      value={searchQuery}
+                      onChange={(e) => handleQueryChange(e.target.value)}
+                      onKeyPress={(e) => e.key === 'Enter' && handleSearch()}
+                      className="pl-12 pr-20 py-4 text-lg bg-transparent border-none focus-visible:ring-0 focus-visible:ring-offset-0 placeholder:text-foreground/40 rounded-full"
+                    />
+                    <div className="absolute right-2 flex items-center space-x-1">
+                      <Button size="sm" variant="ghost" className="rounded-full w-9 h-9 p-0 hover:bg-white/20">
+                        <Mic className="w-4 h-4 text-foreground/60" />
+                      </Button>
+                      <Button size="sm" variant="ghost" className="rounded-full w-9 h-9 p-0 hover:bg-white/20">
+                        <Camera className="w-4 h-4 text-foreground/60" />
+                      </Button>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Search Suggestions */}
+                {showSuggestions && searchSuggestions.length > 0 && (
+                  <div className="absolute top-full left-0 right-0 mt-2 bg-white/90 dark:bg-black/90 backdrop-blur-md border border-white/30 dark:border-white/10 rounded-2xl shadow-2xl z-20 overflow-hidden">
+                    {searchSuggestions.map((suggestion, index) => (
+                      <button
+                        key={index}
+                        onClick={() => {
+                          setSearchQuery(suggestion);
+                          setShowSuggestions(false);
+                          handleSearch(suggestion);
+                        }}
+                        className="w-full px-6 py-3 text-left hover:bg-white/50 dark:hover:bg-white/5 transition-colors duration-200 flex items-center space-x-3"
+                      >
+                        <Search className="w-4 h-4 text-foreground/40" />
+                        <span className="text-foreground/80">{suggestion}</span>
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
+
+              {/* Search Buttons */}
+              <div className="flex justify-center space-x-4 mt-8">
+                <Button
+                  onClick={() => handleSearch()}
+                  disabled={isSearching}
+                  className="bg-white/10 hover:bg-white/20 dark:bg-white/5 dark:hover:bg-white/10 backdrop-blur-sm border border-white/20 text-foreground rounded-full px-6 py-2 transition-all duration-300 hover:shadow-lg"
+                >
+                  {isSearching ? (
+                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-current mr-2" />
+                  ) : (
+                    <Search className="w-4 h-4 mr-2" />
+                  )}
+                  INGRES Search
+                </Button>
+                <Button
+                  onClick={() => {
+                    const queries = ['groundwater india', 'water management', 'aquifer recharge', 'water policy'];
+                    const randomQuery = queries[Math.floor(Math.random() * queries.length)];
+                    setSearchQuery(randomQuery);
+                    handleSearch(randomQuery);
+                  }}
+                  variant="outline"
+                  className="bg-white/5 hover:bg-white/10 dark:bg-white/5 dark:hover:bg-white/10 backdrop-blur-sm border border-white/20 text-foreground rounded-full px-6 py-2 transition-all duration-300"
+                >
+                  <Zap className="w-4 h-4 mr-2" />
+                  I'm Feeling Lucky
+                </Button>
+              </div>
             </div>
 
-            {/* Search Suggestions */}
-            {showSuggestions && searchSuggestions.length > 0 && (
-              <div className="absolute top-full left-0 right-0 mt-2 bg-white/90 dark:bg-black/90 backdrop-blur-md border border-white/30 dark:border-white/10 rounded-2xl shadow-2xl z-20 overflow-hidden">
-                {searchSuggestions.map((suggestion, index) => (
-                  <button
-                    key={index}
-                    onClick={() => {
-                      setSearchQuery(suggestion);
-                      setShowSuggestions(false);
-                      handleSearch(suggestion);
-                    }}
-                    className="w-full px-6 py-3 text-left hover:bg-white/50 dark:hover:bg-white/5 transition-colors duration-200 flex items-center space-x-3"
-                  >
-                    <Search className="w-4 h-4 text-foreground/40" />
-                    <span className="text-foreground/80">{suggestion}</span>
-                  </button>
-                ))}
+            {/* Search Results */}
+            {searchResults.length > 0 && (
+              <div className="w-full max-w-4xl mt-12">
+                <div className="flex items-center justify-between mb-6">
+                  <p className="text-foreground/60 text-sm">
+                    About {searchResults.length} results for "{searchQuery}"
+                  </p>
+                  <div className="flex items-center space-x-2">
+                    <Button variant="ghost" size="sm" className="text-foreground/60">
+                      <Filter className="w-4 h-4 mr-2" />
+                      Filter
+                    </Button>
+                  </div>
+                </div>
+                
+                <div className="space-y-6">
+                  {searchResults.map((result, index) => renderSearchResult(result, index))}
+                </div>
               </div>
             )}
           </div>
-
-          {/* Search Buttons */}
-          <div className="flex justify-center space-x-4 mt-8">
-            <Button
-              onClick={() => handleSearch()}
-              disabled={isSearching}
-              className="bg-white/10 hover:bg-white/20 dark:bg-white/5 dark:hover:bg-white/10 backdrop-blur-sm border border-white/20 text-foreground rounded-full px-6 py-2 transition-all duration-300 hover:shadow-lg"
-            >
-              {isSearching ? (
-                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-current mr-2" />
-              ) : (
-                <Search className="w-4 h-4 mr-2" />
-              )}
-              INGRES Search
-            </Button>
-            <Button
-              onClick={() => {
-                const quickSearches = [
-                  'groundwater depletion India',
-                  'water table monitoring systems', 
-                  'aquifer recharge policies',
-                  'sustainable water management'
-                ];
-                const randomSearch = quickSearches[Math.floor(Math.random() * quickSearches.length)];
-                setSearchQuery(randomSearch);
-                handleSearch(randomSearch);
-              }}
-              variant="ghost"
-              className="bg-white/10 hover:bg-white/20 dark:bg-white/5 dark:hover:bg-white/10 backdrop-blur-sm border border-white/20 text-foreground rounded-full px-6 py-2 transition-all duration-300 hover:shadow-lg"
-            >
-              <Zap className="w-4 h-4 mr-2" />
-              I'm Feeling Lucky
-            </Button>
-          </div>
-        </div>
-
-        {/* Quick Access Cards - Only show when no search results */}
-        {searchResults.length === 0 && (
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 w-full max-w-4xl mb-8">
-            <Card className="bg-white/10 dark:bg-black/10 backdrop-blur-sm border border-white/20 hover:bg-white/20 dark:hover:bg-black/20 transition-all duration-300 cursor-pointer group">
-              <CardContent className="p-6 text-center">
-                <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-blue-600 rounded-full flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform duration-300">
-                  <BookOpen className="w-6 h-6 text-white" />
+        ) : (
+          <div className="p-6">
+            <Card className="bg-white/20 dark:bg-black/20 backdrop-blur-md border border-white/20 dark:border-white/10">
+              <CardHeader>
+                <CardTitle className="text-2xl font-light">
+                  {sidebarItems.find(item => item.key === activePanel)?.label}
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="text-center py-12">
+                  <div className="mb-4">
+                    {(() => {
+                      const item = sidebarItems.find(item => item.key === activePanel);
+                      const Icon = item?.icon;
+                      return Icon ? <Icon className="w-16 h-16 mx-auto text-foreground/40" /> : null;
+                    })()}
+                  </div>
+                  <h3 className="text-xl font-medium text-foreground/80 mb-2">
+                    {sidebarItems.find(item => item.key === activePanel)?.label} Coming Soon
+                  </h3>
+                  <p className="text-foreground/60">
+                    This feature is being developed for the INGRES-AI research platform.
+                  </p>
                 </div>
-                <h3 className="font-semibold text-foreground mb-2">Academic Research</h3>
-                <p className="text-sm text-foreground/60">Explore scholarly articles and research papers</p>
-              </CardContent>
-            </Card>
-            
-            <Card className="bg-white/10 dark:bg-black/10 backdrop-blur-sm border border-white/20 hover:bg-white/20 dark:hover:bg-black/20 transition-all duration-300 cursor-pointer group">
-              <CardContent className="p-6 text-center">
-                <div className="w-12 h-12 bg-gradient-to-br from-emerald-500 to-emerald-600 rounded-full flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform duration-300">
-                  <FileText className="w-6 h-6 text-white" />
-                </div>
-                <h3 className="font-semibold text-foreground mb-2">Government Policies</h3>
-                <p className="text-sm text-foreground/60">Access official documents and regulations</p>
-              </CardContent>
-            </Card>
-            
-            <Card className="bg-white/10 dark:bg-black/10 backdrop-blur-sm border border-white/20 hover:bg-white/20 dark:hover:bg-black/20 transition-all duration-300 cursor-pointer group">
-              <CardContent className="p-6 text-center">
-                <div className="w-12 h-12 bg-gradient-to-br from-purple-500 to-purple-600 rounded-full flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform duration-300">
-                  <Database className="w-6 h-6 text-white" />
-                </div>
-                <h3 className="font-semibold text-foreground mb-2">Research Database</h3>
-                <p className="text-sm text-foreground/60">Search academic citations and metadata</p>
               </CardContent>
             </Card>
           </div>
         )}
       </div>
-
-      {/* Results Section */}
-      {searchResults.length > 0 && (
-        <div className="max-w-4xl mx-auto px-4 pb-12">
-          <div className="mb-6">
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="text-lg font-medium text-foreground/80">
-                About {searchResults.length.toLocaleString()} results
-              </h3>
-              <Badge variant="outline" className="capitalize bg-white/20 dark:bg-black/20 backdrop-blur-sm border-white/30 dark:border-white/10">
-                {activeTab} • INGRES-AI
-              </Badge>
-            </div>
-            
-            <div className="space-y-6">
-              {searchResults.map((result, index) => renderSearchResult(result, index))}
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   );
 };
