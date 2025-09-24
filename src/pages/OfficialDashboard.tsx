@@ -146,7 +146,7 @@ const OfficialDashboard = () => {
       case 'helpline':
         return <HelplinePanel />;
       case 'settings':
-        navigate('/settings');
+        navigate('/settings?from=official');
         return null;
       case 'overview':
       default:

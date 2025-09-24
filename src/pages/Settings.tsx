@@ -33,6 +33,16 @@ const Settings = () => {
   
   // Context-aware state management
   const [userContext, setUserContext] = useState<UserContext>('public');
+  const [sourceContext, setSourceContext] = useState<string>('');
+  
+  // Get source context from URL params
+  useEffect(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const from = urlParams.get('from');
+    if (from) {
+      setSourceContext(from);
+    }
+  }, []);
   const [profile, setProfile] = useState<any>(null);
   const [name, setName] = useState('');
   const [profileType, setProfileType] = useState<'public' | 'professional'>('public');
@@ -125,13 +135,21 @@ const Settings = () => {
         <div className="px-6 py-4">
           <div className="flex items-center space-x-4">
             <Button
-              onClick={() => navigate(userContext === 'official' ? '/playground' : '/public-dashboard')}
+              onClick={() => {
+                if (sourceContext === 'official') {
+                  navigate('/official-dashboard');
+                } else if (userContext === 'official') {
+                  navigate('/playground');
+                } else {
+                  navigate('/public-dashboard');
+                }
+              }}
               variant="ghost"
               size="sm"
               className="hover:bg-primary/10"
             >
               <ArrowLeft className="w-4 h-4 mr-2" />
-              Back to {userContext === 'official' ? 'Playground' : 'Dashboard'}
+              Back to {sourceContext === 'official' ? 'Official Dashboard' : userContext === 'official' ? 'Playground' : 'Dashboard'}
             </Button>
             <div className="flex items-center space-x-3">
               <div className="w-10 h-10 bg-gradient-to-br from-primary to-accent rounded-xl flex items-center justify-center shadow-md">
