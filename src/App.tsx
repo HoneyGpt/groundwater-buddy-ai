@@ -6,13 +6,13 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Index from "./pages/Index";
 import About from "./pages/About";
 import Chat from "./pages/Chat";
+import Contact from "./pages/Contact";
 import Mediator from "./pages/Mediator";
 import PublicDashboard from "./pages/PublicDashboard";
 import ProfileSetup from "./pages/ProfileSetup";
 import OfficialLogin from "./pages/OfficialLogin";
 import OfficialDashboard from "./pages/OfficialDashboard";
 import Playground from "./pages/Playground";
-import Settings from "./pages/Settings";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -30,7 +30,7 @@ const App = () => (
           <Route path="/mediator" element={<Mediator />} />
           <Route path="/public-dashboard" element={<PublicDashboard />} />
           <Route path="/profile-setup" element={<ProfileSetup />} />
-          <Route path="/settings" element={<Settings />} />
+          <Route path="/contact" element={<Contact />} />
           <Route path="/official-login" element={<OfficialLogin />} />
           <Route path="/official-dashboard" element={<OfficialDashboard />} />
           <Route path="/playground" element={<Playground />} />
