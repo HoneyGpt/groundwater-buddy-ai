@@ -18,6 +18,7 @@ import BudgetBroPanel from '@/components/dashboard/BudgetBroPanel';
 import { MapsPanel } from '@/components/dashboard/MapsPanel';
 import { CalendarPanel } from '@/components/dashboard/CalendarPanel';
 import HelplinePanel from '@/components/dashboard/HelplinePanel';
+import { SchemesPanel } from '@/components/dashboard/SchemesPanel';
 
 const OfficialDashboard = () => {
   const navigate = useNavigate();
