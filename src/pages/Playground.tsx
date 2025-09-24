@@ -19,6 +19,7 @@ import { MapsPanel } from '@/components/dashboard/MapsPanel';
 import { CalendarPanel } from '@/components/dashboard/CalendarPanel';
 import HelplinePanel from '@/components/dashboard/HelplinePanel';
 import LearningPanel from '@/components/dashboard/LearningPanel';
+import { SchemesPanel } from '@/components/dashboard/SchemesPanel';
 // GoogleCSE removed to keep single search bar
 import { GOVERNMENT_SECRETARIES } from '@/data/governmentSecretaries';
 
@@ -597,6 +598,8 @@ const Playground = () => {
                   return <CalendarPanel />;
                 case 'helpline':
                   return <HelplinePanel />;
+                case 'schemes':
+                  return <SchemesPanel />;
                 case 'learning':
                   return <LearningPanel />;
                 case 'overview':
