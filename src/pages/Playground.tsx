@@ -18,6 +18,7 @@ import BudgetBroPanel from '@/components/dashboard/BudgetBroPanel';
 import { MapsPanel } from '@/components/dashboard/MapsPanel';
 import { CalendarPanel } from '@/components/dashboard/CalendarPanel';
 import HelplinePanel from '@/components/dashboard/HelplinePanel';
+import LearningPanel from '@/components/dashboard/LearningPanel';
 // GoogleCSE removed to keep single search bar
 import { GOVERNMENT_SECRETARIES } from '@/data/governmentSecretaries';
 
@@ -202,6 +203,7 @@ const Playground = () => {
     { icon: Map, label: 'Interactive Maps', key: 'maps' },
     { icon: Gift, label: 'Schemes', key: 'schemes' },
     { icon: Phone, label: 'Helpline', key: 'helpline' },
+    { icon: BookOpen, label: 'Learn with INGRES - AI', key: 'learning' },
   ];
 
   if (loading) {
@@ -522,6 +524,8 @@ const Playground = () => {
                   return <CalendarPanel />;
                 case 'helpline':
                   return <HelplinePanel />;
+                case 'learning':
+                  return <LearningPanel />;
                 case 'overview':
                 default:
                   return <OverviewPanel profile={mockProfile} onSectionChange={setActivePanel} />;
