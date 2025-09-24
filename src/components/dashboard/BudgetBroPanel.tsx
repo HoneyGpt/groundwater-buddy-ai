@@ -7,7 +7,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Mic, MicOff, Send, Save, IndianRupee, Heart, Droplets, Wheat } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
-import { BudgetStorage, getCurrentContext } from '@/lib/storageUtils';
+import { BudgetStorage, getCurrentContext, ChatStorage } from '@/lib/storageUtils';
 
 // Message interface for Budget Bro
 interface BudgetMessage {
@@ -15,6 +15,7 @@ interface BudgetMessage {
   text: string;
   isUser: boolean;
   timestamp: Date;
+  formatted?: boolean;
 }
 
 interface BudgetBroPanelProps {
@@ -34,6 +35,7 @@ const BudgetBroPanel = ({ profile }: BudgetBroPanelProps) => {
   const [inputValue, setInputValue] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [isListening, setIsListening] = useState(false);
+  const [conversationHistory, setConversationHistory] = useState<Array<{role: string, content: string}>>([]);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const { toast } = useToast();
 
@@ -62,14 +64,20 @@ Try: "I have kidney stones, my budget is ₹800" or "Need drip irrigation for 1 
     }
   }, []);
 
-  const getBudgetResponse = async (message: string): Promise<string> => {
+  const getBudgetResponse = async (message: string): Promise<{ text: string; formatted: boolean }> => {
     try {
-      console.log('Sending message to Gemini API:', message);
+      console.log('Sending message to Budget Bro:', message);
+      
+      // Update conversation history
+      const updatedHistory = [...conversationHistory, { role: 'user', content: message }];
       
       const { data, error } = await supabase.functions.invoke('gemini-chat', {
         body: {
           message: message,
-          context: { profile },
+          context: { 
+            profile,
+            conversationHistory: updatedHistory.slice(-10) // Last 10 messages for context
+          },
           chatType: 'budget'
         }
       });
@@ -81,10 +89,12 @@ Try: "I have kidney stones, my budget is ₹800" or "Need drip irrigation for 1 
 
       if (data?.success && data?.response) {
         console.log('Received AI response successfully');
-        return data.response;
+        // Update conversation history with assistant response
+        setConversationHistory([...updatedHistory, { role: 'assistant', content: data.response }]);
+        return { text: data.response, formatted: true };
       } else if (data?.fallbackResponse) {
         console.log('Using fallback response');
-        return data.fallbackResponse;
+        return { text: data.fallbackResponse, formatted: false };
       } else {
         throw new Error('Invalid response from AI service');
       }
@@ -96,7 +106,7 @@ Try: "I have kidney stones, my budget is ₹800" or "Need drip irrigation for 1 
       const budgetMatch = message.match(/₹?(\d{1,3}(?:,\d{3})*(?:\.\d{2})?|\d+)/);
       const budget = budgetMatch ? parseInt(budgetMatch[1].replace(/,/g, '')) : null;
       
-      return `💛 **Budget Bro (Offline Mode)**
+      const fallbackText = `💛 **Budget Bro (Offline Mode)**
 
 I'm having trouble connecting to my AI brain, but I can still help!
 
@@ -115,6 +125,8 @@ ${budget ? `For your ₹${budget} budget:` : 'To help you save money:'}
 • Primary Health Centers for basic care
 
 Please try asking again in a moment, or be more specific about what you need help with! 💪`;
+      
+      return { text: fallbackText, formatted: false };
     }
   };
 
@@ -139,9 +151,10 @@ Please try asking again in a moment, or be more specific about what you need hel
         
         const botMessage: BudgetMessage = {
           id: (Date.now() + 1).toString(),
-          text: response,
+          text: response.text,
           isUser: false,
           timestamp: new Date(),
+          formatted: response.formatted,
         };
 
         setMessages(prev => [...prev, botMessage]);
@@ -151,6 +164,7 @@ Please try asking again in a moment, or be more specific about what you need hel
           text: "Sorry buddy, I'm having technical difficulties! Try again in a moment. Meanwhile, remember: every small saving counts! 💛",
           isUser: false,
           timestamp: new Date(),
+          formatted: false,
         };
         setMessages(prev => [...prev, errorMessage]);
       } finally {
@@ -171,18 +185,21 @@ Please try asking again in a moment, or be more specific about what you need hel
   };
 
   const handleSaveChat = () => {
-    const chatHistory = localStorage.getItem('budget_bro_history') || '[]';
-    const history = JSON.parse(chatHistory);
+    if (messages.length <= 1) return;
     
-    const chatSession = {
+    const chatData = {
       id: Date.now().toString(),
-      timestamp: new Date().toISOString(),
-      messages: messages,
-      summary: messages.length > 1 ? `Budget chat: ${messages[1]?.text?.substring(0, 50)}...` : 'Budget Bro session'
+      name: `Budget Chat - ${new Date().toLocaleDateString()}`,
+      messages: messages.map(msg => ({
+        content: msg.text,
+        isUser: msg.isUser,
+        timestamp: msg.timestamp.toISOString()
+      })),
+      createdAt: new Date().toISOString(),
     };
     
-    history.unshift(chatSession);
-    localStorage.setItem('budget_bro_history', JSON.stringify(history.slice(0, 50))); // Keep last 50 chats
+    // Use unified chat storage system
+    ChatStorage.add(chatData);
     
     toast({
       title: "Chat Saved! 💾",
@@ -263,9 +280,40 @@ Please try asking again in a moment, or be more specific about what you need hel
                   : 'bg-muted'
               }`}>
                 <CardContent className="p-3">
-                  <div className="text-sm whitespace-pre-wrap">
-                    {message.text}
-                  </div>
+                  {message.formatted ? (
+                    <div className="text-sm space-y-3">
+                      {message.text.split('\n\n').map((section, index) => {
+                        if (section.startsWith('## ')) {
+                          const title = section.replace('## ', '');
+                          return (
+                            <div key={index} className="font-semibold text-foreground border-b border-border pb-1">
+                              {title}
+                            </div>
+                          );
+                        } else if (section.includes('1. ') || section.includes('2. ')) {
+                          return (
+                            <div key={index} className="space-y-1">
+                              {section.split('\n').map((line, lineIndex) => (
+                                <div key={lineIndex} className="text-sm">
+                                  {line}
+                                </div>
+                              ))}
+                            </div>
+                          );
+                        } else {
+                          return (
+                            <div key={index} className="text-sm whitespace-pre-wrap">
+                              {section}
+                            </div>
+                          );
+                        }
+                      })}
+                    </div>
+                  ) : (
+                    <div className="text-sm whitespace-pre-wrap">
+                      {message.text}
+                    </div>
+                  )}
                   <div className={`text-xs mt-2 ${
                     message.isUser 
                       ? 'text-primary-foreground/70' 
