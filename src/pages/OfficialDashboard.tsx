@@ -96,7 +96,7 @@ const OfficialDashboard = () => {
   };
 
   const getUserInitials = () => {
-    const name = user?.user_metadata?.name || user?.email || 'Official';
+    const name = user?.user_metadata?.name || 'Official User';
     return name.split(' ').map((n: string) => n[0]).join('').toUpperCase().slice(0, 2);
   };
 

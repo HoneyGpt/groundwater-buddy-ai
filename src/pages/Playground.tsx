@@ -96,7 +96,7 @@ const Playground = () => {
   };
 
   const getUserInitials = () => {
-    const name = user?.user_metadata?.name || user?.email || 'Official';
+    const name = user?.user_metadata?.name || 'Official User';
     return name.split(' ').map((n: string) => n[0]).join('').toUpperCase().slice(0, 2);
   };
 
@@ -536,7 +536,7 @@ const Playground = () => {
           <div className="p-6">
             {(() => {
               const mockProfile = {
-                name: user?.user_metadata?.name || user?.email || 'Official User',
+                name: user?.user_metadata?.name || 'Official User',
                 location: 'Government Office',
                 role: 'official'
               };
