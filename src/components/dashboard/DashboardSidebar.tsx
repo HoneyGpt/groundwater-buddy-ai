@@ -57,24 +57,27 @@ export const DashboardSidebar = ({
         <div className="flex items-center justify-between">
           {!isCollapsed && (
             <div className="flex gap-2">
-              <Button
-                onClick={onNavigateToDashboard}
-                variant="ghost"
-                size="sm"
-                className="text-primary hover:text-accent hover:bg-primary/10 transition-all duration-200"
-              >
-                <ArrowLeft className="w-4 h-4 mr-2" />
-                Dashboard
-              </Button>
-              <Button
-                onClick={onNavigateHome}
-                variant="ghost"
-                size="sm"
-                className="text-primary hover:text-accent hover:bg-primary/10 transition-all duration-200"
-              >
-                <Home className="w-4 h-4 mr-2" />
-                Home
-              </Button>
+              {activeSection === 'overview' ? (
+                <Button
+                  onClick={onNavigateHome}
+                  variant="ghost"
+                  size="sm"
+                  className="text-primary hover:text-accent hover:bg-primary/10 transition-all duration-200"
+                >
+                  <Home className="w-4 h-4 mr-2" />
+                  Home
+                </Button>
+              ) : (
+                <Button
+                  onClick={onNavigateToDashboard}
+                  variant="ghost"
+                  size="sm"
+                  className="text-primary hover:text-accent hover:bg-primary/10 transition-all duration-200"
+                >
+                  <ArrowLeft className="w-4 h-4 mr-2" />
+                  Dashboard
+                </Button>
+              )}
             </div>
           )}
           <Button

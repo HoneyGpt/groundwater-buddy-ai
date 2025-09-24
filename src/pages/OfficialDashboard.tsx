@@ -146,6 +146,8 @@ const OfficialDashboard = () => {
         return <CalendarPanel />;
       case 'helpline':
         return <HelplinePanel />;
+      case 'schemes':
+        return <SchemesPanel />;
       case 'overview':
       default:
         return <OverviewPanel profile={profile} onSectionChange={handleSectionChange} />;
