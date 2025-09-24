@@ -408,7 +408,7 @@ const LearnMoreModal = ({ open, onOpenChange }: LearnMoreModalProps) => {
                         </li>
                         <li className="flex items-center gap-2">
                           <Badge variant="outline" className="w-20">Latency</Badge>
-                          <span className="text-sm">Median &lt; 3s for cached queries</span>
+                          <span className="text-sm">Median {"< 3s"} for cached queries</span>
                         </li>
                       </ul>
                     </div>
