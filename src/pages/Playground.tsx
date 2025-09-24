@@ -11,6 +11,14 @@ import { useToast } from '@/hooks/use-toast';
 import { searchGoogle, searchAcademicPapers, searchWaterResources, searchGovernmentDocs, searchPDFs, getSearchSuggestions } from '@/lib/googleSearchApi';
 import { searchWorks, searchFunders, searchJournals, formatAuthors, formatPublicationDate } from '@/lib/crossrefApi';
 import { ProfileStorage } from '@/lib/storageUtils';
+import { ChatPanel } from '@/components/dashboard/ChatPanel';
+import { OverviewPanel } from '@/components/dashboard/OverviewPanel';
+import { HistoryPanel } from '@/components/dashboard/HistoryPanel';
+import { DocumentSaverPanel } from '@/components/dashboard/DocumentSaverPanel';
+import BudgetBroPanel from '@/components/dashboard/BudgetBroPanel';
+import { MapsPanel } from '@/components/dashboard/MapsPanel';
+import { CalendarPanel } from '@/components/dashboard/CalendarPanel';
+import HelplinePanel from '@/components/dashboard/HelplinePanel';
 
 const Playground = () => {
   const navigate = useNavigate();
@@ -25,6 +33,7 @@ const Playground = () => {
   const [searchSuggestions, setSearchSuggestions] = useState<string[]>([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [chatMessages, setChatMessages] = useState<any[]>([]);
   const [activePanel, setActivePanel] = useState<string>('search');
 
   // Check authentication
@@ -78,6 +87,10 @@ const Playground = () => {
         variant: "destructive",
       });
     }
+  };
+
+  const handleLoadChat = (chat: any) => {
+    setChatMessages(chat.messages);
   };
 
   const getUserInitials = () => {
@@ -524,30 +537,52 @@ const Playground = () => {
           </div>
         ) : (
           <div className="p-6">
-            <Card className="bg-white/20 dark:bg-black/20 backdrop-blur-md border border-white/20 dark:border-white/10">
-              <CardHeader>
-                <CardTitle className="text-2xl font-light">
-                  {sidebarItems.find(item => item.key === activePanel)?.label}
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="text-center py-12">
-                  <div className="mb-4">
-                    {(() => {
-                      const item = sidebarItems.find(item => item.key === activePanel);
-                      const Icon = item?.icon;
-                      return Icon ? <Icon className="w-16 h-16 mx-auto text-foreground/40" /> : null;
-                    })()}
-                  </div>
-                  <h3 className="text-xl font-medium text-foreground/80 mb-2">
-                    {sidebarItems.find(item => item.key === activePanel)?.label} Coming Soon
-                  </h3>
-                  <p className="text-foreground/60">
-                    This feature is being developed for the INGRES-AI research platform.
-                  </p>
-                </div>
-              </CardContent>
-            </Card>
+            {(() => {
+              const mockProfile = {
+                name: user?.user_metadata?.name || user?.email || 'Official User',
+                location: 'Government Office',
+                role: 'official'
+              };
+
+              switch (activePanel) {
+                case 'chat':
+                  return <ChatPanel profile={mockProfile} />;
+                case 'history':
+                  return <HistoryPanel onLoadChat={handleLoadChat} onSectionChange={setActivePanel} />;
+                case 'documents':
+                  return <DocumentSaverPanel />;
+                case 'budget':
+                  return <BudgetBroPanel profile={mockProfile} />;
+                case 'maps':
+                  return <MapsPanel />;
+                case 'calendar':
+                  return <CalendarPanel />;
+                case 'helpline':
+                  return <HelplinePanel />;
+                case 'settings':
+                  return (
+                    <Card className="bg-white/20 dark:bg-black/20 backdrop-blur-md border border-white/20 dark:border-white/10">
+                      <CardHeader>
+                        <CardTitle className="text-2xl font-light">Settings</CardTitle>
+                      </CardHeader>
+                      <CardContent>
+                        <div className="text-center py-12">
+                      <Settings className="w-16 h-16 mx-auto text-foreground/40 mb-4" />
+                      <h3 className="text-xl font-medium text-foreground/80 mb-2">
+                        Settings Panel
+                      </h3>
+                      <p className="text-foreground/60">
+                        Configure your INGRES-AI preferences and account settings.
+                      </p>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  );
+                case 'overview':
+                default:
+                  return <OverviewPanel profile={mockProfile} onSectionChange={setActivePanel} />;
+              }
+            })()}
           </div>
         )}
       </div>
