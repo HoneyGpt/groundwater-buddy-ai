@@ -5,6 +5,7 @@ import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
 import { MapPin, Search, Download, Filter, ZoomIn, ZoomOut, Home, Layers, Info } from 'lucide-react';
+import ingresLogo from '@/assets/ingres-ai-logo.png';
 
 export const MapsPanel = () => {
   const [selectedYear, setSelectedYear] = useState('2024-2025');
@@ -52,7 +53,7 @@ export const MapsPanel = () => {
         {/* Header */}
         <div className="p-4 border-b border-border bg-primary text-primary-foreground">
           <div className="flex items-center gap-2 mb-2">
-            <img src="/ingres-ai-logo.png" alt="INGRES" className="w-6 h-6" />
+            <img src={ingresLogo} alt="INGRES" className="w-6 h-6" />
             <h3 className="font-semibold text-sm">Central Ground Water Board</h3>
           </div>
           <p className="text-xs opacity-90">Department of WR, RD & GR</p>
