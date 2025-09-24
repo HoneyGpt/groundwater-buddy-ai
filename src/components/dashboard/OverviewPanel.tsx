@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
 import { Droplets, TrendingDown, TrendingUp, AlertTriangle, MapPin, Calendar } from 'lucide-react';
 import { mockApi, type GroundwaterStatus } from '@/lib/mockApi';
+import { ChatStorage, getCurrentContext } from '@/lib/storageUtils';
 
 interface OverviewPanelProps {
   profile?: any;
