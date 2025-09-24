@@ -145,9 +145,6 @@ const OfficialDashboard = () => {
         return <CalendarPanel />;
       case 'helpline':
         return <HelplinePanel />;
-      case 'settings':
-        navigate('/settings?from=official');
-        return null;
       case 'overview':
       default:
         return <OverviewPanel profile={profile} onSectionChange={handleSectionChange} />;
