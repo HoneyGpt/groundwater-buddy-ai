@@ -5,11 +5,10 @@ import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { useNavigate } from 'react-router-dom';
-import { Search, Settings, LogOut, Crown, FileText, Zap, BookOpen, Database, Globe, Filter, Calendar, Star, Mic, Camera, MessageCircle, History, Save, DollarSign, Map, Gift, Phone, Home, Menu, X, Send, GraduationCap } from 'lucide-react';
+import { Search, Settings, LogOut, Crown, FileText, Zap, BookOpen, Database, Globe, Filter, Calendar, Star, Mic, Camera, MessageCircle, History, Save, DollarSign, Map, Gift, Phone, Home, Menu, X, Send } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
-import { searchGoogle, searchAcademicPapers, searchWaterResources, searchGovernmentDocs, searchPDFs, getSearchSuggestions } from '@/lib/googleSearchApi';
-import { searchWorks, searchFunders, searchJournals, formatAuthors, formatPublicationDate } from '@/lib/crossrefApi';
+import { searchGoogle, searchGovernmentDocs, getSearchSuggestions } from '@/lib/googleSearchApi';
 import { ProfileStorage } from '@/lib/storageUtils';
 import { ChatPanel } from '@/components/dashboard/ChatPanel';
 import { OverviewPanel } from '@/components/dashboard/OverviewPanel';
@@ -20,6 +19,7 @@ import { MapsPanel } from '@/components/dashboard/MapsPanel';
 import { CalendarPanel } from '@/components/dashboard/CalendarPanel';
 import HelplinePanel from '@/components/dashboard/HelplinePanel';
 import GoogleCSE from '@/components/GoogleCSE';
+import { GOVERNMENT_SECRETARIES } from '@/data/governmentSecretaries';
 
 const Playground = () => {
   const navigate = useNavigate();
@@ -30,7 +30,7 @@ const Playground = () => {
   const [searchResults, setSearchResults] = useState<any[]>([]);
   const [academicResults, setAcademicResults] = useState<any[]>([]);
   const [isSearching, setIsSearching] = useState(false);
-  const [activeTab, setActiveTab] = useState<'web' | 'academic' | 'government' | 'crossref'>('web');
+  const [activeTab, setActiveTab] = useState<'web' | 'government'>('web');
   const [searchSuggestions, setSearchSuggestions] = useState<string[]>([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -114,19 +114,9 @@ const Playground = () => {
           results = webResults.items || [];
           break;
           
-        case 'academic':
-          const academicResults = await searchAcademicPapers(query, {});
-          results = academicResults.items || [];
-          break;
-          
         case 'government':
           const govResults = await searchGovernmentDocs(query, {});
           results = govResults.items || [];
-          break;
-          
-        case 'crossref':
-          const crossrefResults = await searchWorks(query, 10);
-          results = crossrefResults.message.items || [];
           break;
       }
       
@@ -161,41 +151,6 @@ const Playground = () => {
   };
 
   const renderSearchResult = (result: any, index: number) => {
-    if (activeTab === 'crossref') {
-      return (
-        <div key={index} className="bg-white/40 dark:bg-black/20 backdrop-blur-sm border border-white/20 dark:border-white/10 rounded-2xl p-6 hover:bg-white/50 dark:hover:bg-black/30 transition-all duration-300 shadow-sm hover:shadow-lg">
-          <div className="space-y-3">
-            <h3 className="text-lg font-medium text-foreground hover:text-primary cursor-pointer transition-colors duration-200">
-              <a href={result.URL} target="_blank" rel="noopener noreferrer">
-                {result.title?.[0] || 'Untitled Research Paper'}
-              </a>
-            </h3>
-            <p className="text-sm text-foreground/60">
-              by {formatAuthors(result.author)} • {formatPublicationDate(result.published)}
-            </p>
-            {result['container-title']?.[0] && (
-              <p className="text-sm text-primary font-medium">
-                Published in: {result['container-title'][0]}
-              </p>
-            )}
-            <div className="flex items-center space-x-3">
-              <Badge variant="outline" className="bg-white/20 border-white/30">
-                {result.type}
-              </Badge>
-              <a 
-                href={result.URL} 
-                target="_blank" 
-                rel="noopener noreferrer" 
-                className="text-xs text-blue-600 dark:text-blue-400 hover:underline flex items-center space-x-1"
-              >
-                <span>DOI: {result.DOI}</span>
-              </a>
-            </div>
-          </div>
-        </div>
-      );
-    }
-    
     return (
       <div key={index} className="bg-white/40 dark:bg-black/20 backdrop-blur-sm border border-white/20 dark:border-white/10 rounded-2xl p-6 hover:bg-white/50 dark:hover:bg-black/30 transition-all duration-300 shadow-sm hover:shadow-lg">
         <div className="space-y-3">
@@ -403,18 +358,6 @@ const Playground = () => {
                     Web
                   </Button>
                   <Button
-                    variant={activeTab === 'academic' ? 'default' : 'ghost'}
-                    size="sm"
-                    onClick={() => setActiveTab('academic')}
-                    className={activeTab === 'academic' 
-                      ? "rounded-full bg-primary text-primary-foreground shadow-md" 
-                      : "rounded-full text-foreground/70 hover:text-foreground hover:bg-white/10"
-                    }
-                  >
-                    <GraduationCap className="w-4 h-4 mr-2" />
-                    Academic
-                  </Button>
-                  <Button
                     variant={activeTab === 'government' ? 'default' : 'ghost'}
                     size="sm"
                     onClick={() => setActiveTab('government')}
@@ -425,18 +368,6 @@ const Playground = () => {
                   >
                     <FileText className="w-4 h-4 mr-2" />
                     Government
-                  </Button>
-                  <Button
-                    variant={activeTab === 'crossref' ? 'default' : 'ghost'}
-                    size="sm"
-                    onClick={() => setActiveTab('crossref')}
-                    className={activeTab === 'crossref' 
-                      ? "rounded-full bg-primary text-primary-foreground shadow-md" 
-                    : "rounded-full text-foreground/70 hover:text-foreground hover:bg-white/10"
-                    }
-                  >
-                    <Database className="w-4 h-4 mr-2" />
-                    CrossRef
                   </Button>
                 </div>
               </div>
@@ -526,6 +457,38 @@ const Playground = () => {
               </div>
             )}
 
+            {activeTab === 'government' && (
+              <div className="w-full max-w-6xl mt-8">
+                <Card className="bg-white/20 dark:bg-black/20 backdrop-blur-md border border-white/20 dark:border-white/10">
+                  <CardHeader>
+                    <CardTitle className="text-2xl font-light text-center">Government of India Secretaries</CardTitle>
+                    <p className="text-center text-foreground/60">Contact information for key government departments</p>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="grid gap-4 max-h-96 overflow-y-auto">
+                      {GOVERNMENT_SECRETARIES.map((secretary) => (
+                        <div key={secretary.srNo} className="bg-white/30 dark:bg-black/30 rounded-lg p-4 border border-white/30">
+                          <div className="flex items-start justify-between">
+                            <div className="flex-1">
+                              <h3 className="font-medium text-lg text-primary">{secretary.name}</h3>
+                              <p className="text-sm text-foreground/80 font-medium">{secretary.designation}</p>
+                              <p className="text-sm text-foreground/70">{secretary.department}</p>
+                              <div className="mt-2 text-sm text-foreground/60 whitespace-pre-line">
+                                {secretary.contact}
+                              </div>
+                            </div>
+                            <Badge variant="outline" className="ml-4">
+                              #{secretary.srNo}
+                            </Badge>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </CardContent>
+                </Card>
+              </div>
+            )}
+
             {/* Search Results */}
             {searchResults.length > 0 && (
               <div className="w-full max-w-4xl mt-12">
@@ -573,22 +536,18 @@ const Playground = () => {
                   return <HelplinePanel />;
                 case 'settings':
                   return (
-                    <Card className="bg-white/20 dark:bg-black/20 backdrop-blur-md border border-white/20 dark:border-white/10">
-                      <CardHeader>
-                        <CardTitle className="text-2xl font-light">Settings</CardTitle>
-                      </CardHeader>
-                      <CardContent>
-                        <div className="text-center py-12">
+                    <div className="text-center py-12">
                       <Settings className="w-16 h-16 mx-auto text-foreground/40 mb-4" />
                       <h3 className="text-xl font-medium text-foreground/80 mb-2">
                         Settings Panel
                       </h3>
-                      <p className="text-foreground/60">
+                      <p className="text-foreground/60 mb-6">
                         Configure your INGRES-AI preferences and account settings.
                       </p>
-                        </div>
-                      </CardContent>
-                    </Card>
+                      <Button onClick={() => navigate('/settings')} className="bg-primary hover:bg-primary/90">
+                        Go to Settings
+                      </Button>
+                    </div>
                   );
                 case 'overview':
                 default:

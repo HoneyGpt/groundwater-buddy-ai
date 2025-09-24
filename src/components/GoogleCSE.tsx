@@ -1,7 +1,5 @@
-import { useEffect, useState } from 'react';
-import { Input } from '@/components/ui/input';
+import { useEffect } from 'react';
 import { Button } from '@/components/ui/button';
-import { Send, Search } from 'lucide-react';
 
 declare global {
   interface Window {
@@ -10,8 +8,6 @@ declare global {
 }
 
 const GoogleCSE = ({ cx = 'c35c85b4f765b4693' }: { cx?: string }) => {
-  const [searchQuery, setSearchQuery] = useState('');
-  
   const exampleSearches = [
     "groundwater levels in Karnataka",
     "water table depth in my area", 
@@ -34,22 +30,7 @@ const GoogleCSE = ({ cx = 'c35c85b4f765b4693' }: { cx?: string }) => {
     }
   }, [cx]);
 
-  const handleSearch = () => {
-    if (searchQuery.trim()) {
-      // Trigger Google CSE search
-      const searchElement = document.querySelector('.gsc-input');
-      if (searchElement) {
-        (searchElement as HTMLInputElement).value = searchQuery;
-        const searchButton = document.querySelector('.gsc-search-button');
-        if (searchButton) {
-          (searchButton as HTMLButtonElement).click();
-        }
-      }
-    }
-  };
-
   const handleExampleClick = (query: string) => {
-    setSearchQuery(query);
     // Auto-search when clicking example
     setTimeout(() => {
       const searchElement = document.querySelector('.gsc-input');
@@ -65,26 +46,8 @@ const GoogleCSE = ({ cx = 'c35c85b4f765b4693' }: { cx?: string }) => {
 
   return (
     <section aria-label="INGRES Search" className="bg-white/60 dark:bg-black/20 border border-white/20 dark:border-white/10 rounded-2xl p-6 space-y-6">
-      {/* Custom Search Bar */}
-      <div className="flex items-center space-x-3">
-        <div className="relative flex-1">
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-5 h-5" />
-          <Input
-            type="text"
-            placeholder="Search INGRES groundwater data..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            onKeyPress={(e) => e.key === 'Enter' && handleSearch()}
-            className="pl-12 pr-4 h-12 text-lg bg-background/80 border-border/50 focus:border-primary"
-          />
-        </div>
-        <Button 
-          onClick={handleSearch}
-          className="h-12 px-6 bg-primary hover:bg-primary/90"
-        >
-          <Send className="w-5 h-5" />
-        </Button>
-      </div>
+      {/* Google CSE Search Widget */}
+      <div className="gcse-search" />
 
       {/* Example Searches */}
       <div className="space-y-3">
@@ -100,11 +63,6 @@ const GoogleCSE = ({ cx = 'c35c85b4f765b4693' }: { cx?: string }) => {
             </button>
           ))}
         </div>
-      </div>
-
-      {/* Hidden Google CSE (for functionality) */}
-      <div className="hidden">
-        <div className="gcse-search" />
       </div>
     </section>
   );
