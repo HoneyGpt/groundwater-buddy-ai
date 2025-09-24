@@ -1,9 +1,8 @@
 /**
- * Google Custom Search API integration
+ * Google Custom Search API integration via Supabase Edge Function
  */
 
-const GOOGLE_API_KEY = 'AIzaSyAKE8LeBqiIAgcYKnS_EW4Mej9Po0vKCnU';
-const SEARCH_ENGINE_ID = '436035263b1de8a7cf';
+import { supabase } from '@/integrations/supabase/client';
 
 export interface GoogleSearchResult {
   title: string;
@@ -68,7 +67,7 @@ export interface GoogleSearchResponse {
 }
 
 /**
- * Perform Google Custom Search
+ * Perform Google Custom Search via Supabase Edge Function
  */
 export const searchGoogle = async (
   query: string,
@@ -81,27 +80,23 @@ export const searchGoogle = async (
   } = {}
 ): Promise<GoogleSearchResponse> => {
   try {
-    const params = new URLSearchParams({
-      key: GOOGLE_API_KEY,
-      cx: SEARCH_ENGINE_ID,
-      q: query,
+    const { data, error } = await supabase.functions.invoke('google-search', {
+      body: {
+        query,
+        searchType: 'web',
+        options
+      }
     });
 
-    // Add optional parameters
-    if (options.start) params.append('start', options.start.toString());
-    if (options.num) params.append('num', Math.min(options.num, 10).toString()); // Max 10 per request
-    if (options.siteSearch) params.append('siteSearch', options.siteSearch);
-    if (options.fileType) params.append('fileType', options.fileType);
-    if (options.dateRestrict) params.append('dateRestrict', options.dateRestrict);
-
-    const response = await fetch(`https://www.googleapis.com/customsearch/v1?${params}`);
-
-    if (!response.ok) {
-      const errorData = await response.json().catch(() => ({}));
-      throw new Error(`Google Search API error: ${response.status} - ${errorData.error?.message || 'Unknown error'}`);
+    if (error) {
+      throw new Error(`Supabase function error: ${error.message}`);
     }
 
-    return await response.json();
+    if (!data.success) {
+      throw new Error(data.error || 'Search failed');
+    }
+
+    return data.data;
   } catch (error) {
     console.error('Google Search API error:', error);
     throw error;
@@ -112,24 +107,84 @@ export const searchGoogle = async (
  * Search for academic papers (site-specific searches)
  */
 export const searchAcademicPapers = async (query: string, options: { start?: number } = {}) => {
-  const academicQuery = `${query} site:scholar.google.com OR site:researchgate.net OR site:arxiv.org OR site:pubmed.ncbi.nlm.nih.gov`;
-  return searchGoogle(academicQuery, options);
+  try {
+    const { data, error } = await supabase.functions.invoke('google-search', {
+      body: {
+        query,
+        searchType: 'academic',
+        options
+      }
+    });
+
+    if (error) {
+      throw new Error(`Supabase function error: ${error.message}`);
+    }
+
+    if (!data.success) {
+      throw new Error(data.error || 'Academic search failed');
+    }
+
+    return data.data;
+  } catch (error) {
+    console.error('Academic search error:', error);
+    throw error;
+  }
 };
 
 /**
  * Search for water/groundwater specific resources
  */
 export const searchWaterResources = async (query: string, options: { start?: number } = {}) => {
-  const waterQuery = `${query} groundwater water resources hydrology`;
-  return searchGoogle(waterQuery, options);
+  try {
+    const { data, error } = await supabase.functions.invoke('google-search', {
+      body: {
+        query,
+        searchType: 'water',
+        options
+      }
+    });
+
+    if (error) {
+      throw new Error(`Supabase function error: ${error.message}`);
+    }
+
+    if (!data.success) {
+      throw new Error(data.error || 'Water resources search failed');
+    }
+
+    return data.data;
+  } catch (error) {
+    console.error('Water resources search error:', error);
+    throw error;
+  }
 };
 
 /**
  * Search for government documents and policies
  */
 export const searchGovernmentDocs = async (query: string, options: { start?: number } = {}) => {
-  const govQuery = `${query} site:gov.in OR site:nic.in OR site:india.gov.in`;
-  return searchGoogle(govQuery, options);
+  try {
+    const { data, error } = await supabase.functions.invoke('google-search', {
+      body: {
+        query,
+        searchType: 'government',
+        options
+      }
+    });
+
+    if (error) {
+      throw new Error(`Supabase function error: ${error.message}`);
+    }
+
+    if (!data.success) {
+      throw new Error(data.error || 'Government documents search failed');
+    }
+
+    return data.data;
+  } catch (error) {
+    console.error('Government documents search error:', error);
+    throw error;
+  }
 };
 
 /**
