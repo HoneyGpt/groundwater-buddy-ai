@@ -339,7 +339,7 @@ const Playground = () => {
                 </h1>
               </div>
               <p className="text-foreground/60 text-lg font-light">
-                Indian Ground Water
+                Indian Groundwater Research & Environmental Systems
               </p>
             </div>
 
