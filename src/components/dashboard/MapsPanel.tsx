@@ -1,367 +1,300 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
-import { MapPin, ZoomIn, ZoomOut, RotateCcw, FileText, DollarSign } from 'lucide-react';
-import { toast } from 'sonner';
-
-// Import map images
-import groundwaterMap1 from '@/assets/maps/groundwater-map-1.jpg';
-import groundwaterMap2 from '@/assets/maps/groundwater-map-2.jpg';
-import groundwaterMap3 from '@/assets/maps/groundwater-map-3.jpg';
-import extractionLegend from '@/assets/maps/extraction-legend.jpg';
-
-interface MapData {
-  id: string;
-  name: string;
-  image: string;
-  state: string;
-  district: string;
-  extractionPercent: number;
-  qualityTag: 'Safe' | 'Semi-Critical' | 'Critical' | 'Over-Exploited';
-  schemes: string[];
-  coordinates: { x: number; y: number };
-}
-
-const mapData: MapData[] = [
-  {
-    id: '1',
-    name: 'Northern Region',
-    image: groundwaterMap1,
-    state: 'Telangana',
-    district: 'Hyderabad',
-    extractionPercent: 45,
-    qualityTag: 'Safe',
-    schemes: ['Rainwater Harvesting Scheme', 'Groundwater Recharge Program'],
-    coordinates: { x: 200, y: 150 }
-  },
-  {
-    id: '2',
-    name: 'Central Region',
-    image: groundwaterMap2,
-    state: 'Telangana',
-    district: 'Warangal',
-    extractionPercent: 72,
-    qualityTag: 'Semi-Critical',
-    schemes: ['Water Conservation Initiative', 'Farmer Support Program'],
-    coordinates: { x: 300, y: 250 }
-  },
-  {
-    id: '3',
-    name: 'Southern Region',
-    image: groundwaterMap3,
-    state: 'Andhra Pradesh',
-    district: 'Kurnool',
-    extractionPercent: 89,
-    qualityTag: 'Critical',
-    schemes: ['Emergency Water Supply', 'Drought Relief Program'],
-    coordinates: { x: 150, y: 350 }
-  }
-];
-
-const states = [...new Set(mapData.map(m => m.state))];
-const getDistricts = (state: string) => mapData.filter(m => m.state === state).map(m => m.district);
+import { MapPin, Search, Download, Filter, ZoomIn, ZoomOut, Home, Layers, Info } from 'lucide-react';
 
 export const MapsPanel = () => {
-  const [selectedState, setSelectedState] = useState<string>('all');
-  const [selectedDistrict, setSelectedDistrict] = useState<string>('all');
-  const [currentMapIndex, setCurrentMapIndex] = useState(0);
-  const [zoom, setZoom] = useState(1);
-  const [position, setPosition] = useState({ x: 0, y: 0 });
-  const [isDragging, setIsDragging] = useState(false);
-  const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
-  const [hoveredRegion, setHoveredRegion] = useState<MapData | null>(null);
-  const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
-  const [userLocation, setUserLocation] = useState<{ x: number; y: number } | null>(null);
-  
-  const mapContainerRef = useRef<HTMLDivElement>(null);
-  const mapImageRef = useRef<HTMLImageElement>(null);
+  const [selectedYear, setSelectedYear] = useState('2024-2025');
+  const [selectedComponent, setSelectedComponent] = useState('recharge');
+  const [selectedCategory, setSelectedCategory] = useState('safe');
+  const [searchQuery, setSearchQuery] = useState('');
 
-  const filteredMaps = mapData.filter(map => {
-    if (selectedState !== 'all' && map.state !== selectedState) return false;
-    if (selectedDistrict !== 'all' && map.district !== selectedDistrict) return false;
-    return true;
-  });
+  // Mock data for state-wise statistics
+  const stateData = [
+    { state: 'ANDAMAN AND NICOBAR ISLANDS', rainfall: 2952.91, resources: 34504.51, extraction: 782.68 },
+    { state: 'ANDHRA PRADESH', rainfall: 891.99, resources: 25802586.50, extraction: 7786396.79 },
+    { state: 'ARUNACHAL PRADESH', rainfall: 3318.76, resources: 3288330.35, extraction: 1343.76 },
+    { state: 'ASSAM', rainfall: 2382.11, resources: 2059912.17, extraction: 2093141.20 },
+    { state: 'BIHAR', rainfall: 1202.46, resources: 3132096.73, extraction: 1446052.87 },
+    { state: 'CHANDIGARH', rainfall: 1009.80, resources: 4786.58, extraction: 3205.59 },
+    { state: 'CHHATTISGARH', rainfall: 1338.43, resources: 1306865.95, extraction: 629687.36 },
+    { state: 'DADRA AND NAGAR HAVELI', rainfall: 2265.70, resources: 9095.76, extraction: 3178.63 },
+    { state: 'DAMAN AND DIU', rainfall: 1709.10, resources: 2587.31, extraction: 1545.50 },
+  ];
 
-  const currentMap = filteredMaps[currentMapIndex] || mapData[0];
-
-  // Get user location
-  useEffect(() => {
-    if (navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition(
-        (position) => {
-          // Mock conversion of real coordinates to map coordinates
-          setUserLocation({ x: 250, y: 200 });
-          toast.success('Location detected');
-        },
-        () => {
-          toast.error('Location access denied');
-        }
-      );
-    }
-  }, []);
-
-  const handleZoomIn = () => setZoom(prev => Math.min(prev + 0.2, 3));
-  const handleZoomOut = () => setZoom(prev => Math.max(prev - 0.2, 0.5));
-  const handleReset = () => {
-    setZoom(1);
-    setPosition({ x: 0, y: 0 });
+  const categoryStats = {
+    total: 6769,
+    safe: 4346,
+    semiCritical: 763,
+    critical: 201,
+    overExploited: 731,
+    saline: 128
   };
 
-  const handleMouseDown = (e: React.MouseEvent) => {
-    setIsDragging(true);
-    setDragStart({ x: e.clientX - position.x, y: e.clientY - position.y });
-  };
-
-  const handleMouseMove = (e: React.MouseEvent) => {
-    if (isDragging) {
-      setPosition({
-        x: e.clientX - dragStart.x,
-        y: e.clientY - dragStart.y
-      });
-    }
-    setMousePosition({ x: e.clientX, y: e.clientY });
-  };
-
-  const handleMouseUp = () => setIsDragging(false);
-
-  const handleRegionClick = (region: MapData) => {
-    toast.success(`Selected ${region.name}`, {
-      description: `Extraction: ${region.extractionPercent}% | Quality: ${region.qualityTag}`,
-    });
-  };
-
-  const getQualityColor = (tag: string) => {
-    switch (tag) {
-      case 'Safe': return 'bg-green-100 text-green-800 border-green-200';
-      case 'Semi-Critical': return 'bg-yellow-100 text-yellow-800 border-yellow-200';
-      case 'Critical': return 'bg-orange-100 text-orange-800 border-orange-200';
-      case 'Over-Exploited': return 'bg-red-100 text-red-800 border-red-200';
-      default: return 'bg-gray-100 text-gray-800 border-gray-200';
-    }
+  const getCategoryColor = (category: string) => {
+    const colors = {
+      safe: 'bg-green-500',
+      semiCritical: 'bg-yellow-500', 
+      critical: 'bg-orange-500',
+      overExploited: 'bg-red-500',
+      saline: 'bg-purple-500'
+    };
+    return colors[category as keyof typeof colors] || 'bg-gray-500';
   };
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <div>
-          <h2 className="text-2xl font-bold text-foreground">Interactive Maps</h2>
-          <p className="text-muted-foreground">Explore groundwater data across regions</p>
+    <div className="h-full flex bg-background">
+      {/* Left Sidebar - Controls */}
+      <div className="w-80 bg-muted/30 border-r border-border flex flex-col">
+        {/* Header */}
+        <div className="p-4 border-b border-border bg-primary text-primary-foreground">
+          <div className="flex items-center gap-2 mb-2">
+            <img src="/ingres-ai-logo.png" alt="INGRES" className="w-6 h-6" />
+            <h3 className="font-semibold text-sm">Central Ground Water Board</h3>
+          </div>
+          <p className="text-xs opacity-90">Department of WR, RD & GR</p>
+          <p className="text-xs opacity-90">Ministry of Jal Shakti, Government of India</p>
         </div>
-        <div className="flex gap-2">
-          <Button variant="outline" size="sm" onClick={handleZoomIn}>
-            <ZoomIn className="w-4 h-4" />
-          </Button>
-          <Button variant="outline" size="sm" onClick={handleZoomOut}>
-            <ZoomOut className="w-4 h-4" />
-          </Button>
-          <Button variant="outline" size="sm" onClick={handleReset}>
-            <RotateCcw className="w-4 h-4" />
-          </Button>
+
+        {/* Assessment Year */}
+        <div className="p-4 border-b border-border">
+          <div className="bg-muted rounded px-3 py-2">
+            <span className="text-sm font-medium">Assessment year: {selectedYear}</span>
+          </div>
+        </div>
+
+        {/* Navigation Icons */}
+        <div className="p-4 border-b border-border">
+          <div className="grid grid-cols-4 gap-2">
+            <Button variant="ghost" size="sm" className="p-2 h-auto">
+              <Filter className="w-4 h-4" />
+            </Button>
+            <Button variant="ghost" size="sm" className="p-2 h-auto">
+              <Layers className="w-4 h-4" />
+            </Button>
+            <Button variant="ghost" size="sm" className="p-2 h-auto">
+              <Home className="w-4 h-4" />
+            </Button>
+            <Button variant="ghost" size="sm" className="p-2 h-auto">
+              <Info className="w-4 h-4" />
+            </Button>
+          </div>
+        </div>
+
+        {/* Controls */}
+        <div className="flex-1 p-4 space-y-4 overflow-y-auto">
+          <div>
+            <label className="text-sm font-medium mb-2 block">Year</label>
+            <Select value={selectedYear} onValueChange={setSelectedYear}>
+              <SelectTrigger className="w-full">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="2024-2025">2024-2025</SelectItem>
+                <SelectItem value="2023-2024">2023-2024</SelectItem>
+                <SelectItem value="2022-2023">2022-2023</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+
+          <div>
+            <label className="text-sm font-medium mb-2 block">Component</label>
+            <Select value={selectedComponent} onValueChange={setSelectedComponent}>
+              <SelectTrigger className="w-full">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="recharge">Recharge</SelectItem>
+                <SelectItem value="extraction">Extraction</SelectItem>
+                <SelectItem value="stage">Stage of Extraction</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+
+          <div>
+            <label className="text-sm font-medium mb-2 block">Category</label>
+            <Select value={selectedCategory} onValueChange={setSelectedCategory}>
+              <SelectTrigger className="w-full">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="safe">Safe</SelectItem>
+                <SelectItem value="semiCritical">Semi-Critical</SelectItem>
+                <SelectItem value="critical">Critical</SelectItem>
+                <SelectItem value="overExploited">Over-Exploited</SelectItem>
+                <SelectItem value="saline">Saline</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
         </div>
       </div>
 
-      {/* Filters */}
-      <div className="flex gap-4 flex-wrap">
-        <Select value={selectedState} onValueChange={(value) => {
-          setSelectedState(value);
-          setSelectedDistrict('all');
-          setCurrentMapIndex(0);
-        }}>
-          <SelectTrigger className="w-48">
-            <SelectValue placeholder="Select State" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">All States</SelectItem>
-            {states.map(state => (
-              <SelectItem key={state} value={state}>{state}</SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
+      {/* Center - Map Area */}
+      <div className="flex-1 flex flex-col">
+        {/* Top Stats Bar */}
+        <div className="bg-primary text-primary-foreground p-2">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-4 text-sm">
+              <span className="flex items-center gap-1">
+                <span className="font-semibold">Total:</span> {categoryStats.total}
+              </span>
+              <span className="flex items-center gap-1">
+                <span className="font-semibold">Safe:</span> {categoryStats.safe}
+              </span>
+              <span className="flex items-center gap-1">
+                <span className="font-semibold">Semi-Critical:</span> {categoryStats.semiCritical}
+              </span>
+              <span className="flex items-center gap-1">
+                <span className="font-semibold">Critical:</span> {categoryStats.critical}
+              </span>
+              <span className="flex items-center gap-1">
+                <span className="font-semibold">Over-Exploited:</span> {categoryStats.overExploited}
+              </span>
+              <span className="flex items-center gap-1">
+                <span className="font-semibold">Saline:</span> {categoryStats.saline}
+              </span>
+            </div>
+            <div className="flex items-center gap-2">
+              <Button variant="secondary" size="sm">
+                <Download className="w-3 h-3 mr-1" />
+                PDF
+              </Button>
+            </div>
+          </div>
+        </div>
 
-        <Select 
-          value={selectedDistrict} 
-          onValueChange={setSelectedDistrict}
-          disabled={selectedState === 'all'}
-        >
-          <SelectTrigger className="w-48">
-            <SelectValue placeholder="Select District" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">All Districts</SelectItem>
-            {selectedState !== 'all' && getDistricts(selectedState).map(district => (
-              <SelectItem key={district} value={district}>{district}</SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
+        {/* Map Controls */}
+        <div className="bg-background border-b border-border p-2">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <Button variant="outline" size="sm">
+                <ZoomIn className="w-3 h-3" />
+              </Button>
+              <Button variant="outline" size="sm">
+                <ZoomOut className="w-3 h-3" />
+              </Button>
+              <Button variant="outline" size="sm">
+                <Home className="w-3 h-3" />
+              </Button>
+            </div>
+            <div className="text-sm text-muted-foreground">
+              Area of Focus: INDIA (COUNTRY)
+            </div>
+          </div>
+        </div>
 
-        {filteredMaps.length > 1 && (
-          <Select value={currentMapIndex.toString()} onValueChange={(value) => setCurrentMapIndex(parseInt(value))}>
-            <SelectTrigger className="w-48">
-              <SelectValue placeholder="Select Region" />
-            </SelectTrigger>
-            <SelectContent>
-              {filteredMaps.map((map, index) => (
-                <SelectItem key={map.id} value={index.toString()}>{map.name}</SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        )}
-      </div>
-
-      <div className="grid lg:grid-cols-4 gap-6">
         {/* Map Display */}
-        <Card className="lg:col-span-3">
-          <CardContent className="p-0">
-            <div 
-              ref={mapContainerRef}
-              className="relative h-[600px] overflow-hidden rounded-lg cursor-grab active:cursor-grabbing"
-              onMouseDown={handleMouseDown}
-              onMouseMove={handleMouseMove}
-              onMouseUp={handleMouseUp}
-              onMouseLeave={handleMouseUp}
-            >
-              <div
-                className="relative transition-transform duration-200"
-                style={{
-                  transform: `translate(${position.x}px, ${position.y}px) scale(${zoom})`,
-                  transformOrigin: 'center center'
-                }}
-              >
-                <img
-                  ref={mapImageRef}
-                  src={currentMap.image}
-                  alt={currentMap.name}
-                  className="w-full h-full object-contain select-none"
-                  draggable={false}
-                />
-
-                {/* Interactive Regions */}
-                <div
-                  className="absolute top-1/3 left-1/3 w-8 h-8 bg-primary/20 border-2 border-primary rounded-full cursor-pointer hover:bg-primary/40 transition-colors"
-                  onClick={() => handleRegionClick(currentMap)}
-                  onMouseEnter={() => setHoveredRegion(currentMap)}
-                  onMouseLeave={() => setHoveredRegion(null)}
-                />
-
-                {/* User Location Marker */}
-                {userLocation && (
-                  <div
-                    className="absolute flex items-center justify-center"
-                    style={{
-                      left: `${userLocation.x}px`,
-                      top: `${userLocation.y}px`,
-                      transform: 'translate(-50%, -50%)'
-                    }}
-                  >
-                    <MapPin className="w-6 h-6 text-blue-600 drop-shadow-lg" />
-                  </div>
-                )}
-              </div>
-
-              {/* Hover Popup */}
-              {hoveredRegion && (
-                <div
-                  className="absolute z-10 bg-background border rounded-lg shadow-lg p-4 min-w-64 pointer-events-none"
-                  style={{
-                    left: `${mousePosition.x - (mapContainerRef.current?.getBoundingClientRect().left || 0)}px`,
-                    top: `${mousePosition.y - (mapContainerRef.current?.getBoundingClientRect().top || 0) - 100}px`
-                  }}
-                >
-                  <h3 className="font-semibold text-foreground">{hoveredRegion.name}</h3>
-                  <p className="text-sm text-muted-foreground">{hoveredRegion.district}, {hoveredRegion.state}</p>
-                  <div className="mt-2 space-y-1">
-                    <div className="flex justify-between">
-                      <span className="text-sm">Extraction:</span>
-                      <span className="text-sm font-medium">{hoveredRegion.extractionPercent}%</span>
-                    </div>
-                    <div className="flex justify-between items-center">
-                      <span className="text-sm">Quality:</span>
-                      <Badge className={getQualityColor(hoveredRegion.qualityTag)}>
-                        {hoveredRegion.qualityTag}
-                      </Badge>
-                    </div>
-                    <div className="text-sm">
-                      <span>Schemes: </span>
-                      <span className="text-primary">{hoveredRegion.schemes.length} available</span>
+        <div className="flex-1 bg-slate-100 relative overflow-hidden">
+          <div className="absolute inset-0 flex items-center justify-center">
+            <div className="w-full h-full relative">
+              {/* Map placeholder with India outline */}
+              <div className="w-full h-full bg-gradient-to-b from-blue-50 to-blue-100 relative">
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <div className="text-center">
+                    <MapPin className="w-16 h-16 text-primary mx-auto mb-4" />
+                    <h3 className="text-lg font-semibold text-primary mb-2">Interactive India Map</h3>
+                    <p className="text-sm text-muted-foreground mb-4">
+                      Showing {selectedComponent} data for {selectedYear}
+                    </p>
+                    <div className="grid grid-cols-2 gap-2 text-xs">
+                      <div className="text-right">
+                        <div className="font-medium">Annual Extractable:</div>
+                        <div className="text-blue-600 font-semibold">407.84 BCM</div>  
+                      </div>
+                      <div className="text-left">
+                        <div className="font-medium">Ground Water Extraction:</div>
+                        <div className="text-blue-600 font-semibold">247.18 BCM</div>
+                      </div>
                     </div>
                   </div>
                 </div>
-              )}
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Info Panel */}
-        <div className="space-y-4">
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-lg">Region Details</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div>
-                <h3 className="font-semibold text-foreground">{currentMap.name}</h3>
-                <p className="text-sm text-muted-foreground">{currentMap.district}, {currentMap.state}</p>
               </div>
               
-              <div className="space-y-2">
-                <div className="flex justify-between">
-                  <span className="text-sm">Water Extraction:</span>
-                  <span className="text-sm font-medium">{currentMap.extractionPercent}%</span>
+              {/* Scale bar */}
+              <div className="absolute bottom-4 left-4 bg-white/90 backdrop-blur-sm rounded px-2 py-1 text-xs">
+                0 _____ 300 _____ 600km
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Right Panel - Data */}
+      <div className="w-96 bg-muted/30 border-l border-border flex flex-col">
+        {/* Header */}
+        <div className="p-3 border-b border-border bg-primary text-primary-foreground">
+          <div className="text-sm font-medium">YEAR: {selectedYear}</div>
+          <div className="text-xs opacity-90 mt-1">INDIA</div>
+        </div>
+
+        {/* Statistics Cards */}
+        <div className="p-3 space-y-3 border-b border-border">
+          <div className="grid grid-cols-2 gap-2">
+            <div className="bg-background rounded p-2 text-center">
+              <div className="text-xs text-muted-foreground">Annual Extractable Ground Water Resources (BCM)</div>
+              <div className="text-lg font-bold text-blue-600">407.84</div>
+            </div>
+            <div className="bg-background rounded p-2 text-center">
+              <div className="text-xs text-muted-foreground">Ground Water Extraction for all uses (BCM)</div>
+              <div className="text-lg font-bold text-blue-600">247.18</div>
+            </div>
+          </div>
+          
+          <div className="space-y-2">
+            <div className="text-xs text-muted-foreground">Rainfall (mm): 1055.23</div>
+            <div className="text-xs text-muted-foreground">Ground Water Recharge (BCM): 449.61 ▼</div>
+            <div className="text-xs text-muted-foreground">Natural Discharges (BCM): 39.99 ▼</div>
+            <div className="text-xs text-muted-foreground">Annual Extractable Ground Water Resources (BCM): 407.84 ▼</div>
+            <div className="text-xs text-muted-foreground">Ground Water Extraction (BCM): 247.18 ▼</div>
+          </div>
+        </div>
+
+        {/* Search */}
+        <div className="p-3 border-b border-border">
+          <div className="relative">
+            <Search className="absolute left-2 top-1/2 transform -translate-y-1/2 w-3 h-3 text-muted-foreground" />
+            <Input
+              placeholder="Search..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="pl-7 h-8 text-xs"
+            />
+          </div>
+        </div>
+
+        {/* Data Table */}
+        <div className="flex-1 overflow-y-auto">
+          <div className="bg-muted text-xs font-medium sticky top-0 z-10">
+            <div className="grid grid-cols-4 gap-1 p-2 border-b">
+              <div>STATE</div>
+              <div className="text-center">Rainfall (mm)</div>
+              <div className="text-center">Annual Extractable Ground Water Resources (ham)</div>
+              <div className="text-center">Ground Water Extraction (ham)</div>
+            </div>
+          </div>
+          
+          <div className="text-xs">
+            {stateData
+              .filter(item => 
+                !searchQuery || 
+                item.state.toLowerCase().includes(searchQuery.toLowerCase())
+              )
+              .map((item, index) => (
+                <div 
+                  key={index}
+                  className="grid grid-cols-4 gap-1 p-2 border-b border-border/50 hover:bg-background/50 cursor-pointer"
+                >
+                  <div className="font-medium text-primary">{item.state}</div>
+                  <div className="text-center">{item.rainfall}</div>
+                  <div className="text-center">{item.resources.toLocaleString()}</div>
+                  <div className="text-center">{item.extraction.toLocaleString()}</div>
                 </div>
-                <div className="w-full bg-secondary rounded-full h-2">
-                  <div 
-                    className="bg-primary h-2 rounded-full transition-all duration-500"
-                    style={{ width: `${currentMap.extractionPercent}%` }}
-                  />
-                </div>
-              </div>
-
-              <div className="flex justify-between items-center">
-                <span className="text-sm">Quality Status:</span>
-                <Badge className={getQualityColor(currentMap.qualityTag)}>
-                  {currentMap.qualityTag}
-                </Badge>
-              </div>
-
-              <div>
-                <span className="text-sm font-medium">Available Schemes:</span>
-                <div className="mt-2 space-y-1">
-                  {currentMap.schemes.map((scheme, index) => (
-                    <div key={index} className="text-xs text-muted-foreground p-2 bg-secondary rounded">
-                      {scheme}
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              <div className="flex gap-2 pt-2">
-                <Button variant="outline" size="sm" className="flex-1">
-                  <FileText className="w-4 h-4 mr-1" />
-                  Documents
-                </Button>
-                <Button variant="outline" size="sm" className="flex-1">
-                  <DollarSign className="w-4 h-4 mr-1" />
-                  Budget
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* Legend */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-lg">Extraction Legend</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <img
-                src={extractionLegend}
-                alt="Groundwater Extraction Legend"
-                className="w-full rounded"
-              />
-            </CardContent>
-          </Card>
+              ))
+            }
+          </div>
         </div>
       </div>
     </div>
