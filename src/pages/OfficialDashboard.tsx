@@ -10,7 +10,10 @@ import { DashboardSidebar } from '@/components/dashboard/DashboardSidebar';
 import { ChatPanel } from '@/components/dashboard/ChatPanel';
 import { OverviewPanel } from '@/components/dashboard/OverviewPanel';
 import { HistoryPanel } from '@/components/dashboard/HistoryPanel';
-import { DocumentSaverPanel } from '@/components/dashboard/DocumentSaverPanel';
+import { EnhancedDocumentPanel } from '@/components/dashboard/EnhancedDocumentPanel';
+import { ChatExportPanel } from '@/components/dashboard/ChatExportPanel';
+import { AIResearchPanel } from '@/components/dashboard/AIResearchPanel';
+import { SmartWidgetsPanel } from '@/components/dashboard/SmartWidgetsPanel';
 import BudgetBroPanel from '@/components/dashboard/BudgetBroPanel';
 import { MapsPanel } from '@/components/dashboard/MapsPanel';
 import { CalendarPanel } from '@/components/dashboard/CalendarPanel';
@@ -127,7 +130,13 @@ const OfficialDashboard = () => {
       case 'history':
         return <HistoryPanel onLoadChat={handleLoadChat} onSectionChange={handleSectionChange} />;
       case 'documents':
-        return <DocumentSaverPanel />;
+        return <EnhancedDocumentPanel />;
+      case 'export':
+        return <ChatExportPanel />;
+      case 'research':
+        return <AIResearchPanel />;
+      case 'widgets':
+        return <SmartWidgetsPanel />;
       case 'budget':
         return <BudgetBroPanel profile={profile} />;
       case 'maps':
