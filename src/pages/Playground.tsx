@@ -5,7 +5,7 @@ import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { useNavigate } from 'react-router-dom';
-import { Search, LogOut, Crown, FileText, Zap, BookOpen, Database, Globe, Filter, Calendar, Star, Mic, Camera, MessageCircle, History, Save, DollarSign, Map, Gift, Phone, Home, Menu, X, Send } from 'lucide-react';
+import { Search, LogOut, Crown, FileText, Zap, BookOpen, Database, Globe, Filter, Calendar, Star, Mic, Camera, MessageCircle, History, Save, DollarSign, Map, Gift, Phone, Home, Menu, X, Send, Settings } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { searchGoogle, searchGovernmentDocs, getSearchSuggestions } from '@/lib/googleSearchApi';
@@ -310,6 +310,15 @@ const Playground = () => {
                 {getUserInitials()}
               </AvatarFallback>
             </Avatar>
+            
+            <Button
+              onClick={() => navigate('/settings')}
+              variant="ghost"
+              size="sm"
+              className="text-foreground/70 hover:text-foreground"
+            >
+              <Settings className="w-4 h-4" />
+            </Button>
             
             <Button
               onClick={handleLogout}

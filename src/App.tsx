@@ -13,6 +13,7 @@ import ProfileSetup from "./pages/ProfileSetup";
 import OfficialLogin from "./pages/OfficialLogin";
 import OfficialDashboard from "./pages/OfficialDashboard";
 import Playground from "./pages/Playground";
+import Settings from "./pages/Settings";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -34,6 +35,7 @@ const App = () => (
           <Route path="/official-login" element={<OfficialLogin />} />
           <Route path="/official-dashboard" element={<OfficialDashboard />} />
           <Route path="/playground" element={<Playground />} />
+          <Route path="/settings" element={<Settings />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>

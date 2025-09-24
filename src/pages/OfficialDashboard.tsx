@@ -222,6 +222,26 @@ const OfficialDashboard = () => {
                   <span className="absolute -top-1 -right-1 w-2 h-2 bg-red-500 rounded-full"></span>
                 </Button>
                 
+                {/* Settings Button */}
+                <Button
+                  onClick={() => navigate('/settings')}
+                  variant="ghost"
+                  size="sm"
+                  className="text-foreground/70 hover:text-foreground"
+                >
+                  <Settings className="w-4 h-4" />
+                </Button>
+
+                {/* Settings Button */}
+                <Button
+                  onClick={() => navigate('/settings')}
+                  variant="ghost"
+                  size="sm"
+                  className="text-foreground/70 hover:text-foreground"
+                >
+                  <Settings className="w-4 h-4" />
+                </Button>
+
                 {/* Logout Button */}
                 <Button
                   onClick={handleLogout}
