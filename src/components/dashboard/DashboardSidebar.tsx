@@ -15,7 +15,8 @@ import {
   Settings,
   ChevronLeft,
   ChevronRight,
-  Home
+  Home,
+  ArrowLeft
 } from 'lucide-react';
 
 interface SidebarProps {
@@ -24,6 +25,7 @@ interface SidebarProps {
   isCollapsed: boolean;
   onToggleCollapse: () => void;
   onNavigateHome: () => void;
+  onNavigateToDashboard: () => void;
 }
 
 const sidebarItems = [
@@ -43,7 +45,8 @@ export const DashboardSidebar = ({
   onSectionChange, 
   isCollapsed, 
   onToggleCollapse,
-  onNavigateHome 
+  onNavigateHome,
+  onNavigateToDashboard
 }: SidebarProps) => {
   return (
     <div className={`bg-gradient-to-b from-primary/5 to-accent/5 border-r border-primary/10 transition-all duration-500 ease-in-out h-full ${
@@ -53,15 +56,26 @@ export const DashboardSidebar = ({
       <div className="p-4 border-b border-primary/10">
         <div className="flex items-center justify-between">
           {!isCollapsed && (
-            <Button
-              onClick={onNavigateHome}
-              variant="ghost"
-              size="sm"
-              className="text-primary hover:text-accent hover:bg-primary/10 transition-all duration-200"
-            >
-              <Home className="w-4 h-4 mr-2" />
-              Home
-            </Button>
+            <div className="flex gap-2">
+              <Button
+                onClick={onNavigateToDashboard}
+                variant="ghost"
+                size="sm"
+                className="text-primary hover:text-accent hover:bg-primary/10 transition-all duration-200"
+              >
+                <ArrowLeft className="w-4 h-4 mr-2" />
+                Dashboard
+              </Button>
+              <Button
+                onClick={onNavigateHome}
+                variant="ghost"
+                size="sm"
+                className="text-primary hover:text-accent hover:bg-primary/10 transition-all duration-200"
+              >
+                <Home className="w-4 h-4 mr-2" />
+                Home
+              </Button>
+            </div>
           )}
           <Button
             onClick={onToggleCollapse}

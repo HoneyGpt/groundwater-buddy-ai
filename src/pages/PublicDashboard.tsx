@@ -13,6 +13,7 @@ import BudgetBroPanel from '@/components/dashboard/BudgetBroPanel';
 import { MapsPanel } from '@/components/dashboard/MapsPanel';
 import { CalendarPanel } from '@/components/dashboard/CalendarPanel';
 import HelplinePanel from '@/components/dashboard/HelplinePanel';
+import { SchemesPanel } from '@/components/dashboard/SchemesPanel';
 
 const PublicDashboard = () => {
   const navigate = useNavigate();
@@ -91,6 +92,8 @@ const PublicDashboard = () => {
         return <CalendarPanel />;
       case 'helpline':
         return <HelplinePanel />;
+      case 'schemes':
+        return <SchemesPanel />;
       case 'settings':
         navigate('/settings');
         return null;
@@ -114,6 +117,7 @@ const PublicDashboard = () => {
             setSidebarCollapsed(!sidebarCollapsed);
           }}
           onNavigateHome={() => navigate('/')}
+          onNavigateToDashboard={() => navigate('/playground')}
         />
       </div>
 
@@ -127,6 +131,7 @@ const PublicDashboard = () => {
               isCollapsed={false}
               onToggleCollapse={() => {}}
               onNavigateHome={() => navigate('/')}
+              onNavigateToDashboard={() => navigate('/playground')}
             />
           </div>
         </div>
