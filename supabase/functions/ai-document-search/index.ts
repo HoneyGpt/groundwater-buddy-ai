@@ -89,7 +89,7 @@ serve(async (req) => {
         smartResults = smartResults.filter(doc => 
           doc.category === pattern.category || 
           pattern.tags.some(tag => 
-            doc.tags.some(docTag => docTag.toLowerCase().includes(tag.toLowerCase())) ||
+            doc.tags.some((docTag: string) => docTag.toLowerCase().includes(tag.toLowerCase())) ||
             doc.title?.toLowerCase().includes(tag.toLowerCase()) ||
             doc.original_name.toLowerCase().includes(tag.toLowerCase())
           )
@@ -124,7 +124,7 @@ serve(async (req) => {
     console.error('AI Document Search Error:', error);
     return new Response(JSON.stringify({
       success: false,
-      error: error.message || 'An error occurred during search'
+      error: (error as Error).message || 'An error occurred during search'
     }), {
       status: 500,
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },

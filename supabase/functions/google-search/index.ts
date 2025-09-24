@@ -66,7 +66,7 @@ serve(async (req) => {
     
     return new Response(JSON.stringify({
       success: false,
-      error: error.message,
+      error: (error as Error).message,
       fallbackResponse: "I'm having trouble searching right now. Please try again in a moment."
     }), {
       status: 500,

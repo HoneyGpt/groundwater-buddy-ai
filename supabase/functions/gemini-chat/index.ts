@@ -168,13 +168,13 @@ Be helpful, informative, and focused on practical water management solutions for
     console.error('Error in gemini-chat function:', error);
     
     // Provide fallback response based on chat type
-    const fallbackResponse = error.message.includes('GEMINI_API_KEY') 
+    const fallbackResponse = (error as Error).message.includes('GEMINI_API_KEY') 
       ? "I'm having trouble connecting to my AI brain right now. Please check if the API key is configured correctly."
       : "I'm experiencing some technical difficulties. Let me try to help you anyway! Could you please rephrase your question?";
 
     return new Response(JSON.stringify({
       success: false,
-      error: error.message,
+      error: (error as Error).message,
       fallbackResponse: fallbackResponse
     }), {
       status: 500,
