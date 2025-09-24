@@ -6,11 +6,11 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Switch } from '@/components/ui/switch';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
-import { Separator } from '@/components/ui/separator';
 import { Badge } from '@/components/ui/badge';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, User, MapPin, Bell, Palette, Shield, Save, RotateCcw, Camera } from 'lucide-react';
+import { ArrowLeft, User, MapPin, Bell, Palette, Shield, Save, RotateCcw, Camera, Crown, Zap } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import { ProfileStorage, getCurrentContext, type UserContext } from '@/lib/storageUtils';
 
 const INDIAN_STATES = [
   'Andhra Pradesh', 'Arunachal Pradesh', 'Assam', 'Bihar', 'Chhattisgarh', 'Goa', 'Gujarat',
@@ -31,7 +31,8 @@ const Settings = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
   
-  // Profile states
+  // Context-aware state management
+  const [userContext, setUserContext] = useState<UserContext>('public');
   const [profile, setProfile] = useState<any>(null);
   const [name, setName] = useState('');
   const [profileType, setProfileType] = useState<'public' | 'professional'>('public');
@@ -47,23 +48,25 @@ const Settings = () => {
   const [aiResponseStyle, setAiResponseStyle] = useState<'friendly' | 'professional'>('friendly');
   const [theme, setTheme] = useState<'light' | 'dark' | 'auto'>('auto');
   
-  // Load profile data
+  // Load profile data with context awareness
   useEffect(() => {
-    const savedProfile = localStorage.getItem('ingres_public_profile');
+    const context = getCurrentContext();
+    setUserContext(context);
+    
+    const savedProfile = ProfileStorage.get(context);
     if (savedProfile) {
-      const profileData = JSON.parse(savedProfile);
-      setProfile(profileData);
-      setName(profileData.name || '');
-      setProfileType(profileData.profileType || 'public');
-      setCompany(profileData.company || '');
-      setRole(profileData.role || '');
-      setBio(profileData.bio || '');
-      setState(profileData.state || '');
-      setDistrict(profileData.district || '');
-      setCity(profileData.city || profileData.location || '');
-      setNotifications(profileData.notifications !== false);
-      setAiResponseStyle(profileData.aiResponseStyle || 'friendly');
-      setTheme(profileData.theme || 'auto');
+      setProfile(savedProfile);
+      setName(savedProfile.name || '');
+      setProfileType(savedProfile.profileType || (context === 'official' ? 'professional' : 'public'));
+      setCompany(savedProfile.company || '');
+      setRole(savedProfile.role || '');
+      setBio(savedProfile.bio || '');
+      setState(savedProfile.state || '');
+      setDistrict(savedProfile.district || '');
+      setCity(savedProfile.city || savedProfile.location || '');
+      setNotifications(savedProfile.notifications !== false);
+      setAiResponseStyle(savedProfile.aiResponseStyle || (context === 'official' ? 'professional' : 'friendly'));
+      setTheme(savedProfile.theme || 'auto');
     }
   }, []);
 
@@ -90,12 +93,13 @@ const Settings = () => {
       updatedAt: new Date().toISOString()
     };
 
-    localStorage.setItem('ingres_public_profile', JSON.stringify(updatedProfile));
+    ProfileStorage.set(updatedProfile, userContext);
     setProfile(updatedProfile);
     
+    const contextName = userContext === 'official' ? 'Playground' : 'Public Dashboard';
     toast({
       title: "Settings Saved!",
-      description: `Hey ${name}, your profile has been updated successfully.`,
+      description: `Hey ${name}, your ${contextName} profile has been updated successfully.`,
     });
   };
 
@@ -121,23 +125,33 @@ const Settings = () => {
         <div className="px-6 py-4">
           <div className="flex items-center space-x-4">
             <Button
-              onClick={() => navigate('/public-dashboard')}
+              onClick={() => navigate(userContext === 'official' ? '/playground' : '/public-dashboard')}
               variant="ghost"
               size="sm"
               className="hover:bg-primary/10"
             >
               <ArrowLeft className="w-4 h-4 mr-2" />
-              Back to Dashboard
+              Back to {userContext === 'official' ? 'Playground' : 'Dashboard'}
             </Button>
             <div className="flex items-center space-x-3">
               <div className="w-10 h-10 bg-gradient-to-br from-primary to-accent rounded-xl flex items-center justify-center shadow-md">
                 <span className="text-white font-bold">I</span>
               </div>
               <div>
-                <h1 className="text-xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
-                  Settings
-                </h1>
-                <p className="text-xs text-muted-foreground">Customize your INGRES-AI experience</p>
+                <div className="flex items-center space-x-2">
+                  <h1 className="text-xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
+                    Settings
+                  </h1>
+                  {userContext === 'official' && (
+                    <Badge className="bg-gradient-to-r from-yellow-500 to-orange-500 text-white border-0">
+                      <Crown className="w-3 h-3 mr-1" />
+                      Official
+                    </Badge>
+                  )}
+                </div>
+                <p className="text-xs text-muted-foreground">
+                  Customize your {userContext === 'official' ? 'INGRES-AI Playground' : 'INGRES-AI'} experience
+                </p>
               </div>
             </div>
           </div>

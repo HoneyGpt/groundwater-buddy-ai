@@ -7,6 +7,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Mic, MicOff, Send, Save, IndianRupee, Heart, Droplets, Wheat } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
+import { BudgetStorage, getCurrentContext } from '@/lib/storageUtils';
 
 // Message interface for Budget Bro
 interface BudgetMessage {

@@ -6,6 +6,7 @@ import { Card } from '@/components/ui/card';
 import { Send, Bot, User, Save, Mic } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
+import { ChatStorage, getCurrentContext } from '@/lib/storageUtils';
 
 interface Message {
   id: string;
@@ -155,13 +156,12 @@ export const ChatPanel = ({ profile }: ChatPanelProps) => {
       messages: messages.filter(m => m.id !== 'typing')
     };
 
-    const existingChats = JSON.parse(localStorage.getItem('ingres_chats') || '[]');
-    const updatedChats = [chatData, ...existingChats].slice(0, 20); // Keep only 20 most recent
-    localStorage.setItem('ingres_chats', JSON.stringify(updatedChats));
+    ChatStorage.add(chatData);
 
+    const context = getCurrentContext();
     toast({
       title: "Chat saved! 💾",
-      description: "You can find it in your History section."
+      description: `Saved to your ${context === 'official' ? 'Playground' : 'Dashboard'} history.`
     });
   };
 

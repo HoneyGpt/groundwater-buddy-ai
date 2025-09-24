@@ -144,7 +144,7 @@ export const OverviewPanel = ({ profile, onSectionChange }: OverviewPanelProps) 
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">
-              {JSON.parse(localStorage.getItem('ingres_chats') || '[]').length}
+              {ChatStorage.get().length}
             </div>
             <p className="text-xs text-muted-foreground">
               Conversations saved

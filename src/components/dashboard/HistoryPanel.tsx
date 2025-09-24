@@ -6,6 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { Trash2, MessageSquare, Search, Calendar, Edit2 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import { ChatStorage, getCurrentContext } from '@/lib/storageUtils';
 
 interface SavedChat {
   id: string;
@@ -31,18 +32,18 @@ export const HistoryPanel = ({ onLoadChat, onSectionChange }: HistoryPanelProps)
   }, []);
 
   const loadSavedChats = () => {
-    const chats = JSON.parse(localStorage.getItem('ingres_chats') || '[]');
+    const chats = ChatStorage.get();
     setSavedChats(chats);
   };
 
   const deleteChat = (chatId: string) => {
-    const updatedChats = savedChats.filter(chat => chat.id !== chatId);
-    setSavedChats(updatedChats);
-    localStorage.setItem('ingres_chats', JSON.stringify(updatedChats));
+    ChatStorage.delete(chatId);
+    setSavedChats(prev => prev.filter(chat => chat.id !== chatId));
     
+    const context = getCurrentContext();
     toast({
       title: "Chat deleted",
-      description: "The conversation has been removed from your history."
+      description: `Removed from your ${context === 'official' ? 'Playground' : 'Dashboard'} history.`
     });
   };
 
@@ -60,8 +61,8 @@ export const HistoryPanel = ({ onLoadChat, onSectionChange }: HistoryPanelProps)
         : chat
     );
     
+    ChatStorage.update(updatedChats);
     setSavedChats(updatedChats);
-    localStorage.setItem('ingres_chats', JSON.stringify(updatedChats));
     setEditingId(null);
     setEditName('');
     

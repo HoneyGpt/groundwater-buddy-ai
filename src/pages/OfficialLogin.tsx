@@ -35,7 +35,7 @@ const OfficialLogin = () => {
     // Listen for auth changes
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
       if (event === 'SIGNED_IN' && session) {
-        navigate('/official-dashboard');
+        navigate('/playground');
       }
     });
 
