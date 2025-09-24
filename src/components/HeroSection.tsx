@@ -1,8 +1,12 @@
 import { Button } from "@/components/ui/button";
 import { MessageCircle, ArrowRight } from "lucide-react";
+import { useState } from "react";
 import heroImage from "@/assets/hero-water-modern.png";
+import LearnMoreModal from "@/components/LearnMoreModal";
 
 const HeroSection = () => {
+  const [showLearnMore, setShowLearnMore] = useState(false);
+
   return (
     <section id="home" className="min-h-screen bg-background flex items-center">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
@@ -21,10 +25,19 @@ const HeroSection = () => {
               </p>
             </div>
             <div className="flex gap-4">
-              <Button size="lg" className="px-8 py-4 text-lg font-semibold bg-accent hover:bg-accent/90 text-white">
+              <Button 
+                size="lg" 
+                className="px-8 py-4 text-lg font-semibold bg-accent hover:bg-accent/90 text-white"
+                onClick={() => window.location.href = '/mediator'}
+              >
                 Ask Now
               </Button>
-              <Button variant="outline" size="lg" className="px-8 py-4 text-lg font-semibold">
+              <Button 
+                variant="outline" 
+                size="lg" 
+                className="px-8 py-4 text-lg font-semibold"
+                onClick={() => setShowLearnMore(true)}
+              >
                 Learn More
               </Button>
             </div>
@@ -40,6 +53,11 @@ const HeroSection = () => {
           </div>
         </div>
       </div>
+
+      <LearnMoreModal 
+        open={showLearnMore} 
+        onOpenChange={setShowLearnMore} 
+      />
     </section>
   );
 };
