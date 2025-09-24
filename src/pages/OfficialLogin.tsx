@@ -18,7 +18,6 @@ const OfficialLogin = () => {
   const [formData, setFormData] = useState({
     email: '',
     password: '',
-    departmentId: '',
     name: ''
   });
 
@@ -75,7 +74,6 @@ const OfficialLogin = () => {
           options: {
             emailRedirectTo: `${window.location.origin}/official-login`,
             data: {
-              department_id: formData.departmentId,
               name: formData.name,
               user_type: 'official'
             }
@@ -172,23 +170,8 @@ const OfficialLogin = () => {
                     </button>
                   </div>
                 </div>
-                
-                {!isLogin && (
-                  <div>
-                    <label className="text-sm font-medium text-foreground">Department ID</label>
-                    <Input 
-                      type="text"
-                      name="departmentId"
-                      value={formData.departmentId}
-                      onChange={handleInputChange}
-                      placeholder="DEPT-12345"
-                      className="mt-1"
-                      required={!isLogin}
-                    />
-                  </div>
-                )}
 
-                <Button 
+                <Button
                   type="submit"
                   disabled={loading}
                   className="w-full bg-primary hover:bg-primary/90 text-primary-foreground"
