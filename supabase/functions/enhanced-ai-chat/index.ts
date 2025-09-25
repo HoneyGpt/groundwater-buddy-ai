@@ -93,6 +93,71 @@ serve(async (req) => {
     
     console.log('Processing chat request:', { question, userId: userProfile?.id });
 
+    // Check for special queries first
+    const lowerQuestion = question.toLowerCase();
+    
+    // Handle "who made you" type questions
+    if (lowerQuestion.includes('who made') || lowerQuestion.includes('who created') || 
+        lowerQuestion.includes('who developed') || lowerQuestion.includes('creator') ||
+        lowerQuestion.includes('maker') || lowerQuestion.includes('developer')) {
+      const creatorResponse = `👩‍💻 **Created by Harshita Bhaskaruni and Team Auron Hive Tech**
+
+🌟 **About Our Team:**
+INGRES-AI was developed by **Harshita Bhaskaruni** and the innovative **Team Auron Hive Tech** to make groundwater data accessible to everyone in India.
+
+💡 **Our Mission:**
+We believe that every farmer, citizen, and policymaker deserves easy access to crucial groundwater information to make informed decisions about water resources.
+
+🚀 **Team Auron Hive Tech** combines expertise in AI, water resource management, and user experience to create solutions that truly serve the people of India.`;
+
+      return new Response(
+        JSON.stringify({ 
+          success: true,
+          response: creatorResponse,
+          sources: { primary_source: 'custom_response' }
+        }),
+        { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
+    // Handle contact/help queries
+    if (lowerQuestion.includes('contact') || lowerQuestion.includes('help') || 
+        lowerQuestion.includes('support') || lowerQuestion.includes('email') ||
+        lowerQuestion.includes('reach') || lowerQuestion.includes('assistance')) {
+      const contactResponse = `📞 **Get in Touch with INGRES-AI Team**
+
+💌 **Contact Information:**
+
+**🛠️ Technical Help & General Queries:**
+• **Ganesh**: tinkuganesh15@gmail.com
+
+**📋 Information & Demo Requests:**
+• **Anchal Jaiswal**: anchaljaiswal.1001@gmail.com
+
+**🤝 Collaborations & Partnerships:**
+• **Kishlaya Mishra**: kishlayamishra@gmail.com
+
+**💻 Lead Developer:**
+• **Tushar Chaurasia**: tusharchaurasia14@gmail.com
+
+**❓ General Enquiries:**
+• **Saurav Sharma**: isauravsharmaokay4359@gmail.com
+
+**🎯 Customer Service & Demo Scheduling:**
+• **Vivek U**: minusonebroking@gmail.com
+
+📧 **Quick Contact**: Feel free to reach out to any team member based on your specific needs. We're here to help you make the most of groundwater data!`;
+
+      return new Response(
+        JSON.stringify({ 
+          success: true,
+          response: contactResponse,
+          sources: { primary_source: 'custom_response' }
+        }),
+        { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
     // Get recent conversation context for memory
     const contextHistory = conversationHistory ? 
       conversationHistory.slice(-6).map((msg: any) => 
