@@ -153,6 +153,22 @@ export const SettingsPanel = ({ profile, onProfileUpdate }: SettingsPanelProps) 
                   >
                     isauravsharmaokay4359@gmail.com
                   </a>
+                  <a 
+                    href="mailto:minusonebroking@gmail.com" 
+                    className="text-primary hover:text-primary/80 font-medium text-xs block"
+                  >
+                    minusonebroking@gmail.com
+                  </a>
+                  <div className="mt-2 pt-2 border-t border-accent/20">
+                    <a 
+                      href="https://www.linkedin.com/in/vivek-u-5619a125b?utm_source=share&utm_campaign=share_via&utm_content=profile&utm_medium=android_app" 
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-primary hover:text-primary/80 font-medium text-xs block"
+                    >
+                      💼 Vivek U - LinkedIn Profile
+                    </a>
+                  </div>
                 </div>
               </div>
             </div>
