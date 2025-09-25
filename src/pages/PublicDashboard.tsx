@@ -121,7 +121,7 @@ case 'chat':
             setSidebarCollapsed(!sidebarCollapsed);
           }}
           onNavigateHome={() => navigate('/')}
-          onNavigateToDashboard={() => navigate('/playground')}
+          onNavigateToDashboard={() => setActiveSection('overview')}
         />
       </div>
 
@@ -135,7 +135,7 @@ case 'chat':
               isCollapsed={false}
               onToggleCollapse={() => {}}
               onNavigateHome={() => navigate('/')}
-              onNavigateToDashboard={() => navigate('/playground')}
+              onNavigateToDashboard={() => setActiveSection('overview')}
             />
           </div>
         </div>
