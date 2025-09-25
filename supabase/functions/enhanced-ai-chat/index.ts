@@ -211,22 +211,24 @@ We believe that every farmer, citizen, and policymaker deserves easy access to c
       finalAnswer = "🌊 **INGRES-AI Response**\n\nI couldn't find specific information about your query. Please try:\n• Being more specific about your location\n• Asking about government schemes\n• Requesting water conservation tips\n• Checking groundwater levels in your area";
     }
 
-    // Store chat interaction for analytics
-    await supabaseClient
-      .from('user_documents')
-      .insert({
-        user_id: userProfile?.id || 'anonymous',
-        title: `Chat: ${question.substring(0, 50)}...`,
-        file_name: `chat_${Date.now()}.txt`,
-        file_path: 'chat_logs',
-        original_name: 'AI Chat Log',
-        mime_type: 'text/plain',
-        file_size: question.length + finalAnswer.length,
-        category: 'chat_log',
-        description: 'AI chat interaction',
-        extracted_text: `User: ${question}\n\nAI: ${finalAnswer}`,
-        is_local_only: true
-      });
+    // Store chat interaction for analytics (only if user has valid profile)
+    if (userProfile?.id) {
+      await supabaseClient
+        .from('user_documents')
+        .insert({
+          user_id: userProfile.id,
+          title: `Chat: ${question.substring(0, 50)}...`,
+          file_name: `chat_${Date.now()}.txt`,
+          file_path: 'chat_logs',
+          original_name: 'AI Chat Log',
+          mime_type: 'text/plain',
+          file_size: question.length + finalAnswer.length,
+          category: 'chat_log',
+          description: 'AI chat interaction',
+          extracted_text: `User: ${question}\n\nAI: ${finalAnswer}`,
+          is_local_only: true
+        });
+    }
 
     return new Response(
       JSON.stringify({ 
