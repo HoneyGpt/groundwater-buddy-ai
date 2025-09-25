@@ -79,9 +79,10 @@ export const HistoryPanel = ({ onLoadChat, onSectionChange }: HistoryPanelProps)
 
   const filteredChats = savedChats.filter(chat =>
     chat.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    chat.messages.some(msg => 
-      msg.text.toLowerCase().includes(searchTerm.toLowerCase())
-    )
+    chat.messages.some(msg => {
+      const messageText = msg.text || msg.content || '';
+      return messageText.toLowerCase().includes(searchTerm.toLowerCase());
+    })
   );
 
   const formatDate = (dateString: string) => {
@@ -99,7 +100,13 @@ export const HistoryPanel = ({ onLoadChat, onSectionChange }: HistoryPanelProps)
   const getChatPreview = (messages: any[]) => {
     const userMessages = messages.filter(msg => msg.isUser);
     if (userMessages.length === 0) return 'New conversation';
-    return userMessages[0].text.slice(0, 60) + (userMessages[0].text.length > 60 ? '...' : '');
+    
+    // Handle both 'text' and 'content' properties with null safety
+    const firstMessage = userMessages[0];
+    const messageText = firstMessage?.text || firstMessage?.content || '';
+    
+    if (!messageText) return 'New conversation';
+    return messageText.slice(0, 60) + (messageText.length > 60 ? '...' : '');
   };
 
   const getMessageCount = (messages: any[]) => {
