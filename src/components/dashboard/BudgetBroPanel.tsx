@@ -23,7 +23,44 @@ interface BudgetBroPanelProps {
   initialChat?: any | null;
 }
 
-// Quick Budget Queries for different scenarios
+// Enhanced message formatter for clean ChatGPT-like responses
+const formatBudgetMessage = (text: string) => {
+  // Clean up asterisks formatting and structure content
+  let cleaned = text
+    // Remove excessive asterisks
+    .replace(/\*{2,}\s*([^*:]+?)\s*:\*{2,}/g, '<h3 class="font-semibold text-base mb-2 text-orange-700">$1</h3>')
+    .replace(/\*{2,}\s*([^*]+?)\s*\*{2,}/g, '<strong class="font-semibold">$1</strong>')
+    // Clean up note patterns
+    .replace(/\*{2,}Note:\*{2,}\s*/g, '<div class="bg-yellow-50 border-l-4 border-yellow-400 p-3 my-3 rounded-r"><strong class="text-yellow-800">💡 Note:</strong> ')
+    // Handle step-by-step sections
+    .replace(/##\s*📋\s*([^#\n]+)/g, '<h3 class="font-semibold text-lg mb-3 text-orange-600 flex items-center gap-2"><span class="text-xl">📋</span> $1</h3>')
+    .replace(/##\s*🏛️\s*([^#\n]+)/g, '<h3 class="font-semibold text-lg mb-3 text-blue-600 flex items-center gap-2"><span class="text-xl">🏛️</span> $1</h3>')
+    .replace(/##\s*([^#\n]+)/g, '<h3 class="font-semibold text-lg mb-3 text-gray-700">$1</h3>')
+    // Handle numbered lists
+    .replace(/(\d+\.\s+)(\*{2,}[^*]+?\*{2,})/g, '$1<strong>$2</strong>')
+    .replace(/(\d+\.\s+)([^\n]+)/g, '<div class="flex gap-3 mb-2"><span class="font-semibold text-orange-600 min-w-[1.5rem]">$1</span><span class="flex-1">$2</span></div>')
+    // Handle bullet points
+    .replace(/^\s*[•*]\s+([^\n]+)/gm, '<div class="flex gap-2 mb-1"><span class="text-orange-500 font-bold">•</span><span>$1</span></div>')
+    // Clean up remaining asterisks
+    .replace(/\*+/g, '')
+    // Handle line breaks properly
+    .replace(/\n\n/g, '</div><div class="space-y-2">')
+    .replace(/\n/g, '<br/>');
+
+  return `<div class="space-y-2">${cleaned}</div>`;
+};
+
+// Component to render formatted budget messages
+const FormattedBudgetMessage = ({ text }: { text: string }) => {
+  const formattedHTML = formatBudgetMessage(text);
+  
+  return (
+    <div 
+      className="prose prose-sm max-w-none prose-headings:text-orange-700 prose-strong:text-gray-800"
+      dangerouslySetInnerHTML={{ __html: formattedHTML }}
+    />
+  );
+};
 const budgetQueries = [
   { text: "I have ₹500 for health issues", icon: Heart },
   { text: "Need water solutions under ₹1000", icon: Droplets },
@@ -338,39 +375,14 @@ const handleSaveChat = () => {
                   ? 'bg-primary text-primary-foreground' 
                   : 'bg-muted'
               }`}>
-                <CardContent className="p-3">
+                <CardContent className="p-4 bg-gradient-to-br from-white to-yellow-50/30">
                   {message.formatted ? (
-                    <div className="text-sm space-y-3">
-                      {message.text.split('\n\n').map((section, index) => {
-                        if (section.startsWith('## ')) {
-                          const title = section.replace('## ', '');
-                          return (
-                            <div key={index} className="font-semibold text-foreground border-b border-border pb-1">
-                              {title}
-                            </div>
-                          );
-                        } else if (section.includes('1. ') || section.includes('2. ')) {
-                          return (
-                            <div key={index} className="space-y-1">
-                              {section.split('\n').map((line, lineIndex) => (
-                                <div key={lineIndex} className="text-sm">
-                                  {line}
-                                </div>
-                              ))}
-                            </div>
-                          );
-                        } else {
-                          return (
-                            <div key={index} className="text-sm whitespace-pre-wrap">
-                              {section}
-                            </div>
-                          );
-                        }
-                      })}
+                    <div className="space-y-3">
+                      <FormattedBudgetMessage text={message.text} />
                     </div>
                   ) : (
-                    <div className="text-sm whitespace-pre-wrap">
-                      {message.text}
+                    <div className="text-sm space-y-2 leading-relaxed">
+                      <FormattedBudgetMessage text={message.text} />
                     </div>
                   )}
                   <div className={`text-xs mt-2 ${
