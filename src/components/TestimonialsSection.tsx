@@ -4,7 +4,7 @@ const TestimonialsSection = () => {
   const testimonials = [
     {
       name: "Mr. Gopal", 
-      role: "Wise Sarpanch",
+      role: "Ex Sarpanch of a Village",
       content: "As a farmer and sarpanch I can't believe that this type of technology exists, it's really a good work, the Telugu translation in chat helped a lot.",
       avatar: "👨‍🌾",
       rating: 5,
