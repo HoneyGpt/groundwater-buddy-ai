@@ -25,17 +25,25 @@ const Footer = () => {
               Empowering communities, farmers, and researchers with the information they need.
             </p>
             <div className="flex space-x-4">
-              <Button variant="ghost" size="icon">
-                <Mail className="h-4 w-4" />
+              <Button variant="ghost" size="icon" asChild>
+                <a href="mailto:harshitabhaskaruni@gmail.com">
+                  <Mail className="h-4 w-4" />
+                </a>
               </Button>
-              <Button variant="ghost" size="icon">
-                <Twitter className="h-4 w-4" />
+              <Button variant="ghost" size="icon" asChild>
+                <a href="https://x.com/TeddySpark1117" target="_blank" rel="noopener noreferrer">
+                  <Twitter className="h-4 w-4" />
+                </a>
               </Button>
-              <Button variant="ghost" size="icon">
-                <Github className="h-4 w-4" />
+              <Button variant="ghost" size="icon" asChild>
+                <a href="https://github.com/HoneyGpt" target="_blank" rel="noopener noreferrer">
+                  <Github className="h-4 w-4" />
+                </a>
               </Button>
-              <Button variant="ghost" size="icon">
-                <Linkedin className="h-4 w-4" />
+              <Button variant="ghost" size="icon" asChild>
+                <a href="https://www.linkedin.com/in/harshitabhaskaruni1117" target="_blank" rel="noopener noreferrer">
+                  <Linkedin className="h-4 w-4" />
+                </a>
               </Button>
             </div>
           </div>
@@ -55,10 +63,10 @@ const Footer = () => {
           <div>
             <h4 className="font-semibold text-foreground mb-4">Contact</h4>
             <ul className="space-y-2 text-muted-foreground">
-              <li>support@ingres-ai.com</li>
-              <li>Research Institute</li>
-              <li>Environmental Sciences</li>
-              <li>Open Source Initiative</li>
+              <li><a href="mailto:harshitabhaskaruni@gmail.com" className="hover:text-accent transition-colors">harshitabhaskaruni@gmail.com</a></li>
+              <li><a href="mailto:tinkuganesh15@gmail.com" className="hover:text-accent transition-colors">tinkuganesh15@gmail.com</a></li>
+              <li><a href="mailto:anchaljaiswal.1001@gmail.com" className="hover:text-accent transition-colors">anchaljaiswal.1001@gmail.com</a></li>
+              <li><a href="mailto:kishlayamishra@gmail.com" className="hover:text-accent transition-colors">kishlayamishra@gmail.com</a></li>
             </ul>
           </div>
         </div>
@@ -66,7 +74,7 @@ const Footer = () => {
         <div className="border-t mt-12 pt-8">
           <div className="flex flex-col sm:flex-row justify-between items-center">
             <p className="text-muted-foreground text-sm">
-              © 2024 INGRES-AI. All rights reserved. Made with ❤️ for the environment.
+              @2025 INGRES - AI. All rights reserved. Made by Auron Hive Tech ❤️ for India Development
             </p>
             <div className="flex space-x-4 mt-4 sm:mt-0 text-sm text-muted-foreground">
               <a href="#" className="hover:text-accent transition-colors">Privacy Policy</a>
