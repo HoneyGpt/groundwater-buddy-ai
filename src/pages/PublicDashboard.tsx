@@ -3,7 +3,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { useNavigate } from 'react-router-dom';
-import { Menu, X, Bell, Settings } from 'lucide-react';
+import { Menu, X, Settings } from 'lucide-react';
 import { DashboardSidebar } from '@/components/dashboard/DashboardSidebar';
 import { ChatPanel } from '@/components/dashboard/ChatPanel';
 import { OverviewPanel } from '@/components/dashboard/OverviewPanel';
@@ -174,12 +174,6 @@ case 'chat':
                 <div className="flex items-center space-x-2 bg-gradient-to-r from-blue-500/10 to-cyan-500/10 px-4 py-2 rounded-full border border-blue-200/20">
                   <span className="text-blue-600 font-semibold">💧 {waterPoints}</span>
                 </div>
-                
-                {/* Notifications */}
-                <Button variant="ghost" size="sm" className="relative">
-                  <Bell className="w-4 h-4" />
-                  <span className="absolute -top-1 -right-1 w-2 h-2 bg-red-500 rounded-full"></span>
-                </Button>
                 
                 {/* Profile */}
 <div className="flex items-center space-x-3">
