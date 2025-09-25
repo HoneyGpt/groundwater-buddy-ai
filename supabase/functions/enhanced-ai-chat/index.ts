@@ -196,7 +196,9 @@ We believe that every farmer, citizen, and policymaker deserves easy access to c
     let geminiAnswer = "";
     console.log('Calling Gemini API with context');
     try {
+      console.log('About to call Gemini with question:', question.substring(0, 50));
       geminiAnswer = await callGeminiAPI(question, contextHistory);
+      console.log('Gemini responded successfully with length:', geminiAnswer.length);
     } catch (geminiError) {
       console.error('Gemini API error:', geminiError);
       const q = (question || '').toLowerCase();
@@ -223,16 +225,71 @@ Next steps:
 • Keep Aadhaar, land docs, and bank details handy
 • Ask local agriculture/horticulture office for current subsidy windows`;
       } else if (q.includes('drip') || q.includes('sprinkler')) {
-        geminiAnswer = `💧 Micro-Irrigation Tips (Drip/Sprinkler)
-• Saves 30–50% water and boosts yields
-• Use mulching with drip to reduce evaporation
-• Schedule: early morning/evening to cut losses
-• Check PMKSY for subsidy eligibility`;
+        geminiAnswer = `💧 **Micro-Irrigation Complete Guide**
+
+**🎯 System Benefits:**
+• Water savings: 30–50% compared to flood irrigation
+• Yield increase: 20-40% higher crop productivity
+• Fertilizer efficiency: Precise nutrient delivery through fertigation
+• Soil health: Prevents erosion and reduces salinization
+
+**💡 Best Implementation Practices:**
+• **Optimal Timing:** Early morning (6-8 AM) or evening (6-8 PM)
+• **Mulching:** Use plastic/organic mulch to reduce evaporation by 60%
+• **System Maintenance:** Clean emitters weekly, flush lines monthly
+• **Filtration:** Install sand and disc filters to prevent clogging
+
+**🏛️ Government Subsidy Support:**
+• **PMKSY Scheme:** 55% subsidy (General category), 60% (SC/ST/Small farmers)
+• **Application Process:** State Horticulture/Agriculture Department
+• **Minimum Area:** 0.5 acres required for subsidy eligibility
+• **Required Documents:** Land records, Aadhaar, bank details
+
+**💰 Cost-Benefit Analysis:**
+• Initial Investment: ₹40,000-60,000 per acre
+• Water Cost Savings: 40-50% reduction in pumping
+• Electricity Savings: 30-40% less power consumption
+• Return on Investment: 2-3 years payback period
+
+**🔧 Technical Setup Tips:**
+• Plan layout based on crop spacing requirements
+• Use pressure compensating emitters for uniform water distribution
+• Install timer-based automation for consistent scheduling
+• Maintain system pressure at 1.5-2.0 kg/cm² for optimal performance`;
       } else if (q.includes('rainwater') || q.includes('harvest')) {
-        geminiAnswer = `🌧️ Rainwater Harvesting Ideas
-• Rooftop gutters → covered tank → first-flush filter
-• Farm pond lined with HDPE; de-silt before monsoon
-• Recharge pit near borewell with graded filter media`;
+        geminiAnswer = `🌧️ **Rainwater Harvesting Complete Guide**
+
+**🏠 Rooftop Harvesting System:**
+• **Components:** Gutters → First-flush diverter → Storage tank
+• **Calculation:** Roof area (sqm) × Rainfall (mm) × 0.8 = Liters collected
+• **Tank Requirements:** For 100 sqm roof, minimum 1000L capacity
+• **Installation Cost:** ₹15,000-25,000 for basic setup
+
+**🚜 Farm-Level Harvesting Methods:**
+• **Farm Ponds:** HDPE-lined, 100-500 cubic meter capacity
+• **Check Dams:** Stone/concrete structures across natural water flows
+• **Contour Bunding:** Follow land contours to prevent runoff
+• **Recharge Pits:** 3m deep near borewells with graded filter media
+
+**💡 Implementation Steps:**
+1. **Immediate Actions:** Install roof gutters, direct to existing containers
+2. **Pre-Monsoon:** De-silt existing ponds, repair damaged bunds
+3. **Long-term:** Construct dedicated recharge structures
+
+**🏛️ Government Support Available:**
+• **MGNREGA:** Funds farm ponds, check dams, watershed works
+• **Jal Shakti Abhiyan:** Community-level recharge structures
+• **State Schemes:** 75-90% subsidy for rural water harvesting
+
+**📊 Expected Benefits:**
+• Water Collection: 1mm rain on 100 sqm = 100 liters
+• Annual Potential: 50,000-150,000 liters per household
+• Groundwater Recharge: 30-40% of harvested rainwater percolates
+
+**⚙️ Technical Specifications:**
+• First-flush diversion: Remove first 2-3mm of rainfall
+• Storage materials: Food-grade only for drinking water
+• Overflow management: Connect to recharge pit or drainage`;
       } else {
         geminiAnswer = "🌊 I'm experiencing temporary AI issues. I’ve added a built‑in fallback. Ask about schemes, drip irrigation, rainwater harvesting, or groundwater status and I’ll still help!";
       }
