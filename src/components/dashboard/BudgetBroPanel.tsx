@@ -31,7 +31,7 @@ const budgetQueries = [
   { text: "Daily needs within ₹200", icon: IndianRupee },
 ];
 
-const BudgetBroPanel = ({ profile }: BudgetBroPanelProps) => {
+const BudgetBroPanel = ({ profile, initialChat = null }: BudgetBroPanelProps) => {
   const [messages, setMessages] = useState<BudgetMessage[]>([]);
   const [inputValue, setInputValue] = useState('');
   const [isLoading, setIsLoading] = useState(false);

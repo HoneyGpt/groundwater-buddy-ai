@@ -30,7 +30,7 @@ const quickQueries = [
   "Conservation tips for farmers"
 ];
 
-export const ChatPanel = ({ profile }: ChatPanelProps) => {
+export const ChatPanel = ({ profile, initialChat = null }: ChatPanelProps) => {
   const { toast } = useToast();
   const [messages, setMessages] = useState<Message[]>([
     {
