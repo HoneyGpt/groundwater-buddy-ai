@@ -9,6 +9,7 @@ import { Switch } from '@/components/ui/switch';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { X } from 'lucide-react';
+import { LocalDocuments } from '@/lib/localDocuments';
 
 interface Document {
   id: string;
@@ -66,6 +67,24 @@ export const DocumentEditDialog = ({
     try {
       setSaving(true);
 
+      // Handle local-only docs without hitting Supabase
+      if (document.is_local_only) {
+        const updated = await LocalDocuments.updateMetadata(document.id, {
+          title: formData.title,
+          category: formData.category,
+          tags: formData.tags.split(',').map(tag => tag.trim()).filter(Boolean),
+          location: formData.location,
+          description: formData.description,
+          is_local_only: formData.is_local_only,
+        });
+
+        if (!updated) throw new Error('Failed to update local document');
+        onDocumentUpdated({ ...document, ...updated });
+
+        toast({ title: 'Success', description: 'Document updated locally' });
+        return;
+      }
+
       const { data, error } = await supabase
         .from('user_documents')
         .update({
@@ -85,15 +104,15 @@ export const DocumentEditDialog = ({
       onDocumentUpdated(data);
       
       toast({
-        title: "Success",
-        description: "Document updated successfully",
+        title: 'Success',
+        description: 'Document updated successfully',
       });
     } catch (error) {
       console.error('Update error:', error);
       toast({
-        title: "Error",
-        description: "Failed to update document",
-        variant: "destructive",
+        title: 'Error',
+        description: 'Failed to update document',
+        variant: 'destructive',
       });
     } finally {
       setSaving(false);

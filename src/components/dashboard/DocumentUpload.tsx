@@ -17,6 +17,7 @@ interface DocumentUploadProps {
 }
 
 import { getCurrentUserId } from '@/lib/userUtils';
+import { LocalDocuments } from '@/lib/localDocuments';
 
 export const DocumentUpload = ({ onDocumentUploaded, onCancel }: DocumentUploadProps) => {
   const [files, setFiles] = useState<File[]>([]);
@@ -102,6 +103,42 @@ export const DocumentUpload = ({ onDocumentUploaded, onCancel }: DocumentUploadP
 
     try {
       setUploading(true);
+
+      // Route public (unauthenticated) users to local storage only
+      const { data: sessionData } = await supabase.auth.getSession();
+      const isAuthenticated = !!sessionData?.session?.user;
+
+      if (!isAuthenticated || metadata.isLocalOnly) {
+        for (const file of files) {
+          const localDoc = await LocalDocuments.save(file, {
+            title: metadata.title,
+            category: metadata.category,
+            tags: metadata.tags,
+            location: metadata.location,
+            description: metadata.description,
+          });
+          onDocumentUploaded(localDoc);
+        }
+
+        toast({
+          title: 'Saved Locally',
+          description: `${files.length} document(s) stored securely on this device. You can view and download them from the Documents panel.`,
+        });
+
+        // Reset form
+        setFiles([]);
+        setMetadata({
+          title: '',
+          category: 'Other',
+          tags: '',
+          location: '',
+          description: '',
+          isLocalOnly: false,
+        });
+
+        return; // stop here for public users
+      }
+
       let userId = getCurrentUserId();
       
       // If no profile exists, create a minimal one for document uploads
@@ -119,8 +156,8 @@ export const DocumentUpload = ({ onDocumentUploaded, onCancel }: DocumentUploadP
         userId = getCurrentUserId();
         
         toast({
-          title: "Profile Created",
-          description: "Created a guest profile for document uploads. You can update it later.",
+          title: 'Profile Created',
+          description: 'Created a guest profile for document uploads. You can update it later.',
         });
       }
 

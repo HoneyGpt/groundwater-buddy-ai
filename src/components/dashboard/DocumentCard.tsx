@@ -5,6 +5,7 @@ import { Badge } from '@/components/ui/badge';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
+import { LocalDocuments } from '@/lib/localDocuments';
 import { 
   FileText, 
   Image, 
@@ -78,6 +79,17 @@ export const DocumentCard = ({ document, onEdit, onDelete, viewMode }: DocumentC
   const handleView = async () => {
     try {
       setViewing(true);
+
+      if (document.is_local_only) {
+        const rec = await LocalDocuments.get(document.id);
+        if (!rec) throw new Error('Document not found locally');
+        const url = URL.createObjectURL(rec.blob);
+        window.open(url, '_blank');
+        // Allow the new tab to load before revoking
+        setTimeout(() => URL.revokeObjectURL(url), 10_000);
+        toast({ title: 'Opening document', description: 'Document opened in new tab' });
+        return;
+      }
       
       const { data, error } = await supabase.storage
         .from('documents')
@@ -95,26 +107,25 @@ export const DocumentCard = ({ document, onEdit, onDelete, viewMode }: DocumentC
                  document.mime_type.includes('xml')) {
         window.open(data.signedUrl, '_blank');
       } else {
-        // For other file types, show info and offer download
         toast({
-          title: "Preview not available",
+          title: 'Preview not available',
           description: "This file type can't be previewed. Use download instead.",
-          variant: "default",
+          variant: 'default',
         });
         handleDownload();
         return;
       }
 
       toast({
-        title: "Opening document",
-        description: "Document opened in new tab",
+        title: 'Opening document',
+        description: 'Document opened in new tab',
       });
     } catch (error) {
       console.error('View error:', error);
       toast({
-        title: "Error",
-        description: "Failed to open document for viewing",
-        variant: "destructive",
+        title: 'Error',
+        description: 'Failed to open document for viewing',
+        variant: 'destructive',
       });
     } finally {
       setViewing(false);
@@ -124,6 +135,21 @@ export const DocumentCard = ({ document, onEdit, onDelete, viewMode }: DocumentC
   const handleDownload = async () => {
     try {
       setDownloading(true);
+
+      if (document.is_local_only) {
+        const rec = await LocalDocuments.get(document.id);
+        if (!rec) throw new Error('Document not found locally');
+        const url = URL.createObjectURL(rec.blob);
+        const link = window.document.createElement('a');
+        link.href = url;
+        link.download = rec.original_name;
+        window.document.body.appendChild(link);
+        link.click();
+        window.document.body.removeChild(link);
+        setTimeout(() => URL.revokeObjectURL(url), 10_000);
+        toast({ title: 'Success', description: 'Document downloaded successfully' });
+        return;
+      }
       
       const { data, error } = await supabase.storage
         .from('documents')
@@ -142,15 +168,15 @@ export const DocumentCard = ({ document, onEdit, onDelete, viewMode }: DocumentC
       URL.revokeObjectURL(url);
 
       toast({
-        title: "Success",
-        description: "Document downloaded successfully",
+        title: 'Success',
+        description: 'Document downloaded successfully',
       });
     } catch (error) {
       console.error('Download error:', error);
       toast({
-        title: "Error",
-        description: "Failed to download document",
-        variant: "destructive",
+        title: 'Error',
+        description: 'Failed to download document',
+        variant: 'destructive',
       });
     } finally {
       setDownloading(false);
@@ -161,6 +187,13 @@ export const DocumentCard = ({ document, onEdit, onDelete, viewMode }: DocumentC
     if (!confirm('Are you sure you want to delete this document?')) return;
 
     try {
+      if (document.is_local_only) {
+        await LocalDocuments.remove(document.id);
+        onDelete();
+        toast({ title: 'Deleted', description: 'Local document removed from this device' });
+        return;
+      }
+
       // Delete from storage
       const { error: storageError } = await supabase.storage
         .from('documents')
@@ -179,15 +212,15 @@ export const DocumentCard = ({ document, onEdit, onDelete, viewMode }: DocumentC
       onDelete();
       
       toast({
-        title: "Success",
-        description: "Document deleted successfully",
+        title: 'Success',
+        description: 'Document deleted successfully',
       });
     } catch (error) {
       console.error('Delete error:', error);
       toast({
-        title: "Error",
-        description: "Failed to delete document",
-        variant: "destructive",
+        title: 'Error',
+        description: 'Failed to delete document',
+        variant: 'destructive',
       });
     }
   };
