@@ -102,14 +102,26 @@ export const DocumentUpload = ({ onDocumentUploaded, onCancel }: DocumentUploadP
 
     try {
       setUploading(true);
-      const userId = getCurrentUserId();
+      let userId = getCurrentUserId();
+      
+      // If no profile exists, create a minimal one for document uploads
       if (!userId) {
+        const guestProfile = {
+          name: 'Guest User',
+          age: '',
+          country: 'India',
+          state: '',
+          district: '',
+          city: '',
+          allowLocation: false
+        };
+        localStorage.setItem('ingres_public_profile', JSON.stringify(guestProfile));
+        userId = getCurrentUserId();
+        
         toast({
-          title: "Error", 
-          description: "User profile not found. Please complete your profile setup.",
-          variant: "destructive",
+          title: "Profile Created",
+          description: "Created a guest profile for document uploads. You can update it later.",
         });
-        return;
       }
 
       for (const file of files) {
