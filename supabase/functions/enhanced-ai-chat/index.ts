@@ -15,10 +15,12 @@ async function callGeminiAPI(question: string, conversationHistory: string = "")
   const systemPrompt = `You are INGRES-AI, a specialized assistant for groundwater management in India. 
 
 CRITICAL LANGUAGE INSTRUCTION:
-• ALWAYS respond in English only, regardless of user input language
-• Keep responses clear and professional in English
-• Use Indian context and technical terms but maintain English language
-• If user asks in any regional language, translate their intent and respond in English
+• Detect if user is EXPLICITLY asking for a different language (e.g., "speak in Hindi", "reply in Telugu", "answer in Tamil")
+• ONLY respond in requested language when user explicitly asks for it
+• Default to English for all responses unless user specifically requests another language
+• If user asks "can you speak Hindi?" - respond in English explaining you can understand and respond in Hindi if requested
+• If user says "respond in Hindi" or "answer in Hindi" - then respond in that language
+• Use Indian context and technical terms but maintain requested language
 
 RESPONSE FORMAT REQUIREMENTS:
 • Use emojis and clear section headers
@@ -163,7 +165,7 @@ We believe that every farmer, citizen, and policymaker deserves easy access to c
 
     // Get recent conversation context for memory
     const contextHistory = conversationHistory ? 
-      conversationHistory.slice(-6).map((msg: any) => 
+      conversationHistory.slice(-10).map((msg: any) => 
         `${msg.isUser ? 'User' : 'INGRES-AI'}: ${msg.text}`
       ).join('\n') : "";
 

@@ -27,6 +27,7 @@ interface Document {
   ai_summary: string;
 }
 
+import { LocalDocuments } from '@/lib/localDocuments';
 import { getCurrentUserId } from '@/lib/userUtils';
 
 export const DocumentSaverPanel = () => {
@@ -53,8 +54,24 @@ export const DocumentSaverPanel = () => {
   const fetchDocuments = async () => {
     try {
       setLoading(true);
+
+      // Check if user is authenticated
+      const { data: sessionData } = await supabase.auth.getSession();
+      const isAuthenticated = !!sessionData?.session?.user;
+
+      if (!isAuthenticated) {
+        // For public users, load from local storage
+        const localDocs = await LocalDocuments.list();
+        setDocuments(localDocs);
+        return;
+      }
+
+      // For authenticated users, fetch from database
       const userId = getCurrentUserId();
-      if (!userId) return;
+      if (!userId) {
+        setDocuments([]);
+        return;
+      }
 
       const { data, error } = await supabase
         .from('user_documents')
@@ -67,9 +84,9 @@ export const DocumentSaverPanel = () => {
     } catch (error) {
       console.error('Error fetching documents:', error);
       toast({
-        title: "Error",
-        description: "Failed to load documents",
-        variant: "destructive",
+        title: 'Error',
+        description: 'Failed to load documents',
+        variant: 'destructive',
       });
     } finally {
       setLoading(false);

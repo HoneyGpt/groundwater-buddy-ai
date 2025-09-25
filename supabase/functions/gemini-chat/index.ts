@@ -48,10 +48,12 @@ if (chatType === 'budget') {
       systemPrompt = `You are Budget Bro 💛, a friendly money-saving assistant for Indian users. 
 
 CRITICAL LANGUAGE INSTRUCTION:
-• ALWAYS respond in English only, regardless of user input language
-• Keep responses clear and simple in English
-• Use Indian context and currency (₹) but maintain English language
-• If user asks in any regional language, translate their intent and respond in English
+• Detect if user is EXPLICITLY asking for a different language (e.g., "speak in Hindi", "reply in Telugu", "answer in Tamil")
+• ONLY respond in requested language when user explicitly asks for it
+• Default to English for all responses unless user specifically requests another language
+• If user asks "can you speak Hindi?" - respond in English explaining you can understand and respond in Hindi if requested
+• If user says "respond in Hindi" or "answer in Hindi" - then respond in that language
+• Use Indian context and currency (₹) but maintain requested language
 
 RESPONSE FORMAT - Use EXACTLY this structure with clean formatting:
 
@@ -100,10 +102,12 @@ Always provide specific costs in ₹, mention government schemes, and give actio
       systemPrompt = `You are INGRES-AI, an intelligent groundwater assistant for India. 
 
 CRITICAL LANGUAGE INSTRUCTION:
-• ALWAYS respond in English only, regardless of user input language
-• Keep responses clear and professional in English
-• Use Indian context and technical terms but maintain English language
-• If user asks in any regional language, translate their intent and respond in English
+• Detect if user is EXPLICITLY asking for a different language (e.g., "speak in Hindi", "reply in Telugu", "answer in Tamil")
+• ONLY respond in requested language when user explicitly asks for it
+• Default to English for all responses unless user specifically requests another language
+• If user asks "can you speak Hindi?" - respond in English explaining you can understand and respond in Hindi if requested
+• If user says "respond in Hindi" or "answer in Hindi" - then respond in that language
+• Use Indian context and technical terms but maintain requested language
 
 You help with:
 - Groundwater status and assessments
@@ -124,12 +128,21 @@ Guidelines:
 Be helpful, informative, and focused on practical water management solutions for Indian farmers and citizens.`;
     }
 
-    // Add user context to the prompt if available
+    // Add user context and conversation history to the prompt
     if (context?.profile) {
       const location = context.profile.state && context.profile.district 
         ? `${context.profile.district}, ${context.profile.state}` 
         : 'India';
       systemPrompt += `\n\nUser is from: ${location}. Provide location-specific advice when relevant.`;
+    }
+
+    // Add conversation memory if available
+    if (context?.conversationHistory && context.conversationHistory.length > 0) {
+      const recentHistory = context.conversationHistory.slice(-10); // Last 10 messages
+      const historyText = recentHistory
+        .map((msg: any) => `${msg.role === 'user' ? 'User' : 'Assistant'}: ${msg.content}`)
+        .join('\n');
+      systemPrompt += `\n\nRecent conversation context:\n${historyText}\n\nNow respond to the current message:`;
     }
 
     console.log('Sending request to Gemini API...');
