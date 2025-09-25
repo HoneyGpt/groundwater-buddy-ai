@@ -55,32 +55,28 @@ Question: ${question}`;
       headers: {
         'Content-Type': 'application/json',
       },
-        body: JSON.stringify({
-          systemInstruction: {
-            role: 'system',
-            parts: [{ text: systemPrompt.replace(/\n?Question:.*$/s, '').trim() }]
-          },
-          contents: [
-            { role: 'user', parts: [{ text: question }] },
-            ...(conversationHistory
-              ? [{ role: 'user', parts: [{ text: `CONVERSATION CONTEXT:\n${conversationHistory}` }] }]
-              : [])
-          ],
-          generationConfig: {
-            temperature: 0.7,
-            topK: 40,
-            topP: 0.95,
-            maxOutputTokens: 1500,
-          }
-        }),
+      body: JSON.stringify({
+        contents: [{
+          parts: [{ text: `${systemPrompt}\n\nUser Question: ${question}${conversationHistory ? `\n\nConversation Context: ${conversationHistory}` : ''}` }]
+        }],
+        generationConfig: {
+          temperature: 0.7,
+          topK: 40,
+          topP: 0.95,
+          maxOutputTokens: 1500,
+        }
+      }),
     }
   );
 
   if (!response.ok) {
-    throw new Error(`Gemini API error: ${response.statusText}`);
+    const errorText = await response.text();
+    console.error('Gemini API error response:', errorText);
+    throw new Error(`Gemini API error: ${response.status} ${response.statusText} - ${errorText}`);
   }
 
   const data = await response.json();
+  console.log('Gemini API response received:', { hasContent: !!data?.candidates?.[0]?.content });
   return data.candidates[0]?.content?.parts[0]?.text || "I couldn't generate a response.";
 }
 
