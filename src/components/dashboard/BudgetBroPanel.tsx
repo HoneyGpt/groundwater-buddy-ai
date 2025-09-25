@@ -68,8 +68,9 @@ Try: "I have kidney stones, my budget is ₹800" or "Need drip irrigation for 1 
     try {
       console.log('Sending message to Budget Bro:', message);
       
-      // Update conversation history
-      const updatedHistory = [...conversationHistory, { role: 'user', content: message }];
+      // Update conversation history with null safety
+      const safeHistory = conversationHistory || [];
+      const updatedHistory = [...safeHistory, { role: 'user', content: message }];
       
       const { data, error } = await supabase.functions.invoke('gemini-chat', {
         body: {
@@ -89,7 +90,8 @@ Try: "I have kidney stones, my budget is ₹800" or "Need drip irrigation for 1 
 
       if (data?.success && data?.response) {
         console.log('Received AI response successfully');
-        // Update conversation history with assistant response
+        // Update conversation history with assistant response and null safety
+        const safeHistory = conversationHistory || [];
         setConversationHistory([...updatedHistory, { role: 'assistant', content: data.response }]);
         return { text: data.response, formatted: true };
       } else if (data?.fallbackResponse) {
