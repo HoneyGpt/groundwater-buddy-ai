@@ -326,9 +326,6 @@ const Playground = () => {
             >
               <Menu className="w-4 h-4" />
             </Button>
-            <Button variant="ghost" size="sm" onClick={() => navigate('/')} className="text-foreground/70 hover:text-foreground">
-              Home
-            </Button>
           </div>
           
           <div className="flex items-center space-x-3">

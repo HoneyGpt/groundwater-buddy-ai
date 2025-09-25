@@ -261,19 +261,65 @@ const handleSaveChat = () => {
   };
 
   const handleDownloadMessage = (messageText: string, messageId: string) => {
-    const blob = new Blob([messageText], { type: 'text/plain' });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement('a');
-    link.href = url;
-    link.download = `ingres-ai-response-${messageId}.txt`;
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-    URL.revokeObjectURL(url);
-    
-    toast({
-      title: "Downloaded! 💾",
-      description: "Message saved as text file."
+    // Dynamic import for jsPDF to avoid bundle issues
+    import('jspdf').then(({ default: jsPDF }) => {
+      const doc = new jsPDF();
+      
+      // Add INGRES-AI header
+      doc.setFontSize(20);
+      doc.setTextColor(0, 100, 200);
+      doc.text('INGRES-AI Chat Response', 20, 20);
+      
+      doc.setFontSize(12);
+      doc.setTextColor(100, 100, 100);
+      doc.text(`Generated on: ${new Date().toLocaleString()}`, 20, 30);
+      
+      // Add message content
+      doc.setFontSize(11);
+      doc.setTextColor(0, 0, 0);
+      
+      // Split text into lines that fit the page width
+      const pageWidth = doc.internal.pageSize.width - 40; // 20mm margin on each side
+      const lines = doc.splitTextToSize(messageText, pageWidth);
+      
+      let yPosition = 45;
+      const lineHeight = 7;
+      const pageHeight = doc.internal.pageSize.height - 40; // Leave margin at bottom
+      
+      lines.forEach((line: string) => {
+        if (yPosition > pageHeight) {
+          doc.addPage();
+          yPosition = 20;
+        }
+        doc.text(line, 20, yPosition);
+        yPosition += lineHeight;
+      });
+      
+      // Save the PDF
+      doc.save(`ingres-ai-response-${messageId}.pdf`);
+      
+      toast({
+        title: "Downloaded! 📄",
+        description: "Response saved as PDF file."
+      });
+    }).catch((error) => {
+      console.error('PDF generation error:', error);
+      toast({
+        title: "PDF Error",
+        description: "Failed to generate PDF. Downloading as text instead.",
+        variant: "destructive"
+      });
+      
+      // Fallback to text download
+      const blob = new Blob([messageText], { type: 'text/plain' });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `ingres-ai-response-${messageId}.txt`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
     });
   };
 
