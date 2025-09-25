@@ -92,11 +92,11 @@ serve(async (req) => {
         `${msg.isUser ? 'User' : 'INGRES-AI'}: ${msg.text}`
       ).join('\n') : "";
 
-    // 1️⃣ Search Supabase knowledge_base first
+    // 1️⃣ Search Supabase knowledge_base first - using ilike for better user input handling
     const { data: kbResults, error } = await supabaseClient
       .from('knowledge_base')
       .select('*')
-      .textSearch('content', question, { config: 'english' })
+      .or(`content.ilike.%${question}%, title.ilike.%${question}%`)
       .limit(5);
 
     if (error) {
