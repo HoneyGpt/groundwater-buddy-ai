@@ -55,17 +55,24 @@ Question: ${question}`;
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({
-        contents: [{
-          parts: [{ text: systemPrompt }]
-        }],
-        generationConfig: {
-          temperature: 0.7,
-          topK: 40,
-          topP: 0.95,
-          maxOutputTokens: 1500,
-        }
-      }),
+        body: JSON.stringify({
+          systemInstruction: {
+            role: 'system',
+            parts: [{ text: systemPrompt.replace(/\n?Question:.*$/s, '').trim() }]
+          },
+          contents: [
+            { role: 'user', parts: [{ text: question }] },
+            ...(conversationHistory
+              ? [{ role: 'user', parts: [{ text: `CONVERSATION CONTEXT:\n${conversationHistory}` }] }]
+              : [])
+          ],
+          generationConfig: {
+            temperature: 0.7,
+            topK: 40,
+            topP: 0.95,
+            maxOutputTokens: 1500,
+          }
+        }),
     }
   );
 
@@ -89,7 +96,8 @@ serve(async (req) => {
       Deno.env.get('SUPABASE_ANON_KEY') ?? '',
     );
 
-    const { message: question, userProfile, conversationHistory } = await req.json();
+    const { message, question: questionAlt, userProfile, conversationHistory } = await req.json();
+    const question = message ?? questionAlt ?? '';
     
     console.log('Processing chat request:', { question, userId: userProfile?.id });
 
@@ -234,6 +242,7 @@ We believe that every farmer, citizen, and policymaker deserves easy access to c
       JSON.stringify({ 
         success: true,
         response: finalAnswer,
+        answer: finalAnswer,
         sources: {
           supabase_results: kbResults?.length || 0,
           used_gemini: !!geminiAnswer,
