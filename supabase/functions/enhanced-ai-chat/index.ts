@@ -15,11 +15,10 @@ async function callGeminiAPI(question: string, conversationHistory: string = "")
   const systemPrompt = `You are INGRES-AI, a specialized assistant for groundwater management in India. 
 
 CRITICAL LANGUAGE INSTRUCTION:
-• ALWAYS respond in the SAME LANGUAGE as the user's question
-• If user asks in Hindi, respond completely in Hindi
-• If user asks in English, respond completely in English
-• If user asks in Telugu, Tamil, or any other Indian language, respond in that language
-• Detect the language automatically from the user's input
+• ALWAYS respond in English only, regardless of user input language
+• Keep responses clear and professional in English
+• Use Indian context and technical terms but maintain English language
+• If user asks in any regional language, translate their intent and respond in English
 
 RESPONSE FORMAT REQUIREMENTS:
 • Use emojis and clear section headers
@@ -295,15 +294,15 @@ Next steps:
       }
     }
 
-    // 3️⃣ Combine responses with better formatting
+    // 3️⃣ Prioritize clean AI response over raw knowledge base data
     let finalAnswer = "";
     
-    if (supabaseAnswer && geminiAnswer) {
-      finalAnswer = `${supabaseAnswer}\n\n---\n\n🤖 **INGRES-AI Analysis**\n${geminiAnswer}`;
-    } else if (supabaseAnswer) {
-      finalAnswer = `${supabaseAnswer}\n\n🤖 **Additional Context**\nFor more specific guidance, please provide your location details or specific requirements.`;
-    } else if (geminiAnswer) {
+    if (geminiAnswer) {
+      // Use AI response as primary - it's cleaner and more user-friendly
       finalAnswer = geminiAnswer;
+    } else if (supabaseAnswer) {
+      // Only fall back to raw knowledge base if AI fails
+      finalAnswer = `🌊 **INGRES-AI Knowledge Base**\n\n${supabaseAnswer.replace('📚 **INGRES Knowledge Base**\n\n', '')}`;
     } else {
       finalAnswer = "🌊 **INGRES-AI Response**\n\nI couldn't find specific information about your query. Please try:\n• Being more specific about your location\n• Asking about government schemes\n• Requesting water conservation tips\n• Checking groundwater levels in your area";
     }
