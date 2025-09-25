@@ -18,12 +18,29 @@ const Contact = () => {
   const { toast } = useToast();
 
   const teamMembers = [
-    { name: "Harshita Bhaskaruni", role: "Project Leader" },
-    { name: "Tushar", role: "UI Designer" },
-    { name: "Anchal", role: "Web Scrapper" },
-    { name: "Ganesh", role: "Tester" },
-    { name: "Saurav", role: "Debugger" },
-    { name: "Vivek Upadhyay", role: "Customer Service" }
+    { 
+      name: "Ganesh", 
+      role: "Technical Help & General", 
+      email: "tinkuganesh15@gmail.com",
+      linkedin: "https://www.linkedin.com/in/ganesh-g-64b38034b?utm_source=share&utm_campaign=share_via&utm_content=profile&utm_medium=android_app"
+    },
+    { 
+      name: "Anchal Jaiswal", 
+      role: "Information & Demo Requests", 
+      email: "anchaljaiswal.1001@gmail.com"
+    },
+    { 
+      name: "Kishlaya Mishra", 
+      role: "Collaborations & Partnership", 
+      email: "kishlayamishra@gmail.com",
+      linkedin: "https://www.linkedin.com/in/kishlayamishra"
+    },
+    { 
+      name: "Harshita Bhaskaruni", 
+      role: "General Inquiries", 
+      email: "harshitabhaskaruni@gmail.com",
+      linkedin: "https://in.linkedin.com/in/harshitabhaskaruni1117"
+    }
   ];
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -206,7 +223,7 @@ const Contact = () => {
                 </p>
               </CardHeader>
               <CardContent>
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   {teamMembers.map((member, index) => (
                     <div 
                       key={index}
@@ -215,9 +232,35 @@ const Contact = () => {
                       <h3 className="font-bold text-lg text-foreground mb-2">
                         {member.name}
                       </h3>
-                      <p className="text-primary font-medium">
+                      <p className="text-primary font-medium mb-3">
                         {member.role}
                       </p>
+                      <div className="space-y-2">
+                        {member.email && (
+                          <div className="flex items-center gap-2">
+                            <Mail className="h-4 w-4 text-muted-foreground" />
+                            <a 
+                              href={`mailto:${member.email}`}
+                              className="text-sm text-primary hover:underline"
+                            >
+                              {member.email}
+                            </a>
+                          </div>
+                        )}
+                        {member.linkedin && (
+                          <div className="flex items-center gap-2">
+                            <Linkedin className="h-4 w-4 text-blue-600" />
+                            <a 
+                              href={member.linkedin}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="text-sm text-blue-600 hover:underline"
+                            >
+                              LinkedIn Profile
+                            </a>
+                          </div>
+                        )}
+                      </div>
                     </div>
                   ))}
                 </div>
