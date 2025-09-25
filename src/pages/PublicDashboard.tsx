@@ -14,6 +14,7 @@ import { MapsPanel } from '@/components/dashboard/MapsPanel';
 import { CalendarPanel } from '@/components/dashboard/CalendarPanel';
 import HelplinePanel from '@/components/dashboard/HelplinePanel';
 import { SchemesPanel } from '@/components/dashboard/SchemesPanel';
+import { SettingsPanel } from '@/components/dashboard/SettingsPanel';
 
 const PublicDashboard = () => {
   const navigate = useNavigate();
@@ -43,6 +44,10 @@ const [selectedChat, setSelectedChat] = useState<any | null>(null);
     const newTotal = waterPoints + points;
     setWaterPoints(newTotal);
     localStorage.setItem('ingres_water_points', newTotal.toString());
+  };
+
+  const handleProfileUpdate = (newProfile: any) => {
+    setProfile(newProfile);
   };
 
   const handleSectionChange = (section: string) => {
@@ -95,8 +100,7 @@ case 'chat':
       case 'schemes':
         return <SchemesPanel />;
       case 'settings':
-        navigate('/settings');
-        return null;
+        return <SettingsPanel profile={profile} onProfileUpdate={handleProfileUpdate} />;
       case 'overview':
       default:
         return <OverviewPanel profile={profile} onSectionChange={handleSectionChange} />;
