@@ -31,11 +31,19 @@ serve(async (req) => {
 
     const uint8 = new Uint8Array(await downloaded.arrayBuffer());
     const pdf = await getDocumentProxy(uint8);
-    const { text } = await extractText(pdf, { mergePages: true });
+    const { text: rawText } = await extractText(pdf, { mergePages: true });
+
+    // Sanitize text by removing null bytes and other problematic characters
+    const text = rawText
+      .replace(/\u0000/g, '') // Remove null bytes
+      .replace(/[\u0001-\u0008\u000B\u000C\u000E-\u001F\u007F]/g, '') // Remove other control characters
+      .trim();
+
+    console.log('Extracted text length after sanitization:', text.length);
 
     // Optionally store full text into knowledge_base for search
     let kbId: string | null = null;
-    if (upsertToKnowledgeBase) {
+    if (upsertToKnowledgeBase && text.length > 0) {
       const title = (originalName || filePath.split('/').pop() || 'PDF Document').replace(/\.pdf$/i, '');
       const { data: kbData, error: kbError } = await supabase
         .from('knowledge_base')
