@@ -41,12 +41,23 @@ const TestimonialsSection = () => {
           {testimonials.map((testimonial, index) => (
             <div key={index} className="bg-background rounded-2xl p-8 shadow-sm">
               <div className="flex items-center mb-6">
+                {/* Filled stars */}
                 {[...Array(Math.floor(testimonial.rating))].map((_, i) => (
-                  <Star key={i} className="h-5 w-5 text-accent fill-current" />
+                  <Star key={`filled-${i}`} className="h-5 w-5 text-accent fill-current" />
                 ))}
+                {/* Half star if rating has decimal */}
                 {testimonial.rating % 1 !== 0 && (
-                  <Star className="h-5 w-5 text-accent fill-current opacity-50" />
+                  <div key="half-star" className="relative">
+                    <Star className="h-5 w-5 text-gray-300 fill-current" />
+                    <div className="absolute inset-0 overflow-hidden w-1/2">
+                      <Star className="h-5 w-5 text-accent fill-current" />
+                    </div>
+                  </div>
                 )}
+                {/* Empty stars to complete 5-star rating */}
+                {[...Array(5 - Math.ceil(testimonial.rating))].map((_, i) => (
+                  <Star key={`empty-${i}`} className="h-5 w-5 text-gray-300 fill-current" />
+                ))}
               </div>
               <blockquote className="text-muted-foreground mb-8 leading-relaxed text-lg">
                 "{testimonial.content}"
