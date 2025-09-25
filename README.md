@@ -1,8 +1,25 @@
-# Welcome to your Lovable project
+# INGRES-AI - Groundwater Data Assistant
 
 ## Project info
 
 **URL**: https://lovable.dev/projects/edb2981d-dfb5-47a6-b1ef-86e0a792af19
+
+## What is INGRES-AI?
+
+INGRES-AI is an intelligent multilingual chatbot that makes India's groundwater data accessible to everyone. Built to solve the challenge of complex INGRES portal navigation, our AI assistant provides instant answers about groundwater status, government schemes, and water management insights in local languages.
+
+### Key Features
+- **Multilingual Support**: Ask questions in Hindi, Telugu, or English
+- **Real-time Data**: Access current groundwater assessments from INGRES
+- **Interactive Maps**: Visual groundwater data with charts and trends
+- **Voice Interface**: Support for low-literacy users
+- **Government Schemes**: Direct access to water-related schemes and eligibility
+- **Farmer-Friendly**: Simple answers with actionable guidance
+
+### Who Benefits?
+- **Farmers**: Check drilling safety, crop planning advice, scheme eligibility
+- **Policymakers**: Quick data analysis, trends, and comprehensive reports
+- **General Public**: Understanding local water resources and conservation
 
 ## How can I edit this code?
 

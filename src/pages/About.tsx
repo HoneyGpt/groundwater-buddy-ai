@@ -4,8 +4,13 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Users, Target, Lightbulb, TrendingUp, Award, Heart, Sparkles, MapPin, Mail, Phone, Calendar, Check, ArrowRight } from "lucide-react";
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import LearnMoreModal from "@/components/LearnMoreModal";
 
 const About = () => {
+  const [showLearnMore, setShowLearnMore] = useState(false);
+  const navigate = useNavigate();
   const teamMembers = [
     { 
       name: "Harshita Bhaskaruni", 
@@ -112,11 +117,20 @@ const About = () => {
                 groundwater information through cutting-edge AI technology and multilingual support.
               </p>
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                <Button size="lg" className="bg-accent hover:bg-accent/90 text-white font-semibold px-8 py-4">
+                <Button 
+                  size="lg" 
+                  className="bg-accent hover:bg-accent/90 text-white font-semibold px-8 py-4"
+                  onClick={() => navigate('/mediator')}
+                >
                   <Heart className="w-5 h-5 mr-2" />
                   Join Our Mission
                 </Button>
-                <Button variant="outline" size="lg" className="font-semibold px-8 py-4">
+                <Button 
+                  variant="outline" 
+                  size="lg" 
+                  className="font-semibold px-8 py-4"
+                  onClick={() => setShowLearnMore(true)}
+                >
                   <ArrowRight className="w-5 h-5 mr-2" />
                   Learn More
                 </Button>
@@ -435,20 +449,36 @@ const About = () => {
                 or simply someone who cares about water conservation, INGRES-AI is here for you.
               </p>
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                <Button size="lg" className="bg-accent hover:bg-accent/90 text-white font-semibold px-8 py-4">
+                <Button 
+                  size="lg" 
+                  className="bg-accent hover:bg-accent/90 text-white font-semibold px-8 py-4"
+                  onClick={() => navigate('/contact')}
+                >
                   <Mail className="w-5 h-5 mr-2" />
                   Get in Touch
                 </Button>
-                <Button variant="outline" size="lg" className="font-semibold px-8 py-4">
-                  <Phone className="w-5 h-5 mr-2" />
-                  Schedule a Demo
+                <Button 
+                  variant="outline" 
+                  size="lg" 
+                  className="font-semibold px-8 py-4"
+                  asChild
+                >
+                  <a href="mailto:minusonebroking@gmail.com">
+                    <Phone className="w-5 h-5 mr-2" />
+                    Schedule a Demo
+                  </a>
                 </Button>
               </div>
             </div>
           </div>
         </section>
       </main>
-
+      
+      <LearnMoreModal 
+        open={showLearnMore} 
+        onOpenChange={setShowLearnMore} 
+      />
+      
       <Footer />
     </div>
   );

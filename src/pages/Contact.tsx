@@ -40,6 +40,18 @@ const Contact = () => {
       role: "General Inquiries", 
       email: "harshitabhaskaruni@gmail.com",
       linkedin: "https://in.linkedin.com/in/harshitabhaskaruni1117"
+    },
+    { 
+      name: "Saurav Sharma", 
+      role: "Lead Developer & Project Coordinator", 
+      email: "isauravsharmaokay4359@gmail.com",
+      linkedin: "https://www.linkedin.com/in/saurav-sharma-1b7321247?utm_source=share&utm_campaign=share_via&utm_content=profile&utm_medium=android_app"
+    },
+    { 
+      name: "Vivek U", 
+      role: "Customer Service & Demo Scheduling", 
+      email: "minusonebroking@gmail.com",
+      linkedin: "https://www.linkedin.com/in/vivek-u-5619a125b?utm_source=share&utm_campaign=share_via&utm_content=profile&utm_medium=android_app"
     }
   ];
 
