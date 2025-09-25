@@ -199,7 +199,43 @@ We believe that every farmer, citizen, and policymaker deserves easy access to c
       geminiAnswer = await callGeminiAPI(question, contextHistory);
     } catch (geminiError) {
       console.error('Gemini API error:', geminiError);
-      geminiAnswer = "🌊 I'm experiencing technical difficulties but remain ready to help with groundwater queries. Please try again!";
+      const q = (question || '').toLowerCase();
+      if (q.includes('scheme')) {
+        geminiAnswer = `🎁 Government Water Schemes You Can Explore
+
+1) PMKSY – Per Drop More Crop
+• Drip/sprinkler subsidy up to 55% (General) / 60% (SC/ST/Small & Marginal)
+• Apply via your State Agriculture Dept. portal or nearest agriculture office
+
+2) Atal Bhujal Yojana (Atal Jal)
+• Community-led groundwater management in selected blocks
+• Focus on water budgeting & recharge works with village committees
+
+3) MGNREGA + Water Conservation
+• Funds for farm ponds, check dams, contour bunding, trenching
+• Ask Gram Panchayat for sanctioned works in your village
+
+4) Jal Shakti Abhiyan
+• Convergence program for recharge structures; check district water resources office
+
+Next steps:
+• Visit Schemes tab in the app → filter by your state
+• Keep Aadhaar, land docs, and bank details handy
+• Ask local agriculture/horticulture office for current subsidy windows`;
+      } else if (q.includes('drip') || q.includes('sprinkler')) {
+        geminiAnswer = `💧 Micro-Irrigation Tips (Drip/Sprinkler)
+• Saves 30–50% water and boosts yields
+• Use mulching with drip to reduce evaporation
+• Schedule: early morning/evening to cut losses
+• Check PMKSY for subsidy eligibility`;
+      } else if (q.includes('rainwater') || q.includes('harvest')) {
+        geminiAnswer = `🌧️ Rainwater Harvesting Ideas
+• Rooftop gutters → covered tank → first-flush filter
+• Farm pond lined with HDPE; de-silt before monsoon
+• Recharge pit near borewell with graded filter media`;
+      } else {
+        geminiAnswer = "🌊 I'm experiencing temporary AI issues. I’ve added a built‑in fallback. Ask about schemes, drip irrigation, rainwater harvesting, or groundwater status and I’ll still help!";
+      }
     }
 
     // 3️⃣ Combine responses with better formatting
