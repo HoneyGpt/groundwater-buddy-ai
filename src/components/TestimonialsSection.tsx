@@ -7,21 +7,21 @@ const TestimonialsSection = () => {
       role: "Small-scale Farmer, Brazil",
       content: "INGRES-AI helps me understand water quality in my fields. The local language support makes it so much easier to get the information I need for better crop management.",
       avatar: "👩‍🌾",
+      rating: 4.5,
+    },
+    {
+      name: "Mr. Gopal", 
+      role: "Wise Sarpanch",
+      content: "As a farmer and sarpanch I can't believe that this type of technology exists, it's really a good work, the Telugu translation in chat helped a lot.",
+      avatar: "👨‍🌾",
       rating: 5,
     },
     {
-      name: "Dr. James Chen", 
-      role: "Hydrologist, Research Institute",
-      content: "The interactive maps and data visualization capabilities are impressive. It makes complex groundwater research accessible to field workers and communities.",
-      avatar: "👨‍🔬",
-      rating: 5,
-    },
-    {
-      name: "Ahmed Hassan",
-      role: "Community Water Manager, Kenya",
-      content: "We use INGRES-AI to monitor water sources for our village. The simple interface helps us make informed decisions about water conservation and usage.",
-      avatar: "👨‍💼",
-      rating: 5,
+      name: "Mrs. Sulekha Subramanyam",
+      role: "Senior Lecturer in Research University Delhi",
+      content: "As a senior lecturer in research university this AI helped our students lot, I even advise this to agricultural students, I suggest to improve customer service response a bit more.",
+      avatar: "👩‍🏫",
+      rating: 4,
     },
     {
       name: "Mr. Mishra",
@@ -48,9 +48,12 @@ const TestimonialsSection = () => {
           {testimonials.map((testimonial, index) => (
             <div key={index} className="bg-background rounded-2xl p-8 shadow-sm">
               <div className="flex items-center mb-6">
-                {[...Array(testimonial.rating)].map((_, i) => (
+                {[...Array(Math.floor(testimonial.rating))].map((_, i) => (
                   <Star key={i} className="h-5 w-5 text-accent fill-current" />
                 ))}
+                {testimonial.rating % 1 !== 0 && (
+                  <Star className="h-5 w-5 text-accent fill-current opacity-50" />
+                )}
               </div>
               <blockquote className="text-muted-foreground mb-8 leading-relaxed text-lg">
                 "{testimonial.content}"
