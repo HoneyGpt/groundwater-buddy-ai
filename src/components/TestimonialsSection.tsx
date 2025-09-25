@@ -23,6 +23,13 @@ const TestimonialsSection = () => {
       avatar: "👨‍💼",
       rating: 5,
     },
+    {
+      name: "Mr. Mishra",
+      role: "Senior & Sophomore, Birla Institute",
+      content: "The website is very good, the UI and translation better than I expected. As a full stack developer I believe that this project helps India a lot.",
+      avatar: "👨‍💻",
+      rating: 5,
+    },
   ];
 
   return (
