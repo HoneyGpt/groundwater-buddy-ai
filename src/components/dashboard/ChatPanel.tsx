@@ -3,7 +3,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Card } from '@/components/ui/card';
-import { Send, Bot, User, Save, Mic } from 'lucide-react';
+import { Send, Bot, User, Save, Mic, Copy, Download } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { ChatStorage, getCurrentContext } from '@/lib/storageUtils';
@@ -244,6 +244,39 @@ const handleSaveChat = () => {
     }, 2000);
   };
 
+  const handleCopyMessage = async (messageText: string) => {
+    try {
+      await navigator.clipboard.writeText(messageText);
+      toast({
+        title: "Copied! 📋",
+        description: "Message copied to clipboard."
+      });
+    } catch (error) {
+      toast({
+        title: "Copy failed",
+        description: "Could not copy message to clipboard.",
+        variant: "destructive"
+      });
+    }
+  };
+
+  const handleDownloadMessage = (messageText: string, messageId: string) => {
+    const blob = new Blob([messageText], { type: 'text/plain' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `ingres-ai-response-${messageId}.txt`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+    
+    toast({
+      title: "Downloaded! 💾",
+      description: "Message saved as text file."
+    });
+  };
+
   return (
     <div className="h-full flex flex-col bg-gradient-to-br from-background to-primary/5 rounded-xl border shadow-lg">
       {/* Chat Header */}
@@ -397,6 +430,30 @@ const handleSaveChat = () => {
                       <p className="text-xs text-muted-foreground mt-2 opacity-70">
                         {message.timestamp.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}
                       </p>
+                      
+                      {/* Action buttons for AI messages */}
+                      {!message.isUser && message.id !== 'typing' && (
+                        <div className="flex items-center gap-2 mt-3 pt-2 border-t border-border/20">
+                          <Button
+                            onClick={() => handleCopyMessage(message.text)}
+                            variant="ghost"
+                            size="sm"
+                            className="h-7 px-2 text-xs hover:bg-primary/10"
+                          >
+                            <Copy className="w-3 h-3 mr-1" />
+                            Copy
+                          </Button>
+                          <Button
+                            onClick={() => handleDownloadMessage(message.text, message.id)}
+                            variant="ghost"
+                            size="sm"
+                            className="h-7 px-2 text-xs hover:bg-primary/10"
+                          >
+                            <Download className="w-3 h-3 mr-1" />
+                            Download
+                          </Button>
+                        </div>
+                      )}
                     </>
                   )}
                 </div>

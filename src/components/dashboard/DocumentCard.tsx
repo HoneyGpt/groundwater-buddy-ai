@@ -46,6 +46,7 @@ interface DocumentCardProps {
 
 export const DocumentCard = ({ document, onEdit, onDelete, viewMode }: DocumentCardProps) => {
   const [downloading, setDownloading] = useState(false);
+  const [viewing, setViewing] = useState(false);
   const { toast } = useToast();
 
   const getFileIcon = () => {
@@ -72,6 +73,52 @@ export const DocumentCard = ({ document, onEdit, onDelete, viewMode }: DocumentC
       month: 'short',
       year: 'numeric'
     });
+  };
+
+  const handleView = async () => {
+    try {
+      setViewing(true);
+      
+      const { data, error } = await supabase.storage
+        .from('documents')
+        .createSignedUrl(document.file_path, 3600); // 1 hour expiry
+
+      if (error) throw error;
+
+      // Open in new tab based on file type
+      if (document.mime_type.includes('pdf')) {
+        window.open(data.signedUrl, '_blank');
+      } else if (document.mime_type.startsWith('image/')) {
+        window.open(data.signedUrl, '_blank');
+      } else if (document.mime_type.includes('text/') || 
+                 document.mime_type.includes('json') ||
+                 document.mime_type.includes('xml')) {
+        window.open(data.signedUrl, '_blank');
+      } else {
+        // For other file types, show info and offer download
+        toast({
+          title: "Preview not available",
+          description: "This file type can't be previewed. Use download instead.",
+          variant: "default",
+        });
+        handleDownload();
+        return;
+      }
+
+      toast({
+        title: "Opening document",
+        description: "Document opened in new tab",
+      });
+    } catch (error) {
+      console.error('View error:', error);
+      toast({
+        title: "Error",
+        description: "Failed to open document for viewing",
+        variant: "destructive",
+      });
+    } finally {
+      setViewing(false);
+    }
   };
 
   const handleDownload = async () => {
@@ -197,6 +244,10 @@ export const DocumentCard = ({ document, onEdit, onDelete, viewMode }: DocumentC
                       </Button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end">
+                      <DropdownMenuItem onClick={handleView} disabled={viewing}>
+                        <Eye className="w-4 h-4 mr-2" />
+                        View
+                      </DropdownMenuItem>
                       <DropdownMenuItem onClick={handleDownload} disabled={downloading}>
                         <Download className="w-4 h-4 mr-2" />
                         Download
@@ -253,6 +304,10 @@ export const DocumentCard = ({ document, onEdit, onDelete, viewMode }: DocumentC
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end">
+                <DropdownMenuItem onClick={handleView} disabled={viewing}>
+                  <Eye className="w-4 h-4 mr-2" />
+                  View
+                </DropdownMenuItem>
                 <DropdownMenuItem onClick={handleDownload} disabled={downloading}>
                   <Download className="w-4 h-4 mr-2" />
                   Download
