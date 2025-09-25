@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { Mail, Twitter, Github, Linkedin } from "lucide-react";
-import ingresLogo from "@/assets/ingres-ai-logo.png";
+import ingresLogo from "@/assets/ingres-ai-logo-new.png";
 
 const Footer = () => {
   return (

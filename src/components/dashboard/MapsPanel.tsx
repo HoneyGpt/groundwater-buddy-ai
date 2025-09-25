@@ -5,7 +5,7 @@ import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
 import { MapPin, Search, Download, Filter, ZoomIn, ZoomOut, Home, Layers, Info } from 'lucide-react';
-import ingresLogo from '@/assets/ingres-ai-logo.png';
+import ingresLogo from '@/assets/ingres-ai-logo-new.png';
 import indiaMap from '@/assets/india-groundwater-map.jpg';
 
 export const MapsPanel = () => {
