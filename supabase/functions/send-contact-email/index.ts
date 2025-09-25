@@ -39,7 +39,7 @@ const handler = async (req: Request): Promise<Response> => {
 
     // Send email to the team
     const emailResponse = await resend.emails.send({
-      from: "INGRES-AI Contact <onboarding@resend.dev>",
+      from: "INGRES-AI Contact <contact@ingres-ai.com>",
       to: ["harshitabhaskaruni@gmail.com"],
       subject: `New Contact Form Message from ${name}`,
       html: `
@@ -69,7 +69,7 @@ const handler = async (req: Request): Promise<Response> => {
 
     // Send confirmation email to user
     const confirmationResponse = await resend.emails.send({
-      from: "INGRES-AI Team <onboarding@resend.dev>",
+      from: "INGRES-AI Team <noreply@ingres-ai.com>",
       to: [email],
       subject: "Thank you for contacting INGRES-AI",
       html: `
