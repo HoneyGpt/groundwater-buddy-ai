@@ -38,6 +38,7 @@ const sidebarItems = [
   { id: 'maps', label: 'Interactive Maps', icon: Map },
   { id: 'schemes', label: 'Schemes', icon: Gift },
   { id: 'helpline', label: 'Helpline', icon: Phone },
+  { id: 'settings', label: 'Settings', icon: Settings },
 ];
 
 export const DashboardSidebar = ({ 
