@@ -77,7 +77,7 @@ const Footer = () => {
               @2025 INGRES - AI. All rights reserved. Made by Auron Hive Tech ❤️ for India Development
             </p>
             <div className="flex space-x-4 mt-4 sm:mt-0 text-sm text-muted-foreground">
-              <a href="#" className="hover:text-accent transition-colors">Privacy Policy</a>
+              <a href="/privacy" className="hover:text-accent transition-colors">Privacy Policy</a>
               <a href="#" className="hover:text-accent transition-colors">Terms of Service</a>
             </div>
           </div>
