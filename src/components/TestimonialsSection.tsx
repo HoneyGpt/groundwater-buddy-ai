@@ -3,13 +3,6 @@ import { Star } from "lucide-react";
 const TestimonialsSection = () => {
   const testimonials = [
     {
-      name: "Maria Santos",
-      role: "Small-scale Farmer, Brazil",
-      content: "INGRES-AI helps me understand water quality in my fields. The local language support makes it so much easier to get the information I need for better crop management.",
-      avatar: "👩‍🌾",
-      rating: 4.5,
-    },
-    {
       name: "Mr. Gopal", 
       role: "Wise Sarpanch",
       content: "As a farmer and sarpanch I can't believe that this type of technology exists, it's really a good work, the Telugu translation in chat helped a lot.",
@@ -28,7 +21,7 @@ const TestimonialsSection = () => {
       role: "Senior & Sophomore, Birla Institute",
       content: "The website is very good, the UI and translation better than I expected. As a full stack developer I believe that this project helps India a lot.",
       avatar: "👨‍💻",
-      rating: 5,
+      rating: 4.5,
     },
   ];
 
