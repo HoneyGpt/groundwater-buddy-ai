@@ -36,14 +36,14 @@ const Contact = () => {
       linkedin: "https://www.linkedin.com/in/kishlayamishra"
     },
     { 
-      name: "Harshita Bhaskaruni", 
-      role: "General Inquiries", 
-      email: "harshitabhaskaruni@gmail.com",
-      linkedin: "https://in.linkedin.com/in/harshitabhaskaruni1117"
+      name: "Tushar Chaurasia", 
+      role: "Lead Developer", 
+      email: "tusharchaurasia14@gmail.com",
+      linkedin: "https://www.linkedin.com/in/tushar-chaurasia-441088309/"
     },
     { 
       name: "Saurav Sharma", 
-      role: "Lead Developer & Project Coordinator", 
+      role: "General Enquiries", 
       email: "isauravsharmaokay4359@gmail.com",
       linkedin: "https://www.linkedin.com/in/saurav-sharma-1b7321247?utm_source=share&utm_campaign=share_via&utm_content=profile&utm_medium=android_app"
     },
