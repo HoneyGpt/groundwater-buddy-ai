@@ -1,19 +1,16 @@
 import { Button } from "@/components/ui/button";
 import { Menu, X } from "lucide-react";
 import { useState } from "react";
-import { useTranslation } from "react-i18next";
 import ingresLogo from "@/assets/ingres-ai-logo-new.png";
-import LanguageSelector from "./LanguageSelector";
 
 const Header = () => {
-  const { t } = useTranslation();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   const navigation = [
-    { name: t("nav.home"), href: "/" },
-    { name: t("nav.features"), href: "/#features" },
-    { name: t("nav.about"), href: "/about" },
-    { name: t("nav.contact"), href: "/contact" },
+    { name: "Home", href: "/" },
+    { name: "Features", href: "/#features" },
+    { name: "About", href: "/about" },
+    { name: "Contact", href: "/contact" },
   ];
 
   return (
@@ -34,7 +31,7 @@ const Header = () => {
           </div>
 
           {/* Desktop Navigation */}
-          <nav className="hidden md:flex items-center space-x-8">
+          <nav className="hidden md:flex items-center space-x-12">
             {navigation.map((item) => (
               <a
                 key={item.name}
@@ -44,12 +41,11 @@ const Header = () => {
                 {item.name}
               </a>
             ))}
-            <LanguageSelector />
             <Button 
               className="bg-accent hover:bg-accent/90 text-white px-8 py-3 text-lg font-semibold"
               onClick={() => window.location.href = '/mediator'}
             >
-              {t("nav.askNow")}
+              Ask Now
             </Button>
           </nav>
 
