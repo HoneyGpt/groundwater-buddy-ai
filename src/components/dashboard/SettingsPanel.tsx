@@ -117,43 +117,43 @@ export const SettingsPanel = ({ profile, onProfileUpdate }: SettingsPanelProps) 
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="space-y-3">
-              <div className="flex items-center justify-between p-3 bg-accent/5 rounded-lg">
+              <div className="flex flex-col space-y-2 p-3 bg-accent/5 rounded-lg">
                 <div>
-                  <p className="font-medium">General Support</p>
-                  <p className="text-sm text-muted-foreground">For general inquiries and support</p>
+                  <p className="font-medium">Team Support</p>
+                  <p className="text-sm text-muted-foreground">Contact our development team for support</p>
                 </div>
-                <a 
-                  href="mailto:support@ingres-ai.com" 
-                  className="text-primary hover:text-primary/80 font-medium text-sm"
-                >
-                  support@ingres-ai.com
-                </a>
-              </div>
-              
-              <div className="flex items-center justify-between p-3 bg-accent/5 rounded-lg">
-                <div>
-                  <p className="font-medium">Technical Support</p>
-                  <p className="text-sm text-muted-foreground">For technical issues and bugs</p>
+                <div className="space-y-1">
+                  <a 
+                    href="mailto:harshitabhaskaruni@gmail.com" 
+                    className="text-primary hover:text-primary/80 font-medium text-xs block"
+                  >
+                    harshitabhaskaruni@gmail.com
+                  </a>
+                  <a 
+                    href="mailto:tinkuganesh15@gmail.com" 
+                    className="text-primary hover:text-primary/80 font-medium text-xs block"
+                  >
+                    tinkuganesh15@gmail.com
+                  </a>
+                  <a 
+                    href="mailto:anchaljaiswal.1001@gmail.com" 
+                    className="text-primary hover:text-primary/80 font-medium text-xs block"
+                  >
+                    anchaljaiswal.1001@gmail.com
+                  </a>
+                  <a 
+                    href="mailto:kishlayamishra@gmail.com" 
+                    className="text-primary hover:text-primary/80 font-medium text-xs block"
+                  >
+                    kishlayamishra@gmail.com
+                  </a>
+                  <a 
+                    href="mailto:isauravsharmaokay4359@gmail.com" 
+                    className="text-primary hover:text-primary/80 font-medium text-xs block"
+                  >
+                    isauravsharmaokay4359@gmail.com
+                  </a>
                 </div>
-                <a 
-                  href="mailto:tech@ingres-ai.com" 
-                  className="text-primary hover:text-primary/80 font-medium text-sm"
-                >
-                  tech@ingres-ai.com
-                </a>
-              </div>
-              
-              <div className="flex items-center justify-between p-3 bg-accent/5 rounded-lg">
-                <div>
-                  <p className="font-medium">Research Partnerships</p>
-                  <p className="text-sm text-muted-foreground">For academic collaborations</p>
-                </div>
-                <a 
-                  href="mailto:research@ingres-ai.com" 
-                  className="text-primary hover:text-primary/80 font-medium text-sm"
-                >
-                  research@ingres-ai.com
-                </a>
               </div>
             </div>
 
@@ -164,7 +164,7 @@ export const SettingsPanel = ({ profile, onProfileUpdate }: SettingsPanelProps) 
                 Need immediate assistance? Our team typically responds within 24 hours.
               </p>
               <Button variant="outline" className="w-full" asChild>
-                <a href="mailto:support@ingres-ai.com?subject=INGRES-AI Support Request">
+                <a href="mailto:harshitabhaskaruni@gmail.com?subject=INGRES-AI Support Request">
                   <Mail className="w-4 h-4 mr-2" />
                   Send Support Email
                 </a>
@@ -198,6 +198,47 @@ export const SettingsPanel = ({ profile, onProfileUpdate }: SettingsPanelProps) 
                 <p className="text-sm text-muted-foreground">
                   Logging out will clear your session and you'll need to set up your profile again.
                 </p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Appreciation & Support */}
+        <Card className="md:col-span-2">
+          <CardHeader>
+            <CardTitle className="flex items-center space-x-2">
+              <span>❤️</span>
+              <span>Appreciation & Support</span>
+            </CardTitle>
+            <CardDescription>
+              Show appreciation and support to our app development
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="flex items-center justify-between p-4 bg-gradient-to-r from-primary/5 to-accent/5 rounded-lg border border-primary/10">
+              <div className="flex-1">
+                <p className="font-medium text-primary">Saurav Sharma</p>
+                <p className="text-sm text-muted-foreground mb-2">Lead Developer & Project Coordinator</p>
+                <p className="text-xs text-muted-foreground">Connect with our lead developer for appreciation and support</p>
+              </div>
+              <div className="flex flex-col space-y-2">
+                <Button variant="outline" size="sm" asChild>
+                  <a href="mailto:isauravsharmaokay4359@gmail.com" className="flex items-center">
+                    <Mail className="w-3 h-3 mr-1" />
+                    Email
+                  </a>
+                </Button>
+                <Button variant="outline" size="sm" asChild>
+                  <a 
+                    href="https://www.linkedin.com/in/saurav-sharma-1b7321247?utm_source=share&utm_campaign=share_via&utm_content=profile&utm_medium=android_app" 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    className="flex items-center"
+                  >
+                    <span className="w-3 h-3 mr-1">💼</span>
+                    LinkedIn
+                  </a>
+                </Button>
               </div>
             </div>
           </CardContent>
