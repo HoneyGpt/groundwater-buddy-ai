@@ -17,21 +17,16 @@ export const SettingsPanel = ({ profile, onProfileUpdate }: SettingsPanelProps) 
   const navigate = useNavigate();
   const { toast } = useToast();
   const [isEditing, setIsEditing] = useState(false);
-  const [editedProfile, setEditedProfile] = useState({
-    name: profile?.name || '',
-    location: profile?.location || '',
-    occupation: profile?.occupation || '',
-    language: profile?.language || ''
-  });
+  const [editedName, setEditedName] = useState(profile?.name || '');
 
   const handleSave = () => {
-    const updatedProfile = { ...profile, ...editedProfile };
+    const updatedProfile = { ...profile, name: editedName };
     localStorage.setItem('ingres_public_profile', JSON.stringify(updatedProfile));
     onProfileUpdate(updatedProfile);
     setIsEditing(false);
     toast({
       title: "Profile Updated",
-      description: "Your profile has been successfully updated.",
+      description: "Your name has been successfully updated.",
     });
   };
 
@@ -52,7 +47,7 @@ export const SettingsPanel = ({ profile, onProfileUpdate }: SettingsPanelProps) 
           Settings
         </h1>
         <p className="text-muted-foreground mt-2">
-          Manage your account settings and preferences
+          Manage your profile and preferences
         </p>
       </div>
 
@@ -62,57 +57,22 @@ export const SettingsPanel = ({ profile, onProfileUpdate }: SettingsPanelProps) 
           <CardHeader>
             <CardTitle className="flex items-center space-x-2">
               <User className="w-5 h-5" />
-              <span>Profile Information</span>
+              <span>Profile</span>
             </CardTitle>
             <CardDescription>
-              Update your personal information and preferences
+              Update your name and preferences
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
-            <div className="space-y-4">
-              <div>
-                <Label htmlFor="name">Name</Label>
-                <Input
-                  id="name"
-                  value={editedProfile.name}
-                  onChange={(e) => setEditedProfile({ ...editedProfile, name: e.target.value })}
-                  disabled={!isEditing}
-                  className={isEditing ? "border-primary/50" : ""}
-                />
-              </div>
-              
-              <div>
-                <Label htmlFor="location">Location</Label>
-                <Input
-                  id="location"
-                  value={editedProfile.location}
-                  onChange={(e) => setEditedProfile({ ...editedProfile, location: e.target.value })}
-                  disabled={!isEditing}
-                  className={isEditing ? "border-primary/50" : ""}
-                />
-              </div>
-              
-              <div>
-                <Label htmlFor="occupation">Occupation</Label>
-                <Input
-                  id="occupation"
-                  value={editedProfile.occupation}
-                  onChange={(e) => setEditedProfile({ ...editedProfile, occupation: e.target.value })}
-                  disabled={!isEditing}
-                  className={isEditing ? "border-primary/50" : ""}
-                />
-              </div>
-              
-              <div>
-                <Label htmlFor="language">Preferred Language</Label>
-                <Input
-                  id="language"
-                  value={editedProfile.language}
-                  onChange={(e) => setEditedProfile({ ...editedProfile, language: e.target.value })}
-                  disabled={!isEditing}
-                  className={isEditing ? "border-primary/50" : ""}
-                />
-              </div>
+            <div>
+              <Label htmlFor="name">Name</Label>
+              <Input
+                id="name"
+                value={editedName}
+                onChange={(e) => setEditedName(e.target.value)}
+                disabled={!isEditing}
+                className={isEditing ? "border-primary/50" : ""}
+              />
             </div>
 
             <Separator />
@@ -121,7 +81,7 @@ export const SettingsPanel = ({ profile, onProfileUpdate }: SettingsPanelProps) 
               {!isEditing ? (
                 <Button onClick={() => setIsEditing(true)} className="flex-1">
                   <Edit3 className="w-4 h-4 mr-2" />
-                  Edit Profile
+                  Edit Name
                 </Button>
               ) : (
                 <>
@@ -133,12 +93,7 @@ export const SettingsPanel = ({ profile, onProfileUpdate }: SettingsPanelProps) 
                     variant="outline" 
                     onClick={() => {
                       setIsEditing(false);
-                      setEditedProfile({
-                        name: profile?.name || '',
-                        location: profile?.location || '',
-                        occupation: profile?.occupation || '',
-                        language: profile?.language || ''
-                      });
+                      setEditedName(profile?.name || '');
                     }}
                   >
                     Cancel
@@ -226,7 +181,7 @@ export const SettingsPanel = ({ profile, onProfileUpdate }: SettingsPanelProps) 
               <span>Account Actions</span>
             </CardTitle>
             <CardDescription>
-              Manage your account and session
+              Manage your session
             </CardDescription>
           </CardHeader>
           <CardContent>
