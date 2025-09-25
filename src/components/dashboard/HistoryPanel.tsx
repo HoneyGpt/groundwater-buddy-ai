@@ -13,6 +13,7 @@ interface SavedChat {
   name: string;
   createdAt: string;
   messages: any[];
+  type?: 'ingres' | 'budget';
 }
 
 interface HistoryPanelProps {
@@ -77,7 +78,7 @@ export const HistoryPanel = ({ onLoadChat, onSectionChange }: HistoryPanelProps)
     setEditName('');
   };
 
-  const filteredChats = savedChats.filter(chat =>
+const filteredChats = savedChats.filter(chat =>
     chat.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
     chat.messages.some(msg => {
       const messageText = msg.text || msg.content || '';
@@ -116,9 +117,9 @@ export const HistoryPanel = ({ onLoadChat, onSectionChange }: HistoryPanelProps)
   return (
     <div className="p-6 space-y-6">
       <div className="space-y-2">
-        <h1 className="text-2xl font-bold text-primary">Chat History</h1>
+<h1 className="text-2xl font-bold text-primary">Chat History</h1>
         <p className="text-muted-foreground">
-          Your saved conversations with INGRES-AI
+          Your saved conversations with INGRES-AI and Budget Bro
         </p>
       </div>
 
@@ -203,7 +204,7 @@ export const HistoryPanel = ({ onLoadChat, onSectionChange }: HistoryPanelProps)
                   }
                 </p>
               </div>
-              {!searchTerm && (
+{!searchTerm && (
                 <Button onClick={() => onSectionChange('chat')}>
                   Start Chatting
                 </Button>
@@ -218,9 +219,9 @@ export const HistoryPanel = ({ onLoadChat, onSectionChange }: HistoryPanelProps)
                     className="p-4 bg-muted/30 rounded-lg border border-border hover:bg-muted/50 transition-colors"
                   >
                     <div className="flex items-start justify-between gap-3">
-                      <div className="flex-1 min-w-0 cursor-pointer" onClick={() => {
+<div className="flex-1 min-w-0 cursor-pointer" onClick={() => {
                         onLoadChat(chat);
-                        onSectionChange('chat');
+                        onSectionChange(chat.type === 'budget' ? 'budget' : 'chat');
                       }}>
                         <div className="flex items-center gap-2 mb-2">
                           {editingId === chat.id ? (
@@ -241,8 +242,8 @@ export const HistoryPanel = ({ onLoadChat, onSectionChange }: HistoryPanelProps)
                           ) : (
                             <>
                               <h3 className="font-medium truncate">{chat.name}</h3>
-                              <Badge variant="secondary" className="text-xs">
-                                {getMessageCount(chat.messages)} msgs
+<Badge variant="secondary" className="text-xs">
+                                {getMessageCount(chat.messages)} msgs • {chat.type === 'budget' ? 'Budget' : 'Chat'}
                               </Badge>
                             </>
                           )}

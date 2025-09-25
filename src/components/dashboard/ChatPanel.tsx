@@ -18,6 +18,7 @@ interface Message {
 
 interface ChatPanelProps {
   profile?: any;
+  initialChat?: any | null;
 }
 
 const quickQueries = [
@@ -41,15 +42,62 @@ export const ChatPanel = ({ profile }: ChatPanelProps) => {
   ]);
   const [inputValue, setInputValue] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const [isListening, setIsListening] = useState(false);
+const [isListening, setIsListening] = useState(false);
+  const [activeChatId, setActiveChatId] = useState<string | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   };
 
-  useEffect(() => {
+useEffect(() => {
     scrollToBottom();
+  }, [messages]);
+
+  // Load initial chat if provided
+  useEffect(() => {
+    if (initialChat?.messages?.length) {
+      const loaded = initialChat.messages.map((m: any, idx: number) => ({
+        id: m.id || String(idx + 1),
+        text: m.text || m.content || '',
+        isUser: m.isUser ?? (m.role === 'user'),
+        timestamp: m.timestamp ? new Date(m.timestamp) : new Date(),
+      }));
+      setMessages(loaded);
+      setActiveChatId(initialChat.id || null);
+    }
+  }, [initialChat]);
+
+  // Auto-save like ChatGPT after any message change
+  useEffect(() => {
+    const userMsgs = messages.filter(m => m.isUser);
+    if (userMsgs.length === 0) return; // don't save welcome-only
+
+    const chats = ChatStorage.get();
+    const nameSource = userMsgs[0]?.text || 'New Chat';
+    const chatName = `${nameSource.slice(0, 30)}${nameSource.length > 30 ? '…' : ''}`;
+
+    const chatPayload = {
+      id: activeChatId || String(Date.now()),
+      name: chatName,
+      createdAt: new Date().toISOString(),
+      type: 'ingres' as const,
+      messages: messages.filter(m => m.id !== 'typing').map(m => ({
+        id: m.id,
+        text: m.text,
+        isUser: m.isUser,
+        timestamp: m.timestamp instanceof Date ? m.timestamp.toISOString() : (m.timestamp || new Date().toISOString()),
+      })),
+    };
+
+    const idx = chats.findIndex((c: any) => c.id === chatPayload.id);
+    if (idx >= 0) {
+      chats[idx] = chatPayload;
+      ChatStorage.update(chats);
+    } else {
+      ChatStorage.add(chatPayload);
+      setActiveChatId(chatPayload.id);
+    }
   }, [messages]);
 
   const handleSendMessage = async (text?: string, useEnhanced = true) => {
@@ -82,7 +130,7 @@ export const ChatPanel = ({ profile }: ChatPanelProps) => {
       // Include conversation history for context
       const conversationHistory = messages.filter(m => m.id !== 'typing').slice(-10);
       
-      const { data, error } = await supabase.functions.invoke('enhanced-ai-chat', {
+const { data, error } = await supabase.functions.invoke('enhanced-ai-chat', {
         body: {
           message: messageText,
           userProfile: profile,
@@ -147,15 +195,25 @@ export const ChatPanel = ({ profile }: ChatPanelProps) => {
     }
   };
 
-  const handleSaveChat = () => {
+const handleSaveChat = () => {
+    const userFirst = messages.find(m => m.isUser)?.text || 'New Chat';
     const chatData = {
-      id: Date.now().toString(),
-      name: messages.find(m => m.isUser)?.text.slice(0, 30) + '...' || 'New Chat',
+      id: activeChatId || Date.now().toString(),
+      name: `${userFirst.slice(0, 30)}${userFirst.length > 30 ? '…' : ''}`,
+      type: 'ingres' as const,
       createdAt: new Date().toISOString(),
       messages: messages.filter(m => m.id !== 'typing')
     };
 
-    ChatStorage.add(chatData);
+    const chats = ChatStorage.get();
+    const idx = chats.findIndex((c: any) => c.id === chatData.id);
+    if (idx >= 0) {
+      chats[idx] = chatData;
+      ChatStorage.update(chats);
+    } else {
+      ChatStorage.add(chatData);
+      setActiveChatId(chatData.id);
+    }
 
     const context = getCurrentContext();
     toast({

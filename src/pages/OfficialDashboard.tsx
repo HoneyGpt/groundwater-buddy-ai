@@ -29,7 +29,7 @@ const OfficialDashboard = () => {
   const [activeSection, setActiveSection] = useState('overview');
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [chatMessages, setChatMessages] = useState<any[]>([]);
+const [selectedChat, setSelectedChat] = useState<any | null>(null);
 
   // Check authentication and load user data
   useEffect(() => {
@@ -92,8 +92,8 @@ const OfficialDashboard = () => {
     setMobileMenuOpen(false);
   };
 
-  const handleLoadChat = (chat: any) => {
-    setChatMessages(chat.messages);
+const handleLoadChat = (chat: any) => {
+    setSelectedChat(chat);
   };
 
   const getUserInitials = () => {
@@ -126,8 +126,8 @@ const OfficialDashboard = () => {
     const profile = getUserProfile();
     
     switch (activeSection) {
-      case 'chat':
-        return <ChatPanel profile={profile} />;
+case 'chat':
+        return <ChatPanel profile={profile} initialChat={selectedChat} />;
       case 'history':
         return <HistoryPanel onLoadChat={handleLoadChat} onSectionChange={handleSectionChange} />;
       case 'documents':
@@ -139,7 +139,7 @@ const OfficialDashboard = () => {
       case 'widgets':
         return <SmartWidgetsPanel />;
       case 'budget':
-        return <BudgetBroPanel profile={profile} />;
+        return <BudgetBroPanel profile={profile} initialChat={selectedChat} />;
       case 'maps':
         return <MapsPanel />;
       case 'calendar':

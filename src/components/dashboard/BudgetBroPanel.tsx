@@ -20,6 +20,7 @@ interface BudgetMessage {
 
 interface BudgetBroPanelProps {
   profile?: any;
+  initialChat?: any | null;
 }
 
 // Quick Budget Queries for different scenarios
@@ -34,8 +35,9 @@ const BudgetBroPanel = ({ profile }: BudgetBroPanelProps) => {
   const [messages, setMessages] = useState<BudgetMessage[]>([]);
   const [inputValue, setInputValue] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const [isListening, setIsListening] = useState(false);
+const [isListening, setIsListening] = useState(false);
   const [conversationHistory, setConversationHistory] = useState<Array<{role: string, content: string}>>([]);
+  const [activeChatId, setActiveChatId] = useState<string | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const { toast } = useToast();
 
@@ -47,7 +49,7 @@ const BudgetBroPanel = ({ profile }: BudgetBroPanelProps) => {
     scrollToBottom();
   }, [messages]);
 
-  // Add welcome message on first load
+// Add welcome message on first load unless loading an existing chat
   useEffect(() => {
     if (messages.length === 0) {
       const welcomeMessage: BudgetMessage = {
@@ -63,6 +65,52 @@ Try: "I have kidney stones, my budget is ₹800" or "Need drip irrigation for 1 
       setMessages([welcomeMessage]);
     }
   }, []);
+
+  // Load a saved chat if provided
+  useEffect(() => {
+    if (messages.length === 0 && initialChat?.messages?.length) {
+      const loaded: BudgetMessage[] = initialChat.messages.map((m: any, idx: number) => ({
+        id: m.id || String(idx + 1),
+        text: m.text || m.content || '',
+        isUser: m.isUser ?? (m.role === 'user'),
+        timestamp: m.timestamp ? new Date(m.timestamp) : new Date(),
+      }));
+      setMessages(loaded);
+      setActiveChatId(initialChat.id || null);
+    }
+  }, [initialChat]);
+
+  // Auto-save conversation like ChatGPT
+  useEffect(() => {
+    const userMsgCount = messages.filter(m => m.isUser).length;
+    if (userMsgCount === 0) return; // don't save empty chats
+
+    const chats = ChatStorage.get();
+    const nameSource = messages.find(m => m.isUser)?.text || 'Budget Chat';
+    const chatName = `Budget: ${nameSource.slice(0, 30)}${nameSource.length > 30 ? '…' : ''}`;
+
+    const chatPayload = {
+      id: activeChatId || String(Date.now()),
+      name: chatName,
+      createdAt: new Date().toISOString(),
+      type: 'budget' as const,
+      messages: messages.map(m => ({
+        id: m.id,
+        text: m.text,
+        isUser: m.isUser,
+        timestamp: m.timestamp instanceof Date ? m.timestamp.toISOString() : (m.timestamp || new Date().toISOString()),
+      })),
+    };
+
+    const existingIndex = chats.findIndex((c: any) => c.id === chatPayload.id);
+    if (existingIndex >= 0) {
+      chats[existingIndex] = chatPayload;
+      ChatStorage.update(chats);
+    } else {
+      ChatStorage.add(chatPayload);
+      setActiveChatId(chatPayload.id);
+    }
+  }, [messages]);
 
   const getBudgetResponse = async (message: string): Promise<{ text: string; formatted: boolean }> => {
     try {
@@ -186,23 +234,32 @@ Please try asking again in a moment, or be more specific about what you need hel
     setInputValue(query);
   };
 
-  const handleSaveChat = () => {
+const handleSaveChat = () => {
     if (messages.length <= 1) return;
-    
+    const nameSource = messages.find(m => m.isUser)?.text || 'Budget Chat';
     const chatData = {
-      id: Date.now().toString(),
-      name: `Budget Chat - ${new Date().toLocaleDateString()}`,
+      id: activeChatId || Date.now().toString(),
+      name: `Budget: ${nameSource.slice(0, 30)}${nameSource.length > 30 ? '…' : ''}`,
+      type: 'budget' as const,
       messages: messages.map(msg => ({
-        content: msg.text,
+        text: msg.text,
         isUser: msg.isUser,
-        timestamp: msg.timestamp.toISOString()
+        timestamp: (msg.timestamp instanceof Date ? msg.timestamp : new Date()).toISOString()
       })),
       createdAt: new Date().toISOString(),
     };
-    
-    // Use unified chat storage system
-    ChatStorage.add(chatData);
-    
+
+    // Upsert into storage
+    const chats = ChatStorage.get();
+    const idx = chats.findIndex((c: any) => c.id === chatData.id);
+    if (idx >= 0) {
+      chats[idx] = chatData;
+      ChatStorage.update(chats);
+    } else {
+      ChatStorage.add(chatData);
+      setActiveChatId(chatData.id);
+    }
+
     toast({
       title: "Chat Saved! 💾",
       description: "Your budget conversation has been saved to history.",

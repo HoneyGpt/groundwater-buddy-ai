@@ -21,7 +21,7 @@ const PublicDashboard = () => {
   const [activeSection, setActiveSection] = useState('overview');
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [chatMessages, setChatMessages] = useState<any[]>([]);
+const [selectedChat, setSelectedChat] = useState<any | null>(null);
   
   // Water points gamification
   const [waterPoints, setWaterPoints] = useState(() => {
@@ -58,8 +58,8 @@ const PublicDashboard = () => {
     }
   };
 
-  const handleLoadChat = (chat: any) => {
-    setChatMessages(chat.messages);
+const handleLoadChat = (chat: any) => {
+    setSelectedChat(chat);
   };
 
   const getUserInitials = () => {
@@ -78,14 +78,14 @@ const PublicDashboard = () => {
 
   const renderMainContent = () => {
     switch (activeSection) {
-      case 'chat':
-        return <ChatPanel profile={profile} />;
+case 'chat':
+        return <ChatPanel profile={profile} initialChat={selectedChat} />;
       case 'history':
         return <HistoryPanel onLoadChat={handleLoadChat} onSectionChange={handleSectionChange} />;
       case 'documents':
         return <DocumentSaverPanel />;
       case 'budget':
-        return <BudgetBroPanel profile={profile} />;
+        return <BudgetBroPanel profile={profile} initialChat={selectedChat} />;
       case 'maps':
         return <MapsPanel />;
       case 'calendar':
@@ -178,7 +178,7 @@ const PublicDashboard = () => {
                 </Button>
                 
                 {/* Profile */}
-                <div className="flex items-center space-x-3">
+<div className="flex items-center space-x-3">
                   <Avatar className="h-9 w-9 ring-2 ring-primary/20">
                     <AvatarFallback className="bg-gradient-to-br from-primary/20 to-accent/20 text-primary font-semibold">
                       {getUserInitials()}
