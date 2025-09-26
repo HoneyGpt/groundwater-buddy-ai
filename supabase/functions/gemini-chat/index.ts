@@ -36,12 +36,10 @@ serve(async (req) => {
       throw new Error('Message is required');
     }
 
-    const OPENROUTER_API_KEY = Deno.env.get('OPENROUTER_API_KEY');
-    const OPENAI_API_KEY = Deno.env.get('OPENAI_API_KEY');
-    
-    if (!OPENROUTER_API_KEY && !OPENAI_API_KEY) {
-      console.error('Neither OPENROUTER_API_KEY nor OPENAI_API_KEY is configured');
-      throw new Error('API key environment variable is not set');
+    const GEMINI_API_KEY = Deno.env.get('GEMINI_API_KEY');
+    if (!GEMINI_API_KEY) {
+      console.error('GEMINI_API_KEY is not configured');
+      throw new Error('GEMINI_API_KEY environment variable is not set');
     }
 
     // Create system prompt based on chat type and context
@@ -148,63 +146,62 @@ Be helpful, informative, and focused on practical water management solutions for
       systemPrompt += `\n\nRecent conversation context:\n${historyText}\n\nNow respond to the current message:`;
     }
 
-    console.log('Sending request to OpenAI API...');
+    console.log('Sending request to Gemini API...');
 
     let generatedText = '';
 
-    // Try OpenRouter first, then fallback to OpenAI
     try {
-      let response;
-      
-      if (OPENROUTER_API_KEY) {
-        console.log('Trying OpenRouter API...');
-        response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
-          method: 'POST',
-          headers: {
-            'Authorization': `Bearer ${OPENROUTER_API_KEY}`,
-            'Content-Type': 'application/json',
-            'HTTP-Referer': `https://mafmxoozubqjoydhipbe.supabase.co`,
-            'X-Title': 'INGRES-AI Chat'
-          },
-          body: JSON.stringify({
-            model: 'meta-llama/llama-3.1-8b-instruct:free',
-            messages: [
-              { role: 'system', content: systemPrompt },
-              { role: 'user', content: message }
-            ],
-            max_tokens: 1024,
+      const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=${GEMINI_API_KEY}`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          contents: [
+            {
+              parts: [
+                {
+                  text: `${systemPrompt}\n\nUser message: ${message}`
+                }
+              ]
+            }
+          ],
+          generationConfig: {
             temperature: 0.7,
-          }),
-        });
-      } else if (OPENAI_API_KEY) {
-        console.log('Trying OpenAI API...');
-        response = await fetch('https://api.openai.com/v1/chat/completions', {
-          method: 'POST',
-          headers: {
-            'Authorization': `Bearer ${OPENAI_API_KEY}`,
-            'Content-Type': 'application/json',
+            topK: 40,
+            topP: 0.95,
+            maxOutputTokens: 1024,
           },
-          body: JSON.stringify({
-            model: 'gpt-4o-mini',
-            messages: [
-              { role: 'system', content: systemPrompt },
-              { role: 'user', content: message }
-            ],
-            max_tokens: 1024,
-            temperature: 0.7,
-          }),
-        });
-      }
+          safetySettings: [
+            {
+              category: "HARM_CATEGORY_HARASSMENT",
+              threshold: "BLOCK_MEDIUM_AND_ABOVE"
+            },
+            {
+              category: "HARM_CATEGORY_HATE_SPEECH", 
+              threshold: "BLOCK_MEDIUM_AND_ABOVE"
+            },
+            {
+              category: "HARM_CATEGORY_SEXUALLY_EXPLICIT",
+              threshold: "BLOCK_MEDIUM_AND_ABOVE"
+            },
+            {
+              category: "HARM_CATEGORY_DANGEROUS_CONTENT",
+              threshold: "BLOCK_MEDIUM_AND_ABOVE"
+            }
+          ]
+        }),
+      });
 
-      if (response && response.ok) {
+      if (response.ok) {
         const data = await response.json();
-        console.log('Received response from API');
-        generatedText = data.choices?.[0]?.message?.content;
+        console.log('Received response from Gemini API');
+        generatedText = data.candidates?.[0]?.content?.parts?.[0]?.text;
       } else {
-        throw new Error(`API failed with status: ${response?.status || 'unknown'}`);
+        throw new Error(`Gemini API failed with status: ${response.status}`);
       }
-    } catch (openaiError) {
-      console.log('OpenAI failed, trying Pollinations fallback...');
+    } catch (geminiError) {
+      console.log('Gemini failed, trying Pollinations fallback...');
       
       // Fallback to Pollinations Text API
       try {
