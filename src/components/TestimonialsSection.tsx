@@ -3,8 +3,8 @@ import { Star } from "lucide-react";
 const TestimonialsSection = () => {
   const testimonials = [
     {
-      name: "Mr. Gopal", 
-      role: "Ex Sarpanch of a Village",
+      name: "Mr.HaraGopal", 
+      role: "Ex Sarpanch of a Dornala - Andhra Pradesh",
       content: "As a farmer and sarpanch I can't believe that this type of technology exists, it's really a good work, the Telugu translation in chat helped a lot.",
       avatar: "👨‍🌾",
       rating: 5,
