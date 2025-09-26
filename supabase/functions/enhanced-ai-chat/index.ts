@@ -6,11 +6,11 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
-async function callGeminiAPI(question: string, conversationHistory: string = "") {
-  const apiKey = Deno.env.get('GEMINI_API_KEY');
+async function callOpenAIAPI(question: string, conversationHistory: string = "") {
+  const apiKey = Deno.env.get('OPENAI_API_KEY');
   if (!apiKey) {
-    console.error('GEMINI_API_KEY is not configured');
-    throw new Error('GEMINI_API_KEY environment variable is not set');
+    console.error('OPENAI_API_KEY is not configured');
+    throw new Error('OPENAI_API_KEY environment variable is not set');
   }
 
   const systemPrompt = `You are INGRES-AI, a specialized assistant for groundwater management in India. 
@@ -51,36 +51,32 @@ ${conversationHistory ? `\nCONVERSATION CONTEXT:\n${conversationHistory}\n` : ""
 Question: ${question}`;
 
   try {
-    const response = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=${apiKey}`,
-      {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          contents: [{
-            parts: [{ text: `${systemPrompt}\n\nUser Question: ${question}${conversationHistory ? `\n\nConversation Context: ${conversationHistory}` : ''}` }]
-          }],
-          generationConfig: {
-            temperature: 0.7,
-            topK: 40,
-            topP: 0.95,
-            maxOutputTokens: 1500,
-          }
-        }),
-      }
-    );
+    const response = await fetch('https://api.openai.com/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${apiKey}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        model: 'gpt-4o-mini',
+        messages: [
+          { role: 'system', content: systemPrompt },
+          { role: 'user', content: question + (conversationHistory ? `\n\nConversation Context: ${conversationHistory}` : '') }
+        ],
+        max_tokens: 1500,
+        temperature: 0.7,
+      }),
+    });
 
     if (response.ok) {
       const data = await response.json();
-      console.log('Gemini API response received:', { hasContent: !!data?.candidates?.[0]?.content });
-      return data.candidates[0]?.content?.parts[0]?.text || "I couldn't generate a response.";
+      console.log('OpenAI API response received:', { hasContent: !!data?.choices?.[0]?.message?.content });
+      return data.choices[0]?.message?.content || "I couldn't generate a response.";
     } else {
-      throw new Error(`Gemini API failed with status: ${response.status}`);
+      throw new Error(`OpenAI API failed with status: ${response.status}`);
     }
-  } catch (geminiError) {
-    console.log('Gemini failed, trying Pollinations fallback...');
+  } catch (openaiError) {
+    console.log('OpenAI failed, trying Pollinations fallback...');
     
     // Fallback to Pollinations Text API
     try {
@@ -240,11 +236,11 @@ We believe that every farmer, citizen, and policymaker deserves easy access to c
 
     // 2️⃣ Get structured AI response with conversation memory and fallback
     let geminiAnswer = "";
-    console.log('Calling Gemini API with context');
+    console.log('Calling OpenAI API with context');
     try {
-      console.log('About to call Gemini with question:', question.substring(0, 50));
-      geminiAnswer = await callGeminiAPI(question, contextHistory);
-      console.log('Gemini responded successfully with length:', geminiAnswer.length);
+      console.log('About to call OpenAI with question:', question.substring(0, 50));
+      geminiAnswer = await callOpenAIAPI(question, contextHistory);
+      console.log('OpenAI responded successfully with length:', geminiAnswer.length);
     } catch (geminiError) {
       console.error('All AI services failed, providing contextual help');
       const q = (question || '').toLowerCase();
