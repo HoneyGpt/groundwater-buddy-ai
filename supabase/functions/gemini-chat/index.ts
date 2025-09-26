@@ -305,4 +305,3 @@ Try rephrasing your question or ask about specific topics like "water schemes," 
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     });
   }
-});
