@@ -235,7 +235,12 @@ Be helpful, informative, and focused on practical water management solutions for
         if (getResponse.ok) {
           const getText = await getResponse.text();
           console.log('Pollinations GET fallback successful');
-          return getText;
+          return new Response(JSON.stringify({ 
+            success: true,
+            response: getText 
+          }), {
+            headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+          });
         } else {
           throw new Error('Pollinations GET also failed');
         }
@@ -243,6 +248,7 @@ Be helpful, informative, and focused on practical water management solutions for
         console.log('All APIs completely failed, intelligent fallback required');
         throw new Error(`All AI services unavailable: ${getError}`);
       }
+    }
     }
     
     if (!generatedText) {
@@ -305,3 +311,4 @@ Try rephrasing your question or ask about specific topics like "water schemes," 
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     });
   }
+});
