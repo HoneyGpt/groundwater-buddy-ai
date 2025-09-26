@@ -36,10 +36,12 @@ serve(async (req) => {
       throw new Error('Message is required');
     }
 
+    const OPENROUTER_API_KEY = Deno.env.get('OPENROUTER_API_KEY');
     const OPENAI_API_KEY = Deno.env.get('OPENAI_API_KEY');
-    if (!OPENAI_API_KEY) {
-      console.error('OPENAI_API_KEY is not configured');
-      throw new Error('OPENAI_API_KEY environment variable is not set');
+    
+    if (!OPENROUTER_API_KEY && !OPENAI_API_KEY) {
+      console.error('Neither OPENROUTER_API_KEY nor OPENAI_API_KEY is configured');
+      throw new Error('API key environment variable is not set');
     }
 
     // Create system prompt based on chat type and context
@@ -150,30 +152,56 @@ Be helpful, informative, and focused on practical water management solutions for
 
     let generatedText = '';
 
+    // Try OpenRouter first, then fallback to OpenAI
     try {
-      const response = await fetch('https://api.openai.com/v1/chat/completions', {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${OPENAI_API_KEY}`,
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          model: 'gpt-4o-mini',
-          messages: [
-            { role: 'system', content: systemPrompt },
-            { role: 'user', content: message }
-          ],
-          max_tokens: 1024,
-          temperature: 0.7,
-        }),
-      });
+      let response;
+      
+      if (OPENROUTER_API_KEY) {
+        console.log('Trying OpenRouter API...');
+        response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${OPENROUTER_API_KEY}`,
+            'Content-Type': 'application/json',
+            'HTTP-Referer': `https://mafmxoozubqjoydhipbe.supabase.co`,
+            'X-Title': 'INGRES-AI Chat'
+          },
+          body: JSON.stringify({
+            model: 'meta-llama/llama-3.1-8b-instruct:free',
+            messages: [
+              { role: 'system', content: systemPrompt },
+              { role: 'user', content: message }
+            ],
+            max_tokens: 1024,
+            temperature: 0.7,
+          }),
+        });
+      } else if (OPENAI_API_KEY) {
+        console.log('Trying OpenAI API...');
+        response = await fetch('https://api.openai.com/v1/chat/completions', {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${OPENAI_API_KEY}`,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            model: 'gpt-4o-mini',
+            messages: [
+              { role: 'system', content: systemPrompt },
+              { role: 'user', content: message }
+            ],
+            max_tokens: 1024,
+            temperature: 0.7,
+          }),
+        });
+      }
 
-      if (response.ok) {
+      if (response && response.ok) {
         const data = await response.json();
-        console.log('Received response from OpenAI API');
+        console.log('Received response from API');
         generatedText = data.choices?.[0]?.message?.content;
       } else {
-        throw new Error(`OpenAI API failed with status: ${response.status}`);
+        throw new Error(`API failed with status: ${response?.status || 'unknown'}`);
       }
     } catch (openaiError) {
       console.log('OpenAI failed, trying Pollinations fallback...');

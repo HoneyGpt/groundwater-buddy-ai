@@ -7,10 +7,12 @@ const corsHeaders = {
 };
 
 async function callOpenAIAPI(question: string, conversationHistory: string = "") {
-  const apiKey = Deno.env.get('OPENAI_API_KEY');
-  if (!apiKey) {
-    console.error('OPENAI_API_KEY is not configured');
-    throw new Error('OPENAI_API_KEY environment variable is not set');
+  const openrouterKey = Deno.env.get('OPENROUTER_API_KEY');
+  const openaiKey = Deno.env.get('OPENAI_API_KEY');
+  
+  if (!openrouterKey && !openaiKey) {
+    console.error('Neither OPENROUTER_API_KEY nor OPENAI_API_KEY is configured');
+    throw new Error('API key environment variable is not set');
   }
 
   const systemPrompt = `You are INGRES-AI, a specialized assistant for groundwater management in India. 
@@ -51,29 +53,54 @@ ${conversationHistory ? `\nCONVERSATION CONTEXT:\n${conversationHistory}\n` : ""
 Question: ${question}`;
 
   try {
-    const response = await fetch('https://api.openai.com/v1/chat/completions', {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${apiKey}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        model: 'gpt-4o-mini',
-        messages: [
-          { role: 'system', content: systemPrompt },
-          { role: 'user', content: question + (conversationHistory ? `\n\nConversation Context: ${conversationHistory}` : '') }
-        ],
-        max_tokens: 1500,
-        temperature: 0.7,
-      }),
-    });
+    let response;
+    
+    if (openrouterKey) {
+      console.log('Trying OpenRouter API...');
+      response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${openrouterKey}`,
+          'Content-Type': 'application/json',
+          'HTTP-Referer': `https://mafmxoozubqjoydhipbe.supabase.co`,
+          'X-Title': 'INGRES-AI Enhanced Chat'
+        },
+        body: JSON.stringify({
+          model: 'meta-llama/llama-3.1-8b-instruct:free',
+          messages: [
+            { role: 'system', content: systemPrompt },
+            { role: 'user', content: question + (conversationHistory ? `\n\nConversation Context: ${conversationHistory}` : '') }
+          ],
+          max_tokens: 1500,
+          temperature: 0.7,
+        }),
+      });
+    } else if (openaiKey) {
+      console.log('Trying OpenAI API...');
+      response = await fetch('https://api.openai.com/v1/chat/completions', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${openaiKey}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          model: 'gpt-4o-mini',
+          messages: [
+            { role: 'system', content: systemPrompt },
+            { role: 'user', content: question + (conversationHistory ? `\n\nConversation Context: ${conversationHistory}` : '') }
+          ],
+          max_tokens: 1500,
+          temperature: 0.7,
+        }),
+      });
+    }
 
-    if (response.ok) {
+    if (response && response.ok) {
       const data = await response.json();
-      console.log('OpenAI API response received:', { hasContent: !!data?.choices?.[0]?.message?.content });
+      console.log('API response received:', { hasContent: !!data?.choices?.[0]?.message?.content });
       return data.choices[0]?.message?.content || "I couldn't generate a response.";
     } else {
-      throw new Error(`OpenAI API failed with status: ${response.status}`);
+      throw new Error(`API failed with status: ${response?.status || 'unknown'}`);
     }
   } catch (openaiError) {
     console.log('OpenAI failed, trying Pollinations fallback...');
