@@ -228,18 +228,187 @@ Be helpful, informative, and focused on practical water management solutions for
       } catch (pollinationsError) {
         console.log('Both APIs failed, using intelligent fallback');
         
-        // Smart contextual fallback based on message content
+        // Smart contextual fallback - provide actual helpful responses
         const lowerMessage = message.toLowerCase();
-        if (lowerMessage.includes('budget') || lowerMessage.includes('cost') || lowerMessage.includes('money') || lowerMessage.includes('₹')) {
+        
+        // Water schemes specific questions
+        if (lowerMessage.includes('scheme') && (lowerMessage.includes('water') || lowerMessage.includes('conservation') || lowerMessage.includes('apply'))) {
+          generatedText = `🌊 **Water Conservation Schemes You Can Apply For:**
+
+**🏛️ Major Government Schemes:**
+
+**1. PMKSY (Pradhan Mantri Krishi Sinchayee Yojana)**
+• Subsidy: 55-75% for micro-irrigation systems
+• Coverage: Drip irrigation, sprinkler systems
+• Apply: Through District Agriculture Officer
+
+**2. Atal Bhujal Yojana (Atal Jal)**
+• Focus: Community-based groundwater management
+• Benefits: Water harvesting infrastructure support
+• Apply: Through State Water Resources Department
+
+**3. MGNREGA Water Conservation**
+• 100% wage support for water conservation works
+• Includes: Farm ponds, check dams, recharge structures
+• Apply: Through local Gram Panchayat
+
+**4. National Rural Drinking Water Programme**
+• Coverage: Household water connections
+• Focus: Safe drinking water access
+• Apply: Through District Collector Office
+
+**📋 Application Steps:**
+1. Visit nearest Agriculture/Water Department office
+2. Submit land documents and application form
+3. Get technical assessment done
+4. Receive approval and start implementation
+
+**📞 Contact:**
+• District Agriculture Officer: For PMKSY
+• Water Resources Dept: For Atal Jal
+• Gram Panchayat: For MGNREGA works
+
+Would you like specific details about any of these schemes?`;
+        
+        } else if (lowerMessage.includes('rainwater') && lowerMessage.includes('harvest')) {
+          generatedText = `🌧️ **Rainwater Harvesting Methods:**
+
+**🏠 Rooftop Rainwater Harvesting:**
+• Cost: ₹15,000-50,000 depending on house size
+• Components: Gutters, downpipes, first flush diverter, storage tank
+• Capacity: 1000-5000 liters storage typically
+• Government subsidy: Up to 50% in many states
+
+**🚜 Farm Pond Construction:**
+• Size: 100-500 cubic meters capacity
+• Cost: ₹50,000-2,00,000 (MGNREGA provides 100% funding)
+• Benefits: Irrigation + groundwater recharge
+• Technical support: Available through agriculture department
+
+**⛲ Recharge Wells/Pits:**
+• Cost: ₹10,000-30,000 per structure
+• Function: Directly recharge groundwater
+• Suitable for: Areas with good soil percolation
+• Maintenance: Minimal, clean annually
+
+**🌊 Check Dams:**
+• Community-level water harvesting
+• Funding: Available through watershed programs
+• Benefits: Flood control + groundwater recharge
+• Apply through: District Rural Development Agency
+
+**📋 Implementation Steps:**
+1. Assess your catchment area and water needs
+2. Choose appropriate method based on land/budget
+3. Get technical design from agriculture department
+4. Apply for government subsidy schemes
+5. Implement during dry season (Oct-May)
+
+**💡 Pro Tips:**
+• Start small with rooftop harvesting
+• Combine with water-efficient irrigation
+• Regular maintenance ensures long-term benefits
+
+Need help calculating capacity for your specific area?`;
+        
+        } else if (lowerMessage.includes('groundwater') || lowerMessage.includes('water level') || lowerMessage.includes('punjab') || lowerMessage.includes('status')) {
+          generatedText = `💧 **Groundwater Status Information:**
+
+**🔍 How to Check Groundwater Status:**
+• Visit CGWB website: cgwb.gov.in
+• Check district-wise groundwater reports
+• Look for "State of Groundwater" annual reports
+• Contact local CGWB office for latest data
+
+**⚠️ Critical States/Regions:**
+• **Punjab**: 76% blocks over-exploited
+• **Haryana**: 62% blocks critical/over-exploited  
+• **Rajasthan**: Western parts critically affected
+• **Gujarat**: Coastal areas facing salinity issues
+
+**📊 Understanding Groundwater Categories:**
+• **Safe**: <70% extraction of annual recharge
+• **Semi-Critical**: 70-90% extraction
+• **Critical**: 90-100% extraction
+• **Over-Exploited**: >100% extraction
+
+**🚨 Warning Signs:**
+• Declining water levels in wells
+• Increasing pumping costs
+• Water quality deterioration
+• Land subsidence in extreme cases
+
+**✅ Sustainable Management:**
+• Adopt micro-irrigation (drip/sprinkler)
+• Practice crop diversification
+• Install rainwater harvesting systems
+• Follow cropping patterns suitable to your region
+
+**🏛️ Government Initiatives:**
+• Jal Shakti Abhiyan for water conservation
+• Atal Bhujal Yojana for community management
+• PMKSY for efficient irrigation systems
+
+**📞 Get Local Data:**
+Contact your nearest CGWB office or State Groundwater Department for area-specific information and latest monitoring data.
+
+Which specific area are you interested in knowing about?`;
+        
+        } else if (lowerMessage.includes('conservation') && lowerMessage.includes('tips')) {
+          generatedText = `🌱 **Water Conservation Tips for Farmers:**
+
+**🚿 Irrigation Efficiency:**
+• **Drip Irrigation**: Save 30-50% water, increase yield by 20-25%
+• **Sprinkler Systems**: 25-40% water savings vs flood irrigation
+• **Timing**: Irrigate early morning or evening to reduce evaporation
+• **Scheduling**: Use soil moisture sensors or follow crop-specific schedules
+
+**🌾 Crop Management:**
+• **Mulching**: Use organic mulch to reduce evaporation by 60%
+• **Crop Selection**: Choose drought-resistant varieties
+• **Mixed Cropping**: Combine water-intensive with drought-tolerant crops
+• **Crop Rotation**: Include legumes to improve soil water retention
+
+**💧 Water Harvesting:**
+• **Farm Ponds**: Store rainwater for dry spells
+• **Bunding**: Create field bunds to prevent runoff
+• **Trenches**: Dig trenches along field boundaries
+• **Recharge Pits**: Allow rainwater to seep into groundwater
+
+**🌿 Soil Health:**
+• **Organic Matter**: Add compost to improve water holding capacity
+• **Cover Crops**: Grow cover crops during off-season
+• **Reduced Tillage**: Minimize soil disturbance to retain moisture
+• **Contour Farming**: Follow land contours to prevent erosion
+
+**💰 Cost-Effective Methods:**
+• **Plastic Mulching**: ₹8,000-12,000 per acre (Government subsidy available)
+• **Drip Systems**: ₹25,000-40,000 per acre (55-75% subsidy under PMKSY)
+• **Farm Ponds**: Fully funded under MGNREGA
+• **Sprinklers**: ₹15,000-25,000 per acre (50-60% subsidy)
+
+**📱 Technology:**
+• Use weather-based irrigation apps
+• Install soil moisture sensors
+• Monitor water usage with digital meters
+• Join farmer WhatsApp groups for water-saving tips
+
+**🏛️ Government Support:**
+• Apply for PMKSY micro-irrigation subsidy
+• Use MGNREGA for water conservation structures
+• Contact KVK (Krishi Vigyan Kendra) for training
+• Join Farmer Producer Organizations (FPOs)
+
+Start with one method and gradually expand. Which conservation technique interests you most?`;
+        
+        } else if (lowerMessage.includes('budget') || lowerMessage.includes('cost') || lowerMessage.includes('money') || lowerMessage.includes('₹')) {
           generatedText = chatType === 'budget' ? 
-            `## 💛 Budget Analysis\nI understand you're looking for budget advice! While I'm having connectivity issues, I can still help with cost-effective solutions.\n\n## 🎯 Solution Summary\nLet me provide you with practical, budget-friendly approaches for your query.\n\n## 💰 Budget Breakdown\n• Primary costs: Focus on essential items first\n• Secondary options: Consider alternatives to save money\n• Total approach: Prioritize needs over wants\n\n## 📋 Step-by-Step Action Plan\n1. **Assess Your Needs:** Clearly define what you actually need vs want\n2. **Research Options:** Compare prices and alternatives\n3. **Start Small:** Begin with minimum viable solutions\n\n## 🏛️ Government Schemes & Support\n• **PMKSY:** Water conservation subsidies up to 55-60%\n• **MGNREGA:** Employment guarantee scheme funds\n• **Local schemes:** Check with your district collector office\n\n## 💡 Money-Saving Tips\n• **DIY Approach:** Consider what you can do yourself\n• **Local Resources:** Use available community resources\n• **Bulk Buying:** Coordinate with neighbors for better rates` :
-            `💧 **Budget-Friendly Water Solutions**\n\nI understand you're looking for cost-effective water management options. Here are practical suggestions:\n\n**💰 Low-Cost Options:**\n• Rainwater harvesting: ₹10,000-25,000 for basic setup\n• Drip irrigation: Government subsidy covers 55-60%\n• Water storage: Plastic tanks starting from ₹3,000\n\n**🏛️ Government Support:**\n• PMKSY scheme for irrigation subsidies\n• MGNREGA funds for water conservation\n• State-specific water schemes available\n\n**📋 Next Steps:**\n1. Visit nearest agriculture office for scheme details\n2. Get soil/water testing done (often free)\n3. Plan implementation in phases to spread costs`;
-        } else if (lowerMessage.includes('water') || lowerMessage.includes('groundwater') || lowerMessage.includes('irrigation')) {
-          generatedText = `💧 **INGRES-AI Water Management Guidance**\n\nI'm currently experiencing connectivity issues, but I can still provide valuable water management insights!\n\n**🌊 Groundwater Status:**\n• Check your local CGWB (Central Ground Water Board) data\n• Monitor seasonal variations in your area\n• Consider sustainable extraction practices\n\n**🚰 Conservation Methods:**\n• **Rainwater Harvesting:** Collect and store monsoon water\n• **Drip Irrigation:** Save 30-50% water compared to flood irrigation\n• **Mulching:** Reduce evaporation by 60%\n\n**🏛️ Government Schemes:**\n• **PMKSY:** Micro-irrigation subsidies\n• **Atal Bhujal Yojana:** Community groundwater management\n• **Jal Shakti Abhiyan:** Water conservation campaigns\n\n**📞 Contact Support:**\nFor immediate assistance, contact your local water resources department or agriculture extension officer.`;
+            `## 💛 Budget Analysis\nLet me help you with cost-effective solutions for your specific needs!\n\n## 🎯 Smart Budget Approach\n• Prioritize essential items first\n• Look for government subsidies (can save 50-75%)\n• Consider phased implementation to spread costs\n• Explore community/group buying options\n\n## 💰 Cost-Saving Strategies\n• **Government Schemes**: PMKSY offers 55-75% subsidy\n• **MGNREGA**: 100% funding for water conservation works\n• **Bulk Purchase**: Coordinate with neighbors for better rates\n• **Local Materials**: Use locally available resources\n\n## 📋 Budget Planning Steps\n1. **Define Requirements**: List exactly what you need\n2. **Research Subsidies**: Check eligibility for government schemes\n3. **Get Quotes**: Compare prices from multiple vendors\n4. **Plan Timeline**: Implement in phases if budget is tight\n\n## 🆘 Low-Budget Options\n• Start with basic rainwater harvesting (₹5,000-15,000)\n• Use plastic mulch instead of expensive alternatives\n• DIY solutions where possible\n• Community-shared equipment\n\nWhat specific budget range are you working with?` :
+            `💰 **Budget-Friendly Water Solutions**\n\nHere are cost-effective water management options with actual pricing:\n\n**🏡 Low-Cost Options:**\n• **Rainwater Tank**: ₹3,000-8,000 (1000-2000L capacity)\n• **Drip Kit**: ₹2,500-5,000 per acre (small scale)\n• **Farm Pond Lining**: ₹15-25 per sq ft\n• **Mulch Film**: ₹8,000-12,000 per acre\n\n**🏛️ Government Subsidized:**\n• **PMKSY Drip**: Pay only 25-45% of cost\n• **MGNREGA Pond**: 100% free under employment scheme\n• **State Schemes**: Additional 10-20% support available\n\n**📋 Budget Planning:**\n1. Start with rainwater harvesting (immediate impact)\n2. Apply for government schemes (save 50-75%)\n3. Implement in phases to spread costs\n4. Join farmer groups for bulk purchasing\n\n**💡 Money-Saving Tips:**\n• Use local materials where possible\n• DIY installation for simple systems\n• Coordinate with neighbors for better rates\n• Choose durable options to avoid replacement costs\n\nWhat's your approximate budget range?`;
         } else {
           generatedText = chatType === 'budget' ?
-            `## 💛 Budget Bro Here!\nI'm experiencing some technical difficulties, but I'm still here to help with your budget needs!\n\n## 🎯 Quick Budget Tips\n• Start with essentials and work your way up\n• Look for government schemes and subsidies\n• Consider local, cost-effective alternatives\n\n## 💡 Money-Saving Approach\n• Research before spending\n• Compare multiple options\n• Ask for community recommendations\n\nTry rephrasing your question and I'll do my best to provide specific budget advice!` :
-            `🌊 **INGRES-AI is here!**\n\nI'm having some connectivity issues, but I'm still ready to help with groundwater and water management questions!\n\n**Quick Help Available:**\n• Government water schemes information\n• Water conservation techniques\n• Groundwater status queries\n• Irrigation advice\n\nTry asking me about specific topics like "drip irrigation," "rainwater harvesting," or "water schemes in [your state]" and I'll provide detailed guidance!`;
+            `## 💛 Budget Bro Here!\nReady to help you save money and make smart spending decisions!\n\n## 🎯 What I Can Help With:\n• Cost analysis for any purchase or project\n• Finding government schemes and subsidies\n• Budget planning and cost optimization\n• Comparing options to get best value\n\n## 💡 Quick Money-Saving Tips:\n• Always check for government subsidies first\n• Compare at least 3 options before buying\n• Consider long-term value over just initial cost\n• Ask local communities for recommendations\n\nTell me about your specific budget needs!` :
+            `🌊 **INGRES-AI Water Expert**\n\nI can help you with:\n\n**💧 Water Management:**\n• Groundwater status and monitoring\n• Conservation techniques and methods\n• Irrigation system selection and optimization\n• Water quality assessment and solutions\n\n**🏛️ Government Schemes:**\n• PMKSY application process and benefits\n• MGNREGA water conservation works\n• State-specific water schemes\n• Subsidy calculations and eligibility\n\n**🌱 Practical Solutions:**\n• Rainwater harvesting system design\n• Drip irrigation setup and maintenance\n• Crop-specific water requirements\n• Cost-effective water storage options\n\nWhat specific water-related question can I help you with?`;
         }
       }
     }
