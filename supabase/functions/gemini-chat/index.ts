@@ -37,10 +37,6 @@ serve(async (req) => {
     }
 
     const GEMINI_API_KEY = Deno.env.get('GEMINI_API_KEY');
-    if (!GEMINI_API_KEY) {
-      console.error('GEMINI_API_KEY is not configured');
-      throw new Error('GEMINI_API_KEY environment variable is not set');
-    }
 
     // Create system prompt based on chat type and context
     let systemPrompt = '';
@@ -89,11 +85,11 @@ RESPONSE FORMAT - Use EXACTLY this structure with clean formatting:
 [If budget is very tight, suggest free or very low-cost options]
 
 CRITICAL FORMATTING RULES:
-- NO excessive asterisks (*** patterns) 
+- Keep responses SHORT and SCANNABLE - maximum 150 words total
 - Use clean ## headings with emojis
 - Use bullet points (•) for lists, NOT asterisks
 - Use **bold** for emphasis, not ***multiple asterisks***
-- Keep sections clear and well-spaced
+- Skip sections that aren't relevant to the question
 - Write in a warm, supportive tone
 
 Your personality: Encouraging, practical, uses simple language, focuses on affordable local solutions.
@@ -165,109 +161,148 @@ Always prioritize water conservation, mention cost-effective solutions, and prov
       systemPrompt += `\n\nRecent conversation context:\n${historyText}\n\nNow respond to the current message:`;
     }
 
-    console.log('Sending request to Gemini API...');
+    console.log('Sending request to Hugging Face API...');
 
     let generatedText = '';
 
+    // Primary: Hugging Face API
     try {
-      const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=${GEMINI_API_KEY}`, {
+      const HUGGING_FACE_TOKEN = Deno.env.get('HUGGING_FACE_ACCESS_TOKEN');
+      if (!HUGGING_FACE_TOKEN) {
+        throw new Error('HUGGING_FACE_ACCESS_TOKEN not configured');
+      }
+
+      const response = await fetch('https://api-inference.huggingface.co/models/microsoft/BlenderBot-400M-distill', {
         method: 'POST',
         headers: {
+          'Authorization': `Bearer ${HUGGING_FACE_TOKEN}`,
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          contents: [
-            {
-              parts: [
-                {
-                  text: `${systemPrompt}\n\nUser message: ${message}`
-                }
-              ]
-            }
-          ],
-          generationConfig: {
+          inputs: message,
+          parameters: {
             temperature: 0.7,
-            topK: 40,
-            topP: 0.95,
-            maxOutputTokens: 1024,
-          },
-          safetySettings: [
-            {
-              category: "HARM_CATEGORY_HARASSMENT",
-              threshold: "BLOCK_MEDIUM_AND_ABOVE"
-            },
-            {
-              category: "HARM_CATEGORY_HATE_SPEECH", 
-              threshold: "BLOCK_MEDIUM_AND_ABOVE"
-            },
-            {
-              category: "HARM_CATEGORY_SEXUALLY_EXPLICIT",
-              threshold: "BLOCK_MEDIUM_AND_ABOVE"
-            },
-            {
-              category: "HARM_CATEGORY_DANGEROUS_CONTENT",
-              threshold: "BLOCK_MEDIUM_AND_ABOVE"
-            }
-          ]
+            max_length: 1024,
+            do_sample: true
+          }
         }),
       });
 
       if (response.ok) {
         const data = await response.json();
-        console.log('Received response from Gemini API');
-        generatedText = data.candidates?.[0]?.content?.parts?.[0]?.text;
+        console.log('Hugging Face responded successfully');
+        generatedText = data[0]?.generated_text?.trim() || data.generated_text?.trim();
       } else {
-        throw new Error(`Gemini API failed with status: ${response.status}`);
+        throw new Error(`Hugging Face API failed with status: ${response.status}`);
       }
-    } catch (geminiError) {
-      console.log('Gemini failed, trying Pollinations fallback...');
+    } catch (hfError) {
+      console.log('Hugging Face failed, trying Gemini fallback...');
       
-      // Fallback to Pollinations Text API
+      // Fallback 1: Gemini API
       try {
-        const pollinationsResponse = await fetch('https://text.pollinations.ai/', {
+        if (!GEMINI_API_KEY) {
+          throw new Error('GEMINI_API_KEY not configured');
+        }
+        
+        const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=${GEMINI_API_KEY}`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
           },
           body: JSON.stringify({
-            messages: [
-              { role: 'system', content: systemPrompt },
-              { role: 'user', content: message }
+            contents: [
+              {
+                parts: [
+                  {
+                    text: `${systemPrompt}\n\nUser message: ${message}`
+                  }
+                ]
+              }
             ],
-            model: 'openai'
+            generationConfig: {
+              temperature: 0.7,
+              topK: 40,
+              topP: 0.95,
+              maxOutputTokens: 1024,
+            },
+            safetySettings: [
+              {
+                category: "HARM_CATEGORY_HARASSMENT",
+                threshold: "BLOCK_MEDIUM_AND_ABOVE"
+              },
+              {
+                category: "HARM_CATEGORY_HATE_SPEECH", 
+                threshold: "BLOCK_MEDIUM_AND_ABOVE"
+              },
+              {
+                category: "HARM_CATEGORY_SEXUALLY_EXPLICIT",
+                threshold: "BLOCK_MEDIUM_AND_ABOVE"
+              },
+              {
+                category: "HARM_CATEGORY_DANGEROUS_CONTENT",
+                threshold: "BLOCK_MEDIUM_AND_ABOVE"
+              }
+            ]
           }),
         });
 
-        if (pollinationsResponse.ok) {
-          const pollinationsData = await pollinationsResponse.text();
-          generatedText = pollinationsData;
-          console.log('Pollinations fallback successful');
+        if (response.ok) {
+          const data = await response.json();
+          console.log('Gemini fallback successful');
+          generatedText = data.candidates?.[0]?.content?.parts?.[0]?.text;
         } else {
-          throw new Error('Pollinations also failed');
+          throw new Error(`Gemini API failed with status: ${response.status}`);
         }
-    } catch (pollinationsError) {
-      console.log('All APIs failed, trying Pollinations GET fallback...');
-      
-      // Final fallback: Pollinations GET endpoint  
-      try {
-        const getResponse = await fetch(`https://text.pollinations.ai/${encodeURIComponent(message)}`);
-        if (getResponse.ok) {
-          const getText = await getResponse.text();
-          console.log('Pollinations GET fallback successful');
-          return new Response(JSON.stringify({ 
-            success: true,
-            response: getText 
-          }), {
-            headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      } catch (geminiError) {
+        console.log('Gemini failed, trying Pollinations fallback...');
+        
+        // Fallback to Pollinations Text API
+        try {
+          const pollinationsResponse = await fetch('https://text.pollinations.ai/', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              messages: [
+                { role: 'system', content: systemPrompt },
+                { role: 'user', content: message }
+              ],
+              model: 'openai'
+            }),
           });
-        } else {
-          throw new Error('Pollinations GET also failed');
+
+          if (pollinationsResponse.ok) {
+            const pollinationsData = await pollinationsResponse.text();
+            generatedText = pollinationsData;
+            console.log('Pollinations fallback successful');
+          } else {
+            throw new Error('Pollinations also failed');
+          }
+        } catch (pollinationsError) {
+          console.log('All APIs failed, trying Pollinations GET fallback...');
+          
+          // Final fallback: Pollinations GET endpoint  
+          try {
+            const getResponse = await fetch(`https://text.pollinations.ai/${encodeURIComponent(message)}`);
+            if (getResponse.ok) {
+              const getText = await getResponse.text();
+              console.log('Pollinations GET fallback successful');
+              return new Response(JSON.stringify({ 
+                success: true,
+                response: getText 
+              }), {
+                headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+              });
+            } else {
+              throw new Error('Pollinations GET also failed');
+            }
+          } catch (getError) {
+            console.log('All APIs completely failed, intelligent fallback required');
+            throw new Error(`All AI services unavailable: ${getError}`);
+          }
         }
-      } catch (getError) {
-        console.log('All APIs completely failed, intelligent fallback required');
-        throw new Error(`All AI services unavailable: ${getError}`);
       }
-    }
     }
     
     if (!generatedText) {
