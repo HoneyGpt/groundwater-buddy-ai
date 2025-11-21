@@ -60,7 +60,7 @@ export type Database = {
           expected_impact: string | null
           id: string
           implementation_steps: string[] | null
-          search_vector: unknown | null
+          search_vector: unknown
           seasonal_relevance: string[] | null
           source_document: string | null
           title: string
@@ -76,7 +76,7 @@ export type Database = {
           expected_impact?: string | null
           id?: string
           implementation_steps?: string[] | null
-          search_vector?: unknown | null
+          search_vector?: unknown
           seasonal_relevance?: string[] | null
           source_document?: string | null
           title: string
@@ -92,7 +92,7 @@ export type Database = {
           expected_impact?: string | null
           id?: string
           implementation_steps?: string[] | null
-          search_vector?: unknown | null
+          search_vector?: unknown
           seasonal_relevance?: string[] | null
           source_document?: string | null
           title?: string
@@ -152,7 +152,7 @@ export type Database = {
           official_website: string | null
           scheme_name: string
           scheme_type: string | null
-          search_vector: unknown | null
+          search_vector: unknown
           state_specific: boolean | null
           updated_at: string
         }
@@ -172,7 +172,7 @@ export type Database = {
           official_website?: string | null
           scheme_name: string
           scheme_type?: string | null
-          search_vector?: unknown | null
+          search_vector?: unknown
           state_specific?: boolean | null
           updated_at?: string
         }
@@ -192,7 +192,7 @@ export type Database = {
           official_website?: string | null
           scheme_name?: string
           scheme_type?: string | null
-          search_vector?: unknown | null
+          search_vector?: unknown
           state_specific?: boolean | null
           updated_at?: string
         }
@@ -514,7 +514,7 @@ export type Database = {
           district_id: string | null
           id: string
           language: string | null
-          search_vector: unknown | null
+          search_vector: unknown
           source_document: string
           source_url: string | null
           state_id: string | null
@@ -530,7 +530,7 @@ export type Database = {
           district_id?: string | null
           id?: string
           language?: string | null
-          search_vector?: unknown | null
+          search_vector?: unknown
           source_document: string
           source_url?: string | null
           state_id?: string | null
@@ -546,7 +546,7 @@ export type Database = {
           district_id?: string | null
           id?: string
           language?: string | null
-          search_vector?: unknown | null
+          search_vector?: unknown
           source_document?: string
           source_url?: string | null
           state_id?: string | null
