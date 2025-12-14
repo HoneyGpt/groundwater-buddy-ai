@@ -199,4 +199,4 @@ For questions, feedback, or collaboration:
 
 ---
 
-**Made with 💙 for India's Water Security**
+**Made with 💙 for India's Water Security.**
